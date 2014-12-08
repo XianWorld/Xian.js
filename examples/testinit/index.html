@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <meta http-equiv="cleartype" content="on">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" /> 
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        
+        <meta name="description" content="">
+        <meta name="keywords" content="">
+        
+        <title>Test</title>
+        
+        <script type="text/javascript">
+			var isMobile = /android|webos|iphone|ipad|ipod|blackberry/i.test(navigator.userAgent.toLowerCase());
+
+			if (isMobile) {
+				window.onerror = function(message, page, line) {
+					alert("line: " + line + ", page: " + page + "\nmessage: " + message);
+				};
+			}
+		</script>
+
+    </head>
+    
+    <body>
+	<script src="../../spm_modules/seajs/2.3.0/dist/sea.js"></script>
+    <script src="../../spm_modules/seajs-wrap/1.0.2/dist/seajs-wrap-debug.js"></script>
+	<script src="./index.js"></script>
+
+	</body>
+    
+</html>
