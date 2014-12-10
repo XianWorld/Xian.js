@@ -12,12 +12,12 @@ Node.js MMO Game World Framework
 ## Install
 
 ```
-$ spm install xian-core --save
+$ spm install xian --save
 ```
 
 ## Usage
 
 ```js
-var xianCore = require('xian-core');
-// use xianCore
+var Xian = require('xian');
+// use Xian
 ```
