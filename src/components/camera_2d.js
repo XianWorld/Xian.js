@@ -26,7 +26,7 @@ function Camera2D(opts) {
 
     this.aspect = this.width / this.height;
 
-    this.orthographicSize = opts.orthographicSize !== undefined ? opts.orthographicSize : 2;
+    this.orthographicSize = opts.orthographicSize !== undefined ? opts.orthographicSize : 1;
 
     this.minOrthographicSize = opts.minOrthographicSize !== undefined ? opts.minOrthographicSize : EPSILON;
     this.maxOrthographicSize = opts.maxOrthographicSize !== undefined ? opts.maxOrthographicSize : 1024;
@@ -39,7 +39,11 @@ function Camera2D(opts) {
     this._view = new Mat32;
 
     this.needsUpdate = true;
-    this._active = false;
+    this._active = true;
+
+    this.renderer = undefined;
+    this.transparent = opts.transparent !== undefined ? opts.transparent : false;
+    this.clearBeforeRender = opts.clearBeforeRender !== undefined ? opts.clearBeforeRender : true;
 }
 
 Component.extend(Camera2D);
@@ -59,6 +63,9 @@ Camera2D.prototype.copy = function (other) {
     this.orthographicSize = other.orthographicSize;
     this.minOrthographicSize = other.minOrthographicSize;
     this.maxOrthographicSize = other.maxOrthographicSize;
+
+    this.transparent = other.transparent;
+    this.clearBeforeRender = other.clearBeforeRender;
 
     this.needsUpdate = true;
 
@@ -154,6 +161,23 @@ Camera2D.prototype.update = function () {
     this._view.fromMat4(this.view);
 };
 
+//Camera2D.prototype.render = function (transforms) {
+//    var j, transform, gameObject,
+//        _projScreenMatrix = new Mat4;
+//
+//    renderer.setTransform();
+//    if(this.clearBeforeRender) renderer.clearScreen(this.background);
+//
+//    _projScreenMatrix.mmul(this.projection, this.view);
+//    //viewMatrix = camera.view;
+//
+//    for (j = 0; j < rootTransforms.length; j++) {
+//        transform = rootTransforms[j];
+//
+//        this._renderTransform(renderer, _projScreenMatrix, transform, 1);
+//    }
+//
+//};
 
 Camera2D.prototype.toJSON = function (json) {
     json = Component.prototype.toJSON.call(this, json);
@@ -167,6 +191,9 @@ Camera2D.prototype.toJSON = function (json) {
     json.orthographicSize = this.orthographicSize;
     json.minOrthographicSize = this.minOrthographicSize;
     json.maxOrthographicSize = this.maxOrthographicSize;
+
+    json.transparent = this.transparent;
+    json.clearBeforeRender = this.clearBeforeRender;
 
     return json;
 };

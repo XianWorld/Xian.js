@@ -1,7 +1,8 @@
 var Renderer2D = require("./renderer_2d");
-var Enums = require("../../core/enums");
-var Dom = require("../dom");
-var util = require("../../base/util");
+var Enums = require("../../../core/enums");
+var Dom = require("../../../context/dom");
+var util = require("../../../base/util");
+var Color = require("../../../math/color");
 "use strict";
 
 function CanvasRenderer2D(canvas, opts) {
@@ -9,8 +10,11 @@ function CanvasRenderer2D(canvas, opts) {
 
     Renderer2D.call(this, opts);
 
+    //this.transparent = opts.transparent !== undefined ? opts.transparent : true;
+
     this.globalAlpha = 1;
     this.canvas = canvas;
+    //this.canvasContext = this.canvas.getContext("2d", {alpha: this.transparent});
     this.canvasContext = this.canvas.getContext("2d");
 
     var f = this.canvasContext.setTransform;
@@ -35,14 +39,32 @@ function CanvasRenderer2D(canvas, opts) {
 
     this.blendModes = {};
 
+    //this.clearBeforeRender = opts.clearBeforeRender !== undefined ? opts.clearBeforeRender : true;
+
     this.initBlendMode();
 
 }
 
 Renderer2D.extend(CanvasRenderer2D);
 
-CanvasRenderer2D.prototype.clearScreen = function () {
-    this.clearRect(0, 0, this.canvas.width, this.canvas.height);
+CanvasRenderer2D.prototype.clearScreen = function (transparent, background) {
+    //if (navigator.isCocoonJS && this.canvas.screencanvas) {
+    //    this.canvasContext.fillStyle = "black";
+    //    this.canvasContext.clear();
+    //}
+
+    if (transparent)
+    {
+        this.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+    else
+    {
+        this.canvasContext.fillStyle = background.toHEX();//Color.colorNames.blue;//this.backgroundColorString;
+        //this.canvasContext.clear();
+        this.canvasContext.fillRect(0, 0, this.canvas.width , this.canvas.height);
+    }
+
+    //this.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.renderCost = 0;
 };
 
@@ -62,8 +84,8 @@ CanvasRenderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sour
     sourceHeight = sourceHeight / scale;
 
     var image = texture.raw;
-    //destX += this._transformTx;
-    //destY += this._transformTy;
+    destX += this._transformTx;
+    destY += this._transformTy;
     //var beforeDraw = egret.getTimer();
     if (repeat === undefined) {
         this.canvasContext.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
@@ -97,6 +119,11 @@ CanvasRenderer2D.prototype.drawRepeatImage = function (texture, sourceX, sourceY
 };
 
 CanvasRenderer2D.prototype.setTransform = function (matrix) {
+    if(!matrix){
+        this._transformTx = this._transformTy = 0;
+        this.canvasContext.setTransform(1,0,0,1,0,0);
+        return;
+    }
     var m = matrix.elements;
     //在没有旋转缩放斜切的情况下，先不进行矩阵偏移，等下次绘制的时候偏移
     if (m[0] == 1 && m[1] == 0 && m[4] == 0 && m[5] == 1 && this._matrixA == 1 && this._matrixB == 0 && this._matrixC == 0 && this._matrixD == 1) {

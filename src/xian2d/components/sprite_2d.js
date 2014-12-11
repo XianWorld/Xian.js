@@ -1,6 +1,6 @@
-var Enums = require("../core/enums");
+var Enums = require("../../core/enums");
 var Renderable2D = require("./renderable_2d");
-var Assets = require("../assets/assets");
+var Assets = require("../../assets/assets");
 //var TextureClip = require("../assets/texture_clip");
 "use strict";
 
@@ -10,7 +10,7 @@ function Sprite2D(opts) {
 
     Renderable2D.call(this, opts);
 
-    this.texture = undefined;
+    this.texture = opts.texture !== undefined ? opts.texture : undefined;
     this.textureClip = undefined;
     //this.material = opts.material !== undefined ? opts.material : undefined;
 }
@@ -39,16 +39,21 @@ Sprite2D.prototype._draw = function (renderer) {
         sourceWidth = texture.width,
         sourceHeight = texture.height;
 
-    var destX = -textureClip.offsetX,
-        destY = -textureClip.offsetY,
-        destWidth = textureClip.clipWidth,
-        destHeight = textureClip.clipHeight;
+    var destX = 0,
+        destY = 0,
+        destWidth = texture.width,
+        destHeight = texture.height;
 
-    if(textureClip){
+    if (textureClip) {
         sourceX = textureClip.clipX;
         sourceY = textureClip.clipY;
         sourceWidth = textureClip.clipWidth;
         sourceHeight = textureClip.clipHeight;
+
+        destX = -textureClip.offsetX;
+        destY = -textureClip.offsetY;
+        destWidth = textureClip.clipWidth;
+        destHeight = textureClip.clipHeight;
     }
 
     renderer.drawImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
@@ -58,12 +63,16 @@ Sprite2D.prototype._draw = function (renderer) {
 Sprite2D.prototype.toJSON = function (json) {
     json = Renderable2D.prototype.toJSON.call(this, json);
 
+    json.texture = this.texture ? this.texture.name : undefined;
+
     return json;
 };
 
 
 Sprite2D.prototype.fromJSON = function (json) {
     Renderable2D.prototype.fromJSON.call(this, json);
+
+    this.texture = json.texture ? Assets.get(json.texture) : undefined;
 
     return this;
 };

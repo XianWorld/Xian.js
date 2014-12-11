@@ -341,7 +341,7 @@ Transform.prototype._setParent = function (parent) {
 Transform.prototype.updateMatrices = function (viewMatrix) {
 
     this.modelView.mmul(viewMatrix, this.matrixWorld);
-    this.normalMatrix.inverseMat4(this.modelView).transpose();
+    //this.normalMatrix.inverseMat4(this.modelView).transpose();
 };
 
 //Transform.prototype.init = function () {

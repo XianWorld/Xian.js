@@ -3,48 +3,93 @@
 seajs.config({
     base: "../../dist/"
 });
+
 seajs.use(['index-debug.js'], function (Xian) {
     console.log(Xian);
 
     Xian.globalize();
 
+    var game, scene, level0, level1, level2, system;
     //var random = Math.random,
     //    PI = Math.PI,
     //    TWO_PI = PI * 2;
 
-    var game = new Game({
+    function Rotate2DBehaviour(){
+        Behaviour.call(this);
+    }
+    Behaviour.extend(Rotate2DBehaviour);
+    Rotate2DBehaviour.prototype.onUpdate = function(){
+        var tensform = this.transform2d;
+        //tensform.position.x += 1;
+        tensform.rotation += 0.01;
+    };
+
+    Assets.addAssets(
+        new Texture({
+            name: "img_player",
+            flipY: true,
+            filter: Enums.FilterMode.None,
+            src: "../content/images/player.png"
+        }),
+        new Texture({
+            name: "img_hospital",
+            flipY: true,
+            filter: Enums.FilterMode.None,
+            src: "../content/images/hospital.png"
+        })
+    );
+
+    game = new Game({
         debug: true,
-        render: "auto",
         canvas: {
             width: 960,
             height: 640
         },
         renderer: {
-            disableDepth: true
+            canvasRenderer: CanvasRenderer2D
         }
     });
 
-    var scene = new Scene({
+    scene = new Scene({
         name: "PlayGround",
         systems: [
-            new Transform2DSystem()
+            new Transform2DSystem(),
+            new BehaviourSystem(),
+            new Render2DSystem(),
         ]
     });
 
-    var level0 = new GameObject({
+    level0 = new GameObject({
         name: "level0",
         components: [
-            new Transform(),
+            new Transform2D(),
+            new Camera2D({
+                transparent: true,
+                clearBeforeRender: true,
+                background: new Color(0.5, 0.5, 0.5)
+            }),
+            //new Sprite2D({
+            //    name: "test1",
+            //    texture: Assets.get("img_player")
+            //}),
         ]
     });
-    var level1 = new GameObject({
+    level1 = new GameObject({
         name: "level1",
         components: [
-            new Transform(),
+            new Transform2D({
+                position: new Vec2(900,0)
+            }),
+            new Sprite2D({
+                name: "test1",
+                blendMode: Enums.blendModes.NORMAL,
+                texture: Assets.get("img_player")
+            }),
+            new Rotate2DBehaviour()
         ]
     });
 
-    level0.transform.addChild(level1.transform);
+    level0.transform2d.addChild(level1.transform2d);
 
     scene.addGameObjects(level0);
 
@@ -52,15 +97,23 @@ seajs.use(['index-debug.js'], function (Xian) {
 
     function start() {
         game.setScene("PlayGround");
-        Log.log("Game Started!");
+        console.log("Game Started!");
+
     }
 
     game.on("start", function () {
         start();
     });
-    game.start();
+    //game.start();
+
+    AssetLoader.on("load", function () {
+        game.start();
+    }).load();
 
 });
+
+
+
 
 //
 //function CameraControl(opts) {

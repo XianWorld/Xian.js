@@ -1,4 +1,4 @@
-var Class = require("../../base/class");
+var Class = require("../../../base/class");
 "use strict";
 
 function Renderer2D(opts) {
@@ -19,7 +19,7 @@ function Renderer2D(opts) {
 
 Class.extend(Renderer2D);
 
-Renderer2D.prototype.clearScreen = function () {
+Renderer2D.prototype.clearScreen = function (transparent, background) {
 };
 
 Renderer2D.prototype.clearRect = function (x, y, w, h) {

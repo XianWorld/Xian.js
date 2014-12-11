@@ -2,7 +2,9 @@
   "name": "Xian",
   "version": "0.0.6",
   "description": "",
-  "keywords": [],
+  "keywords": [
+    "MMO","Game","World","Framework","Engine","Node.js","Browser","Sea.js"
+  ],
   "homepage": "",
   "author": "huodianyan <huodianyan@126.com>",
   "repository": {

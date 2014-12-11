@@ -26,7 +26,7 @@ function Device() {
             has = !!canvas.getContext(names[i]);
             if (has) break;
         }
-
+        canvas = undefined;
         return has;
     }());
 
