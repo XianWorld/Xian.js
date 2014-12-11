@@ -55,11 +55,9 @@ function Xian() {
     //components
     this.AudioSource = require("./src/components/audio_source");
     this.Camera = require("./src/components/camera");
-    this.Camera2D = require("./src/components/camera_2d");
     this.Component = require("./src/core/component");
     this.Sprite = require("./src/components/sprite");
     this.Transform = require("./src/components/transform");
-    this.Transform2D = require("./src/components/transform_2d");
     this.Behaviour = require("./src/components/behaviour");
 
     //core
@@ -73,7 +71,6 @@ function Xian() {
     //systems
     this.ComponentSystem = require("./src/systems/component_system");
     this.TransformSystem = require("./src/systems/transform_system");
-    this.Transform2DSystem = require("./src/systems/transform_2d_system");
     this.BehaviourSystem = require("./src/systems/behaviour_system");
 
     //math
@@ -92,12 +89,15 @@ function Xian() {
     this.Vec3 = require("./src/math/vec3");
     this.Vec4 = require("./src/math/vec4");
 
+    this.Transform2D = require("./src/xian2d/components/transform_2d");
+    this.Camera2D = require("./src/xian2d/components/camera_2d");
     this.TextureClip = require("./src/xian2d/assets/texture_clip");
     this.Renderer2D = require("./src/xian2d/context/renderer/canvas_renderer_2d");
     this.Renderable2D = require("./src/xian2d/components/renderable_2d");
     this.Sprite2D = require("./src/xian2d/components/sprite_2d");
     this.CanvasRenderer2D = require("./src/xian2d/context/renderer/canvas_renderer_2d");
     this.Render2DSystem = require("./src/xian2d/systems/render_2d_system");
+    this.Transform2DSystem = require("./src/xian2d/systems/transform_2d_system");
 
 }
 

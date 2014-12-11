@@ -10,8 +10,8 @@ function TransformSystem(opts) {
 
     this.order = 99999;
 
-    this.addEventName = "startTransform";
-    this.removeEventName = "removeTransform";
+    //this.addEventName = "startComponent";
+    //this.removeEventName = "removeComponent";
     this.componentType = Transform;
 
     this.rootTransforms = [];

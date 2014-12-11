@@ -1,5 +1,5 @@
 var ComponentSystem = require("./../../systems/component_system");
-var Camera2D = require("./../../components/camera_2d");
+var Camera2D = require("./../components/camera_2d");
 var MainContext = require("./../../context/main_context");
 var Log = MainContext.Log;
 var Mat4 = require("../../math/mat4");

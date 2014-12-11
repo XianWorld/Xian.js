@@ -33,12 +33,12 @@ Object.defineProperty(Component.prototype, 'transform', {
     }
 });
 
-Object.defineProperty(Component.prototype, 'transform2d', {
-    get: function() {
-        return this.gameObject === undefined ? undefined : this.gameObject.transform2d;
-    }
-});
-
+//Object.defineProperty(Component.prototype, 'transform2d', {
+//    get: function() {
+//        return this.gameObject === undefined ? undefined : this.gameObject.transform2d;
+//    }
+//});
+//
 Component.prototype.copy = function (other) {
 
     this.sync = other.sync;

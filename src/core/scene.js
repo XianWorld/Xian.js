@@ -333,7 +333,7 @@ Scene.prototype.addGameObject = function (gameObject) {
         i = components.length;
         while (i--) this._addComponent(components[i]);
 
-        if ((transform = gameObject.transform || gameObject.transform2d)) {
+        if ((transform = gameObject.transform/* || gameObject.transform2d*/)) {
 
             i = (children = transform.children).length;
 
@@ -386,7 +386,7 @@ Scene.prototype.removeGameObject = function (gameObject, clear) {
         i = components.length;
         while (i--) this._removeComponent(components[i], clear);
 
-        if ((transform = gameObject.transform || gameObject.transform2d)) {
+        if ((transform = gameObject.transform/* || gameObject.transform2d*/)) {
             //remove the root gameobject
             //if(transform.parent === undefined){
             //    i = roots.indexOf(gameObject);

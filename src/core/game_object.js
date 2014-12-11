@@ -404,7 +404,7 @@ GameObject.prototype.hasComponent = function (type, inherit) {
 
 
 GameObject.prototype.find = function (name) {
-    var transform = this.transform || this.transform2d,
+    var transform = this.transform;// || this.transform2d,
         children, child, i;
 
     if (!transform) return undefined;
