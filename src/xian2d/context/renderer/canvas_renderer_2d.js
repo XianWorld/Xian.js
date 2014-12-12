@@ -118,22 +118,29 @@ CanvasRenderer2D.prototype.drawRepeatImage = function (texture, sourceX, sourceY
     this.canvasContext.translate(-destX, -destY);
 };
 
-CanvasRenderer2D.prototype.setTransform = function (matrix) {
+CanvasRenderer2D.prototype.setTransform = function (matrix, ismat32) {
     if(!matrix){
         this._transformTx = this._transformTy = 0;
         this.canvasContext.setTransform(1,0,0,1,0,0);
         return;
     }
     var m = matrix.elements;
+    var a, b, c, d,tx,ty;
+    if(ismat32){
+        a = m[0]; b = m[1]; c = m[2]; d = m[3]; tx = m[4]; ty = m[5];
+    }else{
+        a = m[0]; b = m[1]; c = m[4]; d = m[5]; tx = m[12]; ty = m[13];
+    }
+
     //在没有旋转缩放斜切的情况下，先不进行矩阵偏移，等下次绘制的时候偏移
-    if (m[0] == 1 && m[1] == 0 && m[4] == 0 && m[5] == 1 && this._matrixA == 1 && this._matrixB == 0 && this._matrixC == 0 && this._matrixD == 1) {
-        this._transformTx = m[12] - this._matrixTx;
-        this._transformTy = m[13] - this._matrixTy;
+    if (a == 1 && b == 0 && c == 0 && d == 1 && this._matrixA == 1 && this._matrixB == 0 && this._matrixC == 0 && this._matrixD == 1) {
+        this._transformTx = tx - this._matrixTx;
+        this._transformTy = ty - this._matrixTy;
         return;
     }
     this._transformTx = this._transformTy = 0;
-    if (this._matrixA != m[0] || this._matrixB != m[1] || this._matrixC != m[4] || this._matrixD != m[5] || this._matrixTx != m[12] || this._matrixTy != m[13]) {
-        this.canvasContext.setTransform(m[0], m[1], m[4], m[5], m[12], m[13]);
+    if (this._matrixA != a || this._matrixB != b || this._matrixC != c || this._matrixD != d || this._matrixTx != tx || this._matrixTy != ty) {
+        this.canvasContext.setTransform(a, b, c, d, tx, ty);
     }
 };
 

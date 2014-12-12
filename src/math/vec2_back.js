@@ -16,39 +16,16 @@ function Vec2(x, y) {
      * @property Number x
      * @memberof Xian.Vec2
      */
-    this._x = x || 0.0;
+    this.x = x || 0.0;
 
     /**
      * @property Number y
      * @memberof Xian.Vec2
      */
-    this._y = y || 0.0;
-
-    this._dirty = true;
+    this.y = y || 0.0;
 }
 
 Mathf._classes.Vec2 = Vec2;
-
-Object.defineProperty(Vec2.prototype, "x", {
-    get: function(){
-        return this._x;
-    },
-    set: function(value){
-        if(this._x === value) return;
-        this._x = value;
-        this._dirty = true;
-    }
-});
-Object.defineProperty(Vec2.prototype, "y", {
-    get: function(){
-        return this._y;
-    },
-    set: function(value){
-        if(this._y === value) return;
-        this._y = value;
-        this._dirty = true;
-    }
-});
 
 /**
  * @method clone
@@ -58,7 +35,7 @@ Object.defineProperty(Vec2.prototype, "y", {
  */
 Vec2.prototype.clone = function () {
 
-    return new Vec2(this._x, this._y);
+    return new Vec2(this.x, this.y);
 };
 
 /**
@@ -70,8 +47,8 @@ Vec2.prototype.clone = function () {
  */
 Vec2.prototype.copy = function (other) {
 
-    this.x = other._x;
-    this.y = other._y;
+    this.x = other.x;
+    this.y = other.y;
 
     return this;
 };
@@ -101,8 +78,8 @@ Vec2.prototype.set = function (x, y) {
  */
 Vec2.prototype.add = function (other) {
 
-    this.x += other._x;
-    this.y += other._y;
+    this.x += other.x;
+    this.y += other.y;
 
     return this;
 };
@@ -117,8 +94,8 @@ Vec2.prototype.add = function (other) {
  */
 Vec2.prototype.vadd = function (a, b) {
 
-    this.x = a._x + b._x;
-    this.y = a._y + b._y;
+    this.x = a.x + b.x;
+    this.y = a.y + b.y;
 
     return this;
 };
@@ -147,8 +124,8 @@ Vec2.prototype.sadd = function (s) {
  */
 Vec2.prototype.sub = function (other) {
 
-    this.x -= other._x;
-    this.y -= other._y;
+    this.x -= other.x;
+    this.y -= other.y;
 
     return this;
 };
@@ -163,8 +140,8 @@ Vec2.prototype.sub = function (other) {
  */
 Vec2.prototype.vsub = function (a, b) {
 
-    this.x = a._x - b._x;
-    this.y = a._y - b._y;
+    this.x = a.x - b.x;
+    this.y = a.y - b.y;
 
     return this;
 };
@@ -193,8 +170,8 @@ Vec2.prototype.ssub = function (s) {
  */
 Vec2.prototype.mul = function (other) {
 
-    this.x *= other._x;
-    this.y *= other._y;
+    this.x *= other.x;
+    this.y *= other.y;
 
     return this;
 };
@@ -209,8 +186,8 @@ Vec2.prototype.mul = function (other) {
  */
 Vec2.prototype.vmul = function (a, b) {
 
-    this.x = a._x * b._x;
-    this.y = a._y * b._y;
+    this.x = a.x * b.x;
+    this.y = a.y * b.y;
 
     return this;
 };
@@ -238,8 +215,8 @@ Vec2.prototype.smul = function (s) {
  * @return this
  */
 Vec2.prototype.div = function (other) {
-    var x = other._x,
-        y = other._y;
+    var x = other.x,
+        y = other.y;
 
     this.x *= x !== 0.0 ? 1.0 / x : 0.0;
     this.y *= y !== 0.0 ? 1.0 / y : 0.0;
@@ -256,11 +233,11 @@ Vec2.prototype.div = function (other) {
  * @return this
  */
 Vec2.prototype.vdiv = function (a, b) {
-    var x = b._x,
-        y = b._y;
+    var x = b.x,
+        y = b.y;
 
-    this.x = x !== 0.0 ? a._x / x : 0.0;
-    this.y = y !== 0.0 ? a._y / y : 0.0;
+    this.x = x !== 0.0 ? a.x / x : 0.0;
+    this.y = y !== 0.0 ? a.y / y : 0.0;
 
     return this;
 };
@@ -288,8 +265,8 @@ Vec2.prototype.sdiv = function (s) {
  * @return Number
  */
 Vec2.prototype.length = function () {
-    var x = this._x,
-        y = this._y,
+    var x = this.x,
+        y = this.y,
         lsq = x * x + y * y;
 
     if (lsq === 1) return 1;
@@ -304,8 +281,8 @@ Vec2.prototype.length = function () {
  * @return Number
  */
 Vec2.prototype.lengthSq = function () {
-    var x = this._x,
-        y = this._y;
+    var x = this.x,
+        y = this.y;
 
     return x * x + y * y;
 };
@@ -318,8 +295,8 @@ Vec2.prototype.lengthSq = function () {
  * @return Vec2
  */
 Vec2.prototype.setLength = function (length) {
-    var x = this._x,
-        y = this._y,
+    var x = this.x,
+        y = this.y,
         l = x * x + y * y;
 
     if (l === 1) {
@@ -344,8 +321,8 @@ Vec2.prototype.setLength = function (length) {
  * @return this
  */
 Vec2.prototype.normalize = function () {
-    var x = this._x,
-        y = this._y,
+    var x = this.x,
+        y = this.y,
         l = x * x + y * y;
 
     if (l === 1) return this;
@@ -398,8 +375,8 @@ Vec2.prototype.inverse = function () {
  */
 Vec2.prototype.inverseVec = function (other) {
 
-    this.x = -other._x;
-    this.y = -other._y;
+    this.x = -other.x;
+    this.y = -other.y;
 
     return this;
 };
@@ -414,8 +391,8 @@ Vec2.prototype.inverseVec = function (other) {
  */
 Vec2.prototype.lerp = function (other, x) {
 
-    this.x += (other._x - this._x) * x;
-    this.y += (other._y - this._y) * x;
+    this.x += (other.x - this.x) * x;
+    this.y += (other.y - this.y) * x;
 
     return this;
 };
@@ -430,11 +407,11 @@ Vec2.prototype.lerp = function (other, x) {
  * @return Vec2
  */
 Vec2.prototype.vlerp = function (a, b, x) {
-    var ax = a._x,
-        ay = a._y;
+    var ax = a.x,
+        ay = a.y;
 
-    this.x = ax + (b._x - ax) * x;
-    this.y = ay + (b._y - ay) * x;
+    this.x = ax + (b.x - ax) * x;
+    this.y = ay + (b.y - ay) * x;
 
     return this;
 };
@@ -449,7 +426,7 @@ Vec2.prototype.vlerp = function (a, b, x) {
  */
 Vec2.vdot = Vec2.prototype.vdot = function (a, b) {
 
-    return a._x * b._x + a._y * b._y;
+    return a.x * b.x + a.y * b.y;
 };
 
 /**
@@ -461,7 +438,7 @@ Vec2.vdot = Vec2.prototype.vdot = function (a, b) {
  */
 Vec2.prototype.dot = function (other) {
 
-    return this._x * other._x + this._y * other._y;
+    return this.x * other.x + this.y * other.y;
 };
 
 /**
@@ -474,7 +451,7 @@ Vec2.prototype.dot = function (other) {
  */
 Vec2.vcross = Vec2.prototype.vcross = function (a, b) {
 
-    return a._x * b._y - a._y * b._x;
+    return a.x * b.y - a.y * b.x;
 };
 
 /**
@@ -486,7 +463,7 @@ Vec2.vcross = Vec2.prototype.vcross = function (a, b) {
  */
 Vec2.prototype.cross = function (other) {
 
-    return this._x * other._y - this._y * other._x;
+    return this.x * other.y - this.y * other.x;
 };
 
 /**
@@ -496,8 +473,8 @@ Vec2.prototype.cross = function (other) {
  * @return Number
  */
 Vec2.prototype.perp = function () {
-    var x = this._x,
-        y = this._y;
+    var x = this.x,
+        y = this.y;
 
     this.x = -y;
     this.y = x;
@@ -513,10 +490,10 @@ Vec2.prototype.perp = function () {
  * @return this
  */
 Vec2.prototype.min = function (other) {
-    var ax = this._x,
-        ay = this._y,
-        bx = other._x,
-        by = other._y;
+    var ax = this.x,
+        ay = this.y,
+        bx = other.x,
+        by = other.y;
 
     this.x = bx < ax ? bx : ax;
     this.y = by < ay ? by : ay;
@@ -532,10 +509,10 @@ Vec2.prototype.min = function (other) {
  * @return this
  */
 Vec2.prototype.max = function (other) {
-    var ax = this._x,
-        ay = this._y,
-        bx = other._x,
-        by = other._y;
+    var ax = this.x,
+        ay = this.y,
+        bx = other.x,
+        by = other.y;
 
     this.x = bx > ax ? bx : ax;
     this.y = by > ay ? by : ay;
@@ -552,12 +529,12 @@ Vec2.prototype.max = function (other) {
  * @return this
  */
 Vec2.prototype.clamp = function (min, max) {
-    var x = this._x,
-        y = this._y,
-        minx = min._x,
-        miny = min._y,
-        maxx = max._x,
-        maxy = max._y;
+    var x = this.x,
+        y = this.y,
+        minx = min.x,
+        miny = min.y,
+        maxx = max.x,
+        maxy = max.y;
 
     this.x = x < minx ? minx : x > maxx ? maxx : x;
     this.y = y < miny ? miny : y > maxy ? maxy : y;
@@ -573,8 +550,8 @@ Vec2.prototype.clamp = function (min, max) {
  * @return this
  */
 Vec2.prototype.transformAngle = function (a) {
-    var x = this._x,
-        y = this._y,
+    var x = this.x,
+        y = this.y,
         c = cos(a),
         s = sin(a);
 
@@ -593,8 +570,8 @@ Vec2.prototype.transformAngle = function (a) {
  */
 Vec2.prototype.transformMat2 = function (m) {
     var me = m.elements,
-        x = this._x,
-        y = this._y;
+        x = this.x,
+        y = this.y;
 
     this.x = x * me[0] + y * me[2];
     this.y = x * me[1] + y * me[3];
@@ -611,8 +588,8 @@ Vec2.prototype.transformMat2 = function (m) {
  */
 Vec2.prototype.untransformMat2 = function (m) {
     var me = m.elements,
-        x = this._x,
-        y = this._y;
+        x = this.x,
+        y = this.y;
 
     this.x = x * me[0] + y * me[1];
     this.y = x * me[2] + y * me[3];
@@ -629,8 +606,8 @@ Vec2.prototype.untransformMat2 = function (m) {
  */
 Vec2.prototype.transformMat32 = function (m) {
     var me = m.elements,
-        x = this._x,
-        y = this._y;
+        x = this.x,
+        y = this.y;
 
     this.x = x * me[0] + y * me[2] + me[4];
     this.y = x * me[1] + y * me[3] + me[5];
@@ -647,8 +624,8 @@ Vec2.prototype.transformMat32 = function (m) {
  */
 Vec2.prototype.untransformMat32 = function (m) {
     var me = m.elements,
-        x = this._x - me[4],
-        y = this._y - me[5];
+        x = this.x - me[4],
+        y = this.y - me[5];
 
     this.x = x * me[0] + y * me[1];
     this.y = x * me[2] + y * me[3];
@@ -665,8 +642,8 @@ Vec2.prototype.untransformMat32 = function (m) {
  */
 Vec2.prototype.transformMat3 = function (m) {
     var me = m.elements,
-        x = this._x,
-        y = this._y;
+        x = this.x,
+        y = this.y;
 
     this.x = x * me[0] + y * me[3] + me[6];
     this.y = x * me[1] + y * me[4] + me[7];
@@ -683,8 +660,8 @@ Vec2.prototype.transformMat3 = function (m) {
  */
 Vec2.prototype.transformMat4 = function (m) {
     var me = m.elements,
-        x = this._x,
-        y = this._y;
+        x = this.x,
+        y = this.y;
 
     this.x = x * me[0] + y * me[4] + me[12];
     this.y = x * me[1] + y * me[5] + me[13];
@@ -701,8 +678,8 @@ Vec2.prototype.transformMat4 = function (m) {
  */
 Vec2.prototype.transformProjection = function (m) {
     var me = m.elements,
-        x = this._x,
-        y = this._y,
+        x = this.x,
+        y = this.y,
         d = 1 / (me[3] * x + me[7] * y + me[11] * z + me[15]);
 
     this.x = (me[0] * x + me[4] * y + me[12]) * d;
@@ -808,8 +785,8 @@ Vec2.prototype.scaleFromMat32 = Vec2.prototype.scaleFromMat2;
 Vec2.prototype.equals = function (other) {
 
     return !(
-    this._x !== other._x ||
-    this._y !== other._y
+    this.x !== other.x ||
+    this.y !== other.y
     );
 };
 
@@ -821,8 +798,8 @@ Vec2.prototype.equals = function (other) {
 Vec2.prototype.notEquals = function (other) {
 
     return (
-    this._x !== other._x ||
-    this._y !== other._y
+    this.x !== other.x ||
+    this.y !== other.y
     );
 };
 
@@ -851,8 +828,8 @@ Vec2.prototype.toJSON = function (json) {
     json || (json = {});
 
     json._className = "Vec2";
-    json.x = this._x;
-    json.y = this._y;
+    json.x = this.x;
+    json.y = this.y;
 
     return json;
 };
@@ -881,8 +858,8 @@ Vec2.prototype.fromArray = function (array) {
 Vec2.prototype.toArray = function (array) {
     array || (array = []);
 
-    array[0] = this._x;
-    array[1] = this._y;
+    array[0] = this.x;
+    array[1] = this.y;
 
     return array;
 };

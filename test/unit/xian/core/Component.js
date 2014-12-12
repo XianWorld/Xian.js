@@ -1,4 +1,4 @@
-describe('xian/core/GameObject', function () {
+describe('xian/core/Component', function () {
     'use strict';
 
     var expect = chai.expect;
@@ -72,10 +72,6 @@ describe('xian/core/GameObject', function () {
         expect(scene.gameObjects).to.have.length(2);
 
         expect(level0.camera.transform).to.equals(level0.transform);
-        expect(level0.camera.transform2d).to.be.undefined;
-
-        expect(level1.camera2d.transform2d).to.equals(level1.transform2d);
-        expect(level1.camera2d.transform).to.be.undefined;
 
     });
 

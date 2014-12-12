@@ -46,8 +46,8 @@ Mat32.prototype.clone = function () {
     var te = this.elements;
 
     return new Mat32(
-        te[0], te[1], te[2],
-        te[3], te[4], te[5]
+        te[0], te[2], te[4],
+        te[1], te[3], te[5]
     );
 };
 
@@ -122,6 +122,15 @@ Mat32.prototype.mul = function (other) {
         b22 = be[3],
         b23 = be[5];
 
+    //ae[0] = a11 * b11 + a12 * b21;
+    //ae[2] = a11 * b12 + a12 * b22;
+    //
+    //ae[1] = a21 * b11 + a22 * b21;
+    //ae[3] = a21 * b12 + a22 * b22;
+    //
+    //ae[4] = a11 * b13 + a12 * b23 + a13;
+    //ae[5] = a21 * b13 + a22 * b23 + a23;
+
     ae[0] = a11 * b11 + a21 * b12;
     ae[2] = a12 * b11 + a22 * b12;
 
@@ -161,14 +170,23 @@ Mat32.prototype.mmul = function (a, b) {
         b22 = be[3],
         b23 = be[5];
 
-    te[0] = a11 * b11 + a21 * b12;
-    te[2] = a12 * b11 + a22 * b12;
+    //te[0] = a11 * b11 + a12 * b21;//a0 * b0 + a2 * b1;
+    //te[2] = a11 * b12 + a12 * b22;//a0 * b2 + a2 * b3;
+    //
+    //te[1] = a21 * b11 + a22 * b21;//a1 * b0 + a3 * b1;
+    //te[3] = a21 * b12 + a22 * b22;//a1 * b2 + a3 * b3;
+    //
+    //te[4] = a11 * b13 + a12 * b23 + a13;//a0 * b4 + a2 * b5 + a4;
+    //te[5] = a21 * b13 + a22 * b23 + a23;//a1 * b4 + a3 * b5 + a5;
 
-    te[1] = a11 * b21 + a21 * b22;
-    te[3] = a12 * b21 + a22 * b22;
+    te[0] = a11 * b11 + a21 * b12;//a0 * b0 + a2 * b1;
+    te[2] = a12 * b11 + a22 * b12;//a0 * b2 + a2 * b3;
 
-    te[4] = a11 * b13 + a12 * b23 + a13;
-    te[5] = a21 * b13 + a22 * b23 + a23;
+    te[1] = a11 * b21 + a21 * b22;//a1 * b0 + a3 * b1;
+    te[3] = a12 * b21 + a22 * b22;//a1 * b2 + a3 * b3;
+
+    te[4] = a11 * b13 + a12 * b23 + a13;//a0 * b4 + a2 * b5 + a4;
+    te[5] = a21 * b13 + a22 * b23 + a23;//a1 * b4 + a3 * b5 + a5;
 
     return this;
 };
@@ -442,6 +460,28 @@ Mat32.prototype.decompose = function (position, scale) {
     scale.y = sy;
 
     return atan2(m12, m11);
+};
+
+/**
+ * @method setRotation
+ * @memberof Odin.Mat32
+ * sets the rotation in radians this
+ * @param Number angle
+ * @return this
+ */
+Mat32.prototype.setScaleRotation = function (scale, angle) {
+    var te = this.elements,
+        sx = scale.x,
+        sy = scale.y,
+        c = cos(angle),
+        s = sin(angle);
+
+    te[0] = c * sx;
+    te[1] = s * sx;
+    te[2] = -s * sy;
+    te[3] = c * sy;
+
+    return this;
 };
 
 /**

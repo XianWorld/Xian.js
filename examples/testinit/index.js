@@ -20,9 +20,9 @@ seajs.use(['index-debug.js'], function (Xian) {
     Behaviour.extend(Rotate2DBehaviour);
     Rotate2DBehaviour.prototype.onUpdate = function(){
         var transform = this.transform;
-        //transform.position.x += 1;
-        //transform.position.y += 1;
-        transform.rotation += 0.01;
+        transform.position.x += 1;
+        transform.position.y += 1;
+        //transform.rotation -= 0.01;
     };
 
     Assets.addAssets(
@@ -63,7 +63,9 @@ seajs.use(['index-debug.js'], function (Xian) {
     level0 = new GameObject({
         name: "level0",
         components: [
-            new Transform2D(),
+            new Transform2D({
+                //identity: true
+            }),
             new Camera2D({
                 transparent: false,
                 clearBeforeRender: true,
@@ -79,7 +81,8 @@ seajs.use(['index-debug.js'], function (Xian) {
         name: "level1",
         components: [
             new Transform2D({
-                position: new Vec2(0,0)
+                //identity: true
+                position: new Vec2(100,100)
             }),
             new Sprite2D({
                 name: "test1",

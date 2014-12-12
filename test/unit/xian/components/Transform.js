@@ -1,4 +1,4 @@
-describe('xian/core/GameObject', function () {
+describe('xian/components/Transform', function () {
     'use strict';
 
     var expect = chai.expect;

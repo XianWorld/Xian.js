@@ -31,12 +31,14 @@ function Camera2D(opts) {
     //this.minOrthographicSize = opts.minOrthographicSize !== undefined ? opts.minOrthographicSize : EPSILON;
     //this.maxOrthographicSize = opts.maxOrthographicSize !== undefined ? opts.maxOrthographicSize : 1024;
 
-    this.projection = new Mat4;
-    this._projection = new Mat32;
-    this.guiProjection = new Mat4;
+    this.projection = new Mat32;
+    //this._projection = new Mat32;
+    //this.guiProjection = new Mat4;
 
-    this.view = new Mat4;
-    this._view = new Mat32;
+    this.view = new Mat32;
+    //this._view = new Mat32;
+
+    this._projectionView = new Mat32;
 
     //this.needsUpdate = true;
     //this._active = true;
@@ -125,9 +127,12 @@ var MAT32 = new Mat32,
 Camera2D.prototype.toWorld = function (v, out) {
     out || (out = new Vec2);
 
-    out.x = 2 * (v.x * this.invWidth) - 1;
-    out.y = -2 * (v.y * this.invHeight) + 1;
-    out.transformMat32(MAT32.mmul(this._projection, this._view).inverse());
+    //out.x = 2 * (v.x * this.invWidth) - 1;
+    //out.y = -2 * (v.y * this.invHeight) + 1;
+    out.x = v.x;
+    out.y = v.y;
+    //out.transformMat32(MAT32.mmul(this._projection, this._view).inverse());
+    out.transformMat32(MAT32.inverseMat(this._projectionView));
 
     return out;
 };
@@ -136,17 +141,22 @@ Camera2D.prototype.toWorld = function (v, out) {
 Camera2D.prototype.toScreen = function (v, out) {
     out || (out = new Vec2);
 
-    VEC2.copy(v).transformMat32(MAT32.mmul(this._projection, this._view));
+    //VEC2.copy(v).transformMat32(MAT32.mmul(this._projection, this._view));
+    VEC2.copy(v).transformMat32(this._projectionView);
 
-    out.x = ((VEC2.x + 1) * 0.5) * this.width;
-    out.y = ((1 - VEC2.y) * 0.5) * this.height;
-
+    //out.x = ((VEC2.x + 1) * 0.5) * this.width;
+    //out.y = ((1 - VEC2.y) * 0.5) * this.height;
+    out.x = VEC2.x;
+    out.y = VEC2.y;
     return out;
 };
 
 
 Camera2D.prototype.update = function () {
     if (!this._active) return;
+
+    var transform = this.transform,
+        changed = false;
 
     if (this.needsUpdate) {
         var orthographicSize = this.orthographicSize,
@@ -156,15 +166,22 @@ Camera2D.prototype.update = function () {
             bottom = -top;
 
         this.projection.orthographic(left, right, top, bottom, -1, 1);
-        this._projection.fromMat4(this.projection);
+        //this._projection.fromMat4(this.projection);
         this.needsUpdate = false;
 
-        this.guiProjection.orthographic(0, this.width, 0, this.height, -1, 1);
+        changed = true;
+        //this.guiProjection.orthographic(0, this.width, 0, this.height, -1, 1);
         //this.guiProjection.orthographic(-1, 1, 1, -1, -1, 1);
     }
 
-    this.view.inverseMat((this.transform || this.transform2d).matrixWorld);
-    this._view.fromMat4(this.view);
+    if (transform._matrix_changed) {
+        this.view.inverseMat(transform.matrixWorld);
+        //this._view.fromMat4(this.view);
+        changed = true;
+    }
+
+    if(changed)
+        this._projectionView.mmul(this.projection, this.view);
 };
 
 

@@ -30,7 +30,7 @@ function Camera(opts) {
     //this.near = opts.near !== undefined ? opts.near : 0.0625;
     //this.far = opts.far !== undefined ? opts.far : 16384;
 
-    this.orthographic = opts.orthographic !== undefined ? !!opts.orthographic : false;
+    //this.orthographic = opts.orthographic !== undefined ? !!opts.orthographic : false;
     this.orthographicSize = opts.orthographicSize !== undefined ? opts.orthographicSize : 1;
 
     this.minOrthographicSize = opts.minOrthographicSize !== undefined ? opts.minOrthographicSize : EPSILON;
@@ -63,7 +63,7 @@ Camera.prototype.copy = function (other) {
     //this.near = other.near;
     //this.fov = other.fov;
 
-    this.orthographic = other.orthographic;
+    //this.orthographic = other.orthographic;
     this.orthographicSize = other.orthographicSize;
     this.minOrthographicSize = other.minOrthographicSize;
     this.maxOrthographicSize = other.maxOrthographicSize;
@@ -129,19 +129,19 @@ Camera.prototype.setHeight = function (height) {
 //    this.needsUpdate = true;
 //};
 //
-
-Camera.prototype.setOrthographic = function (value) {
-
-    this.orthographic = !!value;
-    this.needsUpdate = true;
-};
-
-
-Camera.prototype.toggleOrthographic = function () {
-
-    this.orthographic = !this.orthographic;
-    this.needsUpdate = true;
-};
+//
+//Camera.prototype.setOrthographic = function (value) {
+//
+//    this.orthographic = !!value;
+//    this.needsUpdate = true;
+//};
+//
+//
+//Camera.prototype.toggleOrthographic = function () {
+//
+//    this.orthographic = !this.orthographic;
+//    this.needsUpdate = true;
+//};
 
 
 Camera.prototype.setOrthographicSize = function (size) {
@@ -221,7 +221,7 @@ Camera.prototype.toJSON = function (json) {
     //json.near = this.near;
     //json.fov = this.fov;
 
-    json.orthographic = this.orthographic;
+    //json.orthographic = this.orthographic;
     json.orthographicSize = this.orthographicSize;
     json.minOrthographicSize = this.minOrthographicSize;
     json.maxOrthographicSize = this.maxOrthographicSize;
@@ -244,7 +244,7 @@ Camera.prototype.fromJSON = function (json) {
     //this.near = json.near;
     //this.fov = json.fov;
     //
-    this.orthographic = json.orthographic;
+    //this.orthographic = json.orthographic;
     this.orthographicSize = json.orthographicSize;
     this.minOrthographicSize = json.minOrthographicSize;
     this.maxOrthographicSize = json.maxOrthographicSize;

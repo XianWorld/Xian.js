@@ -48,7 +48,7 @@ Render2DSystem.prototype.render = function () {
         camera = components[i];
         if (!camera._active) continue;
 
-        camera.update();
+        //camera.update();
 
         this._renderCamera(camera, rootTransforms);
         //renderer.setTransform();
@@ -70,20 +70,20 @@ Render2DSystem.prototype.render = function () {
 Render2DSystem.prototype._renderCamera = function (camera, transforms) {
 
     var j, transform, gameObject,
-        _projScreenMatrix = new Mat4;
+        _projectionView = camera._projectionView;
 
     var renderer = camera.renderer || MainContext.RendererContext.renderer;
 
     renderer.setTransform();
     if(camera.clearBeforeRender) renderer.clearScreen(camera.transparent, camera.background);
 
-    _projScreenMatrix.mmul(camera.projection, camera.view);
+    //_projScreenMatrix.mmul(camera.projection, camera.view);
     //viewMatrix = camera.view;
 
     for (j = 0; j < transforms.length; j++) {
         transform = transforms[j];
 
-        this._renderTransform(renderer, _projScreenMatrix, transform, 1);
+        this._renderTransform(renderer, _projectionView, transform, 1);
     }
 };
 
@@ -103,7 +103,15 @@ Render2DSystem.prototype._renderTransform = function (renderer, viewMatrix, tran
         len = components.length;
         for (i = 0; i < len; i++) {
             component = components[i];
-            component.startRender(renderer);
+            //component.startRender(renderer);
+            if (!component.visible) {
+                continue;
+            }
+            //var transform = component.transform;
+            renderer.setAlpha(component.worldAlpha, component.blendMode);
+            renderer.setTransform(transform.modelView, true);
+
+            component._draw(renderer);
         }
     }
 
@@ -116,7 +124,7 @@ Render2DSystem.prototype._renderTransform = function (renderer, viewMatrix, tran
         i = components.length;
         while (i--) {
             component = components[i];
-            component.finishRender(renderer);
+            //component.finishRender(renderer);
         }
     }
 };

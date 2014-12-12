@@ -77,26 +77,26 @@ Renderable2D.prototype.clear = function () {
 //
 //};
 
-Renderable2D.prototype.startRender = function (renderer) {
-    if (!this.visible) {
-        return;
-    }
-    var transform = this.transform || this.transform2d;
-    var o = this;
-    renderer.setAlpha(o.worldAlpha, o.blendMode);
-    renderer.setTransform(transform.modelView);
-
-    this._draw(renderer);
-
-};
+//Renderable2D.prototype.startRender = function (renderer) {
+//    if (!this.visible) {
+//        return;
+//    }
+//    var transform = this.transform || this.transform2d;
+//    var o = this;
+//    renderer.setAlpha(o.worldAlpha, o.blendMode);
+//    renderer.setTransform(transform.modelView);
+//
+//    this._draw(renderer);
+//
+//};
 
 Renderable2D.prototype._draw = function (renderer) {
 
 };
 
-Renderable2D.prototype.finishRender = function (renderer) {
-
-};
+//Renderable2D.prototype.finishRender = function (renderer) {
+//
+//};
 
 Renderable2D.prototype.toJSON = function (json) {
     json = Component.prototype.toJSON.call(this, json);

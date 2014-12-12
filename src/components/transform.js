@@ -27,19 +27,20 @@ function Transform(opts) {
     this.parent = undefined;
     this.children = [];
 
-    //this.position = opts.position !== undefined ? opts.position : new Vec3;
-    //this.rotation = opts.rotation !== undefined ? opts.rotation : new Quat;
-    //this.scale = opts.scale !== undefined ? opts.scale : new Vec3(1, 1, 1);
+    //this._position = undefined;//opts.position !== undefined ? opts.position : new Vec3;
+    //this._rotation = undefined;//opts.rotation !== undefined ? opts.rotation : new Quat;
+    //this._scale = undefined;//opts.scale !== undefined ? opts.scale : new Vec3(1, 1, 1);
     //
     //this.matrix = new Mat4;
     //this.matrixWorld = new Mat4;
     //
     //this.modelView = new Mat4;
     //this.normalMatrix = new Mat3;
+    //
+    //this._dirty = true;
 }
 
 Component.extend(Transform);
-
 
 Transform.prototype.copy = function (other) {
     var children = other.children,
