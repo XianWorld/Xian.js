@@ -11,7 +11,7 @@ MMO Game World Framework based on Node.js, support multiplatforms including Web/
 1. ECS framework for game client-side and server-side, and easy to extend even in runtime
 2. support dynamic module defination and load based on Sea.js in client-side
 3. support dynamic distributed service architechture based on Pomelo in server-side
-4. all codes writed in CommonJS, client build to CMD module for Sea.js
+4. all codes written in CommonJS, client build to CMD module for Sea.js
 5. designed oriented to Cloud service and multi-terminal
 6. designed to support infinity game world, every players all in one world
 7. designed to support UGC, everybody including player, developer, designer, artist can distribute to the game world
