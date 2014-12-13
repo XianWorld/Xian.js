@@ -29,7 +29,7 @@ function Renderable2D(opts) {
     //
     //this._webglInitted = false;
 
-    this.worldAlpha = 1;
+    this.worldAlpha = 1.0;
 }
 
 Component.extend(Renderable2D);

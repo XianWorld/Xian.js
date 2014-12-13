@@ -24,8 +24,9 @@ function Texture(opts) {
     this.format = opts.format !== undefined ? opts.format : Enums.TextureFormat.RGBA;
     this.wrap = opts.wrap !== undefined ? opts.wrap : Enums.TextureWrap.Repeat;
 
-    this._webgl = undefined;
-    this._webglUsed = 0;
+    //this._webgl = undefined;
+    this.webGLTexture = undefined;
+    //this._webglUsed = 0;
 
     this.needsUpdate = true;
 }

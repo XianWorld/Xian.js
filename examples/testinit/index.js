@@ -20,9 +20,9 @@ seajs.use(['index-debug.js'], function (Xian) {
     Behaviour.extend(Rotate2DBehaviour);
     Rotate2DBehaviour.prototype.onUpdate = function(){
         var transform = this.transform;
-        transform.position.x += 1;
-        transform.position.y += 1;
-        //transform.rotation -= 0.01;
+        //transform.position.x += 1;
+        //transform.position.y += 1;
+        transform.rotation += 0.01;
     };
 
     Assets.addAssets(
@@ -47,7 +47,8 @@ seajs.use(['index-debug.js'], function (Xian) {
             height: 640
         },
         renderer: {
-            canvasRenderer: CanvasRenderer2D
+            //canvasRenderer: CanvasRenderer2D,
+            webglRenderer: WebGLRenderer2D
         }
     });
 
@@ -73,6 +74,7 @@ seajs.use(['index-debug.js'], function (Xian) {
             }),
             new Sprite2D({
                 name: "test0",
+                alpha: 0.5,
                 texture: Assets.get("img_player")
             }),
         ]
@@ -86,7 +88,8 @@ seajs.use(['index-debug.js'], function (Xian) {
             }),
             new Sprite2D({
                 name: "test1",
-                blendMode: Enums.blendModes.NORMAL,
+                alpha: 0.5,
+                blendMode: Enums.blendModes.DIFFERENCE,
                 texture: Assets.get("img_player")
             }),
             new Rotate2DBehaviour()

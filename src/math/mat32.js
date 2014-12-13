@@ -614,6 +614,15 @@ Mat32.prototype.translate = function (v) {
     return this;
 };
 
+//Mat32.prototype.translate0 = function (x, y) {
+//    var te = this.elements;
+//
+//    te[4] = te[0] * x + te[2] * y + te[4];
+//    te[5] = te[1] * x + te[3] * y + te[5];
+//
+//    return this;
+//};
+
 /**
  * @method rotate
  * @memberof Odin.Mat32
@@ -654,14 +663,27 @@ Mat32.prototype.scale = function (v) {
 
     te[0] *= x;
     te[1] *= x;
-    te[4] *= x;
+    //te[4] *= x;
 
     te[2] *= y;
     te[3] *= y;
-    te[5] *= y;
+    //te[5] *= y;
 
     return this;
 };
+//Mat32.prototype.scale0 = function (x, y) {
+//    var te = this.elements;
+//
+//    te[0] *= x;
+//    te[1] *= x;
+//    //te[4] *= x;
+//
+//    te[2] *= y;
+//    te[3] *= y;
+//    //te[5] *= y;
+//
+//    return this;
+//};
 
 /**
  * @method orthographic

@@ -69,22 +69,22 @@ Render2DSystem.prototype.render = function () {
 
 Render2DSystem.prototype._renderCamera = function (camera, transforms) {
 
-    var j, transform, gameObject,
+    var j, transform,
         _projectionView = camera._projectionView;
 
     var renderer = camera.renderer || MainContext.RendererContext.renderer;
 
-    renderer.setTransform();
+    //renderer.setTransform();
+    renderer.onRenderStart();
     if(camera.clearBeforeRender) renderer.clearScreen(camera.transparent, camera.background);
-
-    //_projScreenMatrix.mmul(camera.projection, camera.view);
-    //viewMatrix = camera.view;
 
     for (j = 0; j < transforms.length; j++) {
         transform = transforms[j];
 
-        this._renderTransform(renderer, _projectionView, transform, 1);
+        this._renderTransform(renderer, _projectionView, transform, 1.0);
     }
+
+    renderer.onRenderFinish();
 };
 
 Render2DSystem.prototype._renderTransform = function (renderer, viewMatrix, transform, alpha) {
@@ -103,12 +103,13 @@ Render2DSystem.prototype._renderTransform = function (renderer, viewMatrix, tran
         len = components.length;
         for (i = 0; i < len; i++) {
             component = components[i];
-            //component.startRender(renderer);
             if (!component.visible) {
                 continue;
             }
-            //var transform = component.transform;
-            renderer.setAlpha(component.worldAlpha, component.blendMode);
+
+            alpha = component.worldAlpha = alpha * component.alpha;
+
+            renderer.setAlpha(alpha, component.blendMode);
             renderer.setTransform(transform.modelView, true);
 
             component._draw(renderer);

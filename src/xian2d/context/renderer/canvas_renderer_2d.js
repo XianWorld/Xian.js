@@ -37,7 +37,7 @@ function CanvasRenderer2D(canvas, opts) {
     this._transformTx = 0;
     this._transformTy = 0;
 
-    this.blendModes = {};
+    //this.blendModes = {};
 
     //this.clearBeforeRender = opts.clearBeforeRender !== undefined ? opts.clearBeforeRender : true;
 
@@ -52,6 +52,7 @@ CanvasRenderer2D.prototype.clearScreen = function (transparent, background) {
     //    this.canvasContext.fillStyle = "black";
     //    this.canvasContext.clear();
     //}
+    //this.canvasContext.globalAlpha = this.globalAlpha = 1;
 
     if (transparent)
     {
@@ -149,18 +150,23 @@ CanvasRenderer2D.prototype.setAlpha = function (alpha, blendMode) {
         this.canvasContext.globalAlpha = this.globalAlpha = alpha;
     }
     if (blendMode) {
-        this.blendValue = this.blendModes[blendMode];
+        this.blendValue = CanvasRenderer2D.blendModes[blendMode];
         this.canvasContext.globalCompositeOperation = this.blendValue;
     }
     else if (this.blendValue != Enums.blendModes.NORMAL) {
-        this.blendValue = this.blendModes[Enums.blendModes.NORMAL];
+        this.blendValue = CanvasRenderer2D.blendModes[Enums.blendModes.NORMAL];
         this.canvasContext.globalCompositeOperation = this.blendValue;
     }
 };
 
-CanvasRenderer2D.prototype.initBlendMode = function () {
-    var blendModesCanvas = this.blendModes;
+CanvasRenderer2D.blendModes = undefined;
 
+CanvasRenderer2D.prototype.initBlendMode = function () {
+    var blendModesCanvas = CanvasRenderer2D.blendModes;//this.blendModes;
+
+    if(blendModesCanvas) return;
+
+    blendModesCanvas = CanvasRenderer2D.blendModes = [];
     if (Dom.canUseNewCanvasBlendModes()) {
         blendModesCanvas[Enums.blendModes.NORMAL] = "source-over";
         blendModesCanvas[Enums.blendModes.ADD] = "lighter"; //IS THIS OK???
