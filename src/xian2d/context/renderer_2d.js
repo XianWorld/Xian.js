@@ -1,4 +1,4 @@
-var Class = require("../../../base/class");
+var Class = require("../../base/class");
 "use strict";
 
 function Renderer2D(opts) {

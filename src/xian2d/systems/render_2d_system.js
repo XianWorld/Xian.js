@@ -92,7 +92,7 @@ Render2DSystem.prototype._renderTransform = function (renderer, viewMatrix, tran
     var children = transform.children,
         len = children.length,
         gameObject, components, component,
-        i;
+        i, mask, colorTransform;
 
     transform.updateMatrices(viewMatrix);
 
@@ -103,16 +103,28 @@ Render2DSystem.prototype._renderTransform = function (renderer, viewMatrix, tran
         len = components.length;
         for (i = 0; i < len; i++) {
             component = components[i];
-            if (!component.visible) {
-                continue;
-            }
+            //if (!component.visible) {
+            //    continue;
+            //}
+
+            //colorTransform = component._colorTransform;
+            //if (colorTransform){
+            //    renderer.setGlobalColorTransform(colorTransform.matrix);
+            //}
 
             alpha = component.worldAlpha = alpha * component.alpha;
 
-            renderer.setAlpha(alpha, component.blendMode);
-            renderer.setTransform(transform.modelView, true);
+            //mask = component.mask;
+            //if (mask) {
+            //    renderer.pushMask(mask);
+            //}
 
-            component._draw(renderer);
+            //renderer.setAlpha(alpha, component.blendMode);
+            //renderer.setTransform(transform.modelView, true);
+
+            //component._draw(renderer);
+
+            component.startRender(renderer);
         }
     }
 
@@ -125,7 +137,16 @@ Render2DSystem.prototype._renderTransform = function (renderer, viewMatrix, tran
         i = components.length;
         while (i--) {
             component = components[i];
-            //component.finishRender(renderer);
+            component.finishRender(renderer);
+
+            //if (component._colorTransform){
+            //    renderer.setGlobalColorTransform(null);
+            //}
+            //
+            //mask = component.mask;
+            //if (mask) {
+            //    renderer.popMask(mask);
+            //}
         }
     }
 };

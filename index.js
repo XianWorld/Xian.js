@@ -102,6 +102,9 @@ function Xian() {
     this.Render2DSystem = require("./src/xian2d/systems/render_2d_system");
     this.Transform2DSystem = require("./src/xian2d/systems/transform_2d_system");
 
+    this.Graphics = require("./src/xian2d/components/graphics");
+    this.PIXICanvasRenderer2D = require("./src/xian2d/context/pixi/pixi_canvas_renderer_2d");
+
 }
 
 

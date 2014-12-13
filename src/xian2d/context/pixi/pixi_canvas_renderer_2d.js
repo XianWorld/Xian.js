@@ -3,9 +3,11 @@ var Enums = require("../../../core/enums");
 var Dom = require("../../../context/dom");
 var util = require("../../../base/util");
 var Color = require("../../../math/color");
+var CanvasGraphics = require("./utils/canvas_graphics");
+var CanvasMaskManager = require("./utils/canvas_mask_manager");
 "use strict";
 
-function CanvasRenderer2D(canvas, opts) {
+function PIXICanvasRenderer2D(canvas, opts) {
     opts || (opts = {});
 
     Renderer2D.call(this, opts);
@@ -37,6 +39,7 @@ function CanvasRenderer2D(canvas, opts) {
     this._transformTx = 0;
     this._transformTy = 0;
 
+    this.maskManager = new CanvasMaskManager(this);
     //this.blendModes = {};
 
     //this.clearBeforeRender = opts.clearBeforeRender !== undefined ? opts.clearBeforeRender : true;
@@ -45,9 +48,9 @@ function CanvasRenderer2D(canvas, opts) {
 
 }
 
-Renderer2D.extend(CanvasRenderer2D);
+Renderer2D.extend(PIXICanvasRenderer2D);
 
-CanvasRenderer2D.prototype.clearScreen = function (transparent, background) {
+PIXICanvasRenderer2D.prototype.clearScreen = function (transparent, background) {
     //if (navigator.isCocoonJS && this.canvas.screencanvas) {
     //    this.canvasContext.fillStyle = "black";
     //    this.canvasContext.clear();
@@ -69,11 +72,11 @@ CanvasRenderer2D.prototype.clearScreen = function (transparent, background) {
     this.renderCost = 0;
 };
 
-CanvasRenderer2D.prototype.clearRect = function (x, y, w, h) {
+PIXICanvasRenderer2D.prototype.clearRect = function (x, y, w, h) {
     this.canvasContext.clearRect(x, y, w, h);
 };
 
-CanvasRenderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, repeat) {
+PIXICanvasRenderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, repeat) {
     if (repeat === void 0) {
         repeat = undefined;
     }
@@ -98,7 +101,7 @@ CanvasRenderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sour
     //this.renderCost += egret.getTimer() - beforeDraw;
 };
 
-CanvasRenderer2D.prototype.drawRepeatImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, repeat) {
+PIXICanvasRenderer2D.prototype.drawRepeatImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, repeat) {
     if (texture['pattern'] === undefined) {
         var image = texture.raw;
         var tempImage = image;
@@ -119,7 +122,7 @@ CanvasRenderer2D.prototype.drawRepeatImage = function (texture, sourceX, sourceY
     this.canvasContext.translate(-destX, -destY);
 };
 
-CanvasRenderer2D.prototype.setTransform = function (matrix) {
+PIXICanvasRenderer2D.prototype.setTransform = function (matrix) {
     if(!matrix){
         this._transformTx = this._transformTy = 0;
         this.canvasContext.setTransform(1,0,0,1,0,0);
@@ -145,28 +148,28 @@ CanvasRenderer2D.prototype.setTransform = function (matrix) {
     }
 };
 
-CanvasRenderer2D.prototype.setAlpha = function (alpha, blendMode) {
+PIXICanvasRenderer2D.prototype.setAlpha = function (alpha, blendMode) {
     if (alpha != this.globalAlpha) {
         this.canvasContext.globalAlpha = this.globalAlpha = alpha;
     }
     if (blendMode) {
-        this.blendValue = CanvasRenderer2D.blendModes[blendMode];
+        this.blendValue = PIXICanvasRenderer2D.blendModes[blendMode];
         this.canvasContext.globalCompositeOperation = this.blendValue;
     }
     else if (this.blendValue != Enums.blendModes.NORMAL) {
-        this.blendValue = CanvasRenderer2D.blendModes[Enums.blendModes.NORMAL];
+        this.blendValue = PIXICanvasRenderer2D.blendModes[Enums.blendModes.NORMAL];
         this.canvasContext.globalCompositeOperation = this.blendValue;
     }
 };
 
-CanvasRenderer2D.blendModes = undefined;
+PIXICanvasRenderer2D.blendModes = undefined;
 
-CanvasRenderer2D.prototype.initBlendMode = function () {
-    var blendModesCanvas = CanvasRenderer2D.blendModes;//this.blendModes;
+PIXICanvasRenderer2D.prototype.initBlendMode = function () {
+    var blendModesCanvas = PIXICanvasRenderer2D.blendModes;//this.blendModes;
 
     if(blendModesCanvas) return;
 
-    blendModesCanvas = CanvasRenderer2D.blendModes = [];
+    blendModesCanvas = PIXICanvasRenderer2D.blendModes = [];
     if (Dom.canUseNewCanvasBlendModes()) {
         blendModesCanvas[Enums.blendModes.NORMAL] = "source-over";
         blendModesCanvas[Enums.blendModes.ADD] = "lighter"; //IS THIS OK???
@@ -208,7 +211,7 @@ CanvasRenderer2D.prototype.initBlendMode = function () {
     }
 };
 
-CanvasRenderer2D.prototype.setupFont = function (textField) {
+PIXICanvasRenderer2D.prototype.setupFont = function (textField) {
     var ctx = this.canvasContext;
     var font = textField._italic ? "italic " : "normal ";
     font += textField._bold ? "bold " : "normal ";
@@ -218,12 +221,12 @@ CanvasRenderer2D.prototype.setupFont = function (textField) {
     ctx.textBaseline = "middle";
 };
 
-CanvasRenderer2D.prototype.measureText = function (text) {
+PIXICanvasRenderer2D.prototype.measureText = function (text) {
     var result = this.canvasContext.measureText(text);
     return result.width;
 };
 
-CanvasRenderer2D.prototype.drawText = function (textField, text, x, y, maxWidth, style) {
+PIXICanvasRenderer2D.prototype.drawText = function (textField, text, x, y, maxWidth, style) {
     var textColor;
     if (style["textColor"]) {
 
@@ -257,42 +260,52 @@ CanvasRenderer2D.prototype.drawText = function (textField, text, x, y, maxWidth,
     //super.drawText.call(this, textField, text, x, y, maxWidth, style);
 };
 
-CanvasRenderer2D.prototype.strokeRect = function (x, y, w, h, color) {
+PIXICanvasRenderer2D.prototype.strokeRect = function (x, y, w, h, color) {
     this.canvasContext.strokeStyle = color;
     this.canvasContext.strokeRect(x, y, w, h);
 };
 
-CanvasRenderer2D.prototype.pushMask = function (mask) {
-    this.canvasContext.save();
-    this.canvasContext.beginPath();
-    this.canvasContext.rect(mask.x + this._transformTx, mask.y + this._transformTy, mask.width, mask.height);
-    this.canvasContext.clip();
-    this.canvasContext.closePath();
+PIXICanvasRenderer2D.prototype.pushMask = function (worldTransform, graphicsData, worldAlpha, tint) {
+    //this.canvasContext.save();
+    //this.canvasContext.beginPath();
+    //this.canvasContext.rect(mask.x + this._transformTx, mask.y + this._transformTy, mask.width, mask.height);
+    //this.canvasContext.clip();
+    //this.canvasContext.closePath();
+    this.maskManager.pushMask(worldTransform, graphicsData, worldAlpha, tint);
 };
 
-CanvasRenderer2D.prototype.popMask = function () {
+PIXICanvasRenderer2D.prototype.popMask = function (worldTransform, graphicsData, worldAlpha, tint) {
+    //this.canvasContext.restore();
+    //this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+    this.maskManager.popMask(worldTransform, graphicsData, worldAlpha, tint);
+};
+
+PIXICanvasRenderer2D.prototype.onRenderStart = function () {
+    this.canvasContext.save();
+};
+
+PIXICanvasRenderer2D.prototype.onRenderFinish = function () {
     this.canvasContext.restore();
     this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
 };
 
-CanvasRenderer2D.prototype.onRenderStart = function () {
-    this.canvasContext.save();
+PIXICanvasRenderer2D.prototype.setGlobalColorTransform = function (colorTransformMatrix) {
 };
 
-CanvasRenderer2D.prototype.onRenderFinish = function () {
-    this.canvasContext.restore();
-    this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+PIXICanvasRenderer2D.prototype.renderGraphics = function (worldTransform, graphicsData, worldAlpha, tint) {
+    CanvasGraphics.renderGraphics(this, worldTransform, graphicsData, worldAlpha, tint);
 };
 
-CanvasRenderer2D.prototype.setGlobalColorTransform = function (colorTransformMatrix) {
+PIXICanvasRenderer2D.prototype.renderGraphicsMask = function (worldTransform, graphicsData, worldAlpha, tint) {
+    CanvasGraphics.renderGraphicsMask(this, worldTransform, graphicsData, worldAlpha, tint);
 };
 
-CanvasRenderer2D.prototype.toJSON = function (json) {
+PIXICanvasRenderer2D.prototype.toJSON = function (json) {
     return json;
 };
 
-CanvasRenderer2D.prototype.fromJSON = function (json) {
+PIXICanvasRenderer2D.prototype.fromJSON = function (json) {
     return this;
 };
 
-module.exports = CanvasRenderer2D;
+module.exports = PIXICanvasRenderer2D;

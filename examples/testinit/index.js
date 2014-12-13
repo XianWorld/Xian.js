@@ -10,19 +10,74 @@ seajs.use(['index-debug.js'], function (Xian) {
     Xian.globalize();
 
     var game, scene, level0, level1, level2, system;
-    //var random = Math.random,
-    //    PI = Math.PI,
-    //    TWO_PI = PI * 2;
 
-    function Rotate2DBehaviour(){
+    function GraphicsBehaviour(){
         Behaviour.call(this);
     }
-    Behaviour.extend(Rotate2DBehaviour);
-    Rotate2DBehaviour.prototype.onUpdate = function(){
+    Behaviour.extend(GraphicsBehaviour);
+    GraphicsBehaviour.prototype.onStart = function(){
+        var graphics = this.gameObject.graphics;
+        // set a fill and line style
+        graphics.beginFill(0xFF3300);
+        graphics.lineStyle(10, 0xffd900, 1);
+
+        // draw a shape
+        graphics.moveTo(50,50);
+        graphics.lineTo(250, 50);
+        graphics.lineTo(100, 100);
+        graphics.lineTo(250, 220);
+        graphics.lineTo(50, 220);
+        graphics.lineTo(50, 50);
+        graphics.endFill();
+
+        // set a fill and line style again
+        graphics.lineStyle(10, 0xFF0000, 0.8);
+        graphics.beginFill(0xFF700B, 1);
+
+        // draw a second shape
+        graphics.moveTo(210,300);
+        graphics.lineTo(450,320);
+        graphics.lineTo(570,350);
+        graphics.quadraticCurveTo(600, 0, 480,100);
+        graphics.lineTo(330,120);
+        graphics.lineTo(410,200);
+        graphics.lineTo(210,300);
+        graphics.endFill();
+
+        // draw a rectangle
+        graphics.lineStyle(2, 0x0000FF, 1);
+        graphics.drawRect(50, 250, 100, 100);
+
+        // draw a circle
+        graphics.lineStyle(0);
+        graphics.beginFill(0xFFFF0B, 0.5);
+        graphics.drawCircle(470, 200,100);
+        graphics.endFill();
+
+        graphics.lineStyle(20, 0x33FF00);
+        graphics.moveTo(30,30);
+        graphics.lineTo(600, 300);
+    };
+
+    function Sprite2DBehaviour(){
+        Behaviour.call(this);
+    }
+    Behaviour.extend(Sprite2DBehaviour);
+    Sprite2DBehaviour.prototype.onStart = function(){
+    };
+    Sprite2DBehaviour.prototype.onUpdate = function(){
         var transform = this.transform;
         //transform.position.x += 1;
         //transform.position.y += 1;
         transform.rotation += 0.01;
+        //var sprite2d = this.gameObject.sprite2d_0;
+        //if(sprite2d.mask)
+        //{
+        //    sprite2d.mask.width += 1;
+        //    sprite2d.mask.height += 1;
+        //}
+
+
     };
 
     Assets.addAssets(
@@ -47,8 +102,8 @@ seajs.use(['index-debug.js'], function (Xian) {
             height: 640
         },
         renderer: {
-            //canvasRenderer: CanvasRenderer2D,
-            webglRenderer: WebGLRenderer2D
+            canvasRenderer: PIXICanvasRenderer2D,//CanvasRenderer2D,
+            //webglRenderer: WebGLRenderer2D
         }
     });
 
@@ -73,10 +128,16 @@ seajs.use(['index-debug.js'], function (Xian) {
                 background: new Color(0.5, 0.5, 0.5)
             }),
             new Sprite2D({
-                name: "test0",
+                name: "sprite2d_0",
                 alpha: 0.5,
+                //mask: new Rect(10,10,20,20),
                 texture: Assets.get("img_player")
             }),
+            new Graphics({
+                //name: "graphics_0",
+                isMask: true
+            }),
+            new GraphicsBehaviour()
         ]
     });
     level1 = new GameObject({
@@ -87,12 +148,12 @@ seajs.use(['index-debug.js'], function (Xian) {
                 position: new Vec2(100,100)
             }),
             new Sprite2D({
-                name: "test1",
+                name: "sprite2d_1",
                 alpha: 0.5,
-                blendMode: Enums.blendModes.DIFFERENCE,
+                //blendMode: Enums.blendModes.DIFFERENCE,
                 texture: Assets.get("img_player")
             }),
-            new Rotate2DBehaviour()
+            new Sprite2DBehaviour()
         ]
     });
 

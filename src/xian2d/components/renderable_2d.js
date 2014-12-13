@@ -1,6 +1,7 @@
 var Enums = require("../../core/enums");
 var Component = require("./../../core/component");
 var Assets = require("../../assets/assets");
+var Rect = require("../../math/rect");
 "use strict";
 
 
@@ -30,6 +31,8 @@ function Renderable2D(opts) {
     //this._webglInitted = false;
 
     this.worldAlpha = 1.0;
+
+    //this.mask = opts.mask !== undefined ? opts.mask : undefined;
 }
 
 Component.extend(Renderable2D);
@@ -77,26 +80,25 @@ Renderable2D.prototype.clear = function () {
 //
 //};
 
-//Renderable2D.prototype.startRender = function (renderer) {
-//    if (!this.visible) {
-//        return;
-//    }
-//    var transform = this.transform || this.transform2d;
-//    var o = this;
-//    renderer.setAlpha(o.worldAlpha, o.blendMode);
-//    renderer.setTransform(transform.modelView);
-//
-//    this._draw(renderer);
-//
-//};
+Renderable2D.prototype.startRender = function (renderer) {
+    if (!this.visible) {
+        return;
+    }
+    var transform = this.transform;
+    renderer.setAlpha(this.worldAlpha, this.blendMode);
+    renderer.setTransform(transform.modelView);
+
+    this._draw(renderer);
+
+};
 
 Renderable2D.prototype._draw = function (renderer) {
 
 };
 
-//Renderable2D.prototype.finishRender = function (renderer) {
-//
-//};
+Renderable2D.prototype.finishRender = function (renderer) {
+
+};
 
 Renderable2D.prototype.toJSON = function (json) {
     json = Component.prototype.toJSON.call(this, json);
@@ -108,6 +110,9 @@ Renderable2D.prototype.toJSON = function (json) {
     //json.z = this.z;
 
     json.alpha = this.alpha;
+
+    //if(this.mask)
+    //    json.mask = this.mask.toJSON(json.mask);
 
     //json.material = this.material ? this.material.name : undefined;
 
@@ -133,6 +138,13 @@ Renderable2D.prototype.fromJSON = function (json) {
     //this.z = json.z;
 
     this.alpha = json.alpha;
+
+    //if(json.mask){
+    //    this.mask = new Rect();
+    //    this.mask.fromJSON(json.mask);
+    //}
+    //else
+    //    this.mask = undefined;
 
     //this.material = json.material ? Assets.get(json.material) : undefined;
 

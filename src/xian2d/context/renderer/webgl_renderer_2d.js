@@ -1,4 +1,4 @@
-var Renderer2D = require("./renderer_2d");
+var Renderer2D = require("./../renderer_2d");
 var Enums = require("../../../core/enums");
 var Dom = require("../../../context/dom");
 var util = require("../../../base/util");
@@ -151,13 +151,17 @@ WebGLRenderer2D.prototype.start = function () {
     gl.vertexAttribPointer(shader.colorAttribute, 2, gl.FLOAT, false, stride, 4 * 4);
 };
 
-WebGLRenderer2D.prototype.clearScreen = function () {
+WebGLRenderer2D.prototype.clearScreen = function (transparent, background) {
     var gl = this.gl;
-    gl.colorMask(true, true, true, true);
-
-    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.clearColor(0, 0, 0, 0);
+    //gl.colorMask(true, true, true, true);
+    //
+    //gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    if(transparent)
+        gl.clearColor(0, 0, 0, 0);
+    else if(background){
+        gl.clearColor(background.r, background.g, background.b, 1);
+    }
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.renderCost = 0;
@@ -483,6 +487,11 @@ WebGLRenderer2D.prototype.measureText = function (text) {
 //};
 
 WebGLRenderer2D.prototype.onRenderStart = function () {
+    var gl = this.gl;
+    gl.colorMask(true, true, true, true);
+
+    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 };
 
 WebGLRenderer2D.prototype.onRenderFinish = function () {
