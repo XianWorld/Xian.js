@@ -10,13 +10,73 @@ function Sprite2D(opts) {
 
     Renderable2D.call(this, opts);
 
-    this.texture = opts.texture !== undefined ? opts.texture : undefined;
-    this.textureClip = undefined;
-    //this.material = opts.material !== undefined ? opts.material : undefined;
+    this._texture = opts.texture !== undefined ? opts.texture : undefined;
+    this._textureClip = opts.textureClip !== undefined ? opts.textureClip : undefined;
+
+    this.sourceX = 0;
+    this.sourceY = 0;
+    this.sourceWidth = 0;
+    this.sourceHeight = 0;
+
+    this.destX = 0;
+    this.destY = 0;
+    this.destWidth = 0;
+    this.destHeight = 0;
+
+    //this._updateRenderSize();
+    this._dirtyRenderSize = true;
 }
 
 Renderable2D.extend(Sprite2D);
 
+Object.defineProperty(Sprite2D.prototype, "texture", {
+    get: function () {
+        return this._texture;
+    },
+    set: function (value){
+        this._texture = value;
+
+        this._dirtyRenderSize = true;
+    }
+});
+Object.defineProperty(Sprite2D.prototype, "textureClip", {
+    get: function () {
+        return this._textureClip;
+    },
+    set: function (value){
+        this._textureClip = value;
+
+        this._dirtyRenderSize = true;
+    }
+});
+
+Sprite2D.prototype._updateRenderSize = function () {
+    var texture = this._texture,
+        textureClip = this._textureClip;
+
+    if (textureClip) {
+        this.sourceX = textureClip.clipX;
+        this.sourceY = textureClip.clipY;
+        this.sourceWidth = textureClip.clipWidth;
+        this.sourceHeight = textureClip.clipHeight;
+
+        this.destX = -textureClip.offsetX;
+        this.destY = -textureClip.offsetY;
+        this.destWidth = textureClip.clipWidth;
+        this.destHeight = textureClip.clipHeight;
+    }else{
+        this.sourceX = 0;
+        this.sourceY = 0;
+        this.sourceWidth = texture.width;
+        this.sourceHeight = texture.height;
+
+        this.destX = 0;
+        this.destY = 0;
+        this.destWidth = texture.width;
+        this.destHeight = texture.height;
+    }
+    return this;
+};
 
 Sprite2D.prototype.copy = function (other) {
 
@@ -30,35 +90,15 @@ Sprite2D.prototype.clear = function () {
     return this;
 };
 
-Sprite2D.prototype._draw = function (renderer) {
-    var texture = this.texture,
-        textureClip = this.textureClip;
+Sprite2D.prototype._render = function (renderer) {
 
-    var sourceX = 0,
-        sourceY = 0,
-        sourceWidth = texture.width,
-        sourceHeight = texture.height;
-
-    var destX = 0,
-        destY = 0,
-        destWidth = texture.width,
-        destHeight = texture.height;
-
-    if (textureClip) {
-        sourceX = textureClip.clipX;
-        sourceY = textureClip.clipY;
-        sourceWidth = textureClip.clipWidth;
-        sourceHeight = textureClip.clipHeight;
-
-        destX = -textureClip.offsetX;
-        destY = -textureClip.offsetY;
-        destWidth = textureClip.clipWidth;
-        destHeight = textureClip.clipHeight;
+    if(this._dirtyRenderSize){
+        this._updateRenderSize();
+        this._dirtyRenderSize = false;
     }
-
-    renderer.drawImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
+    //renderer.drawImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, this.tint);
+    renderer.renderSprite2D(this);
 };
-
 
 Sprite2D.prototype.toJSON = function (json) {
     json = Renderable2D.prototype.toJSON.call(this, json);

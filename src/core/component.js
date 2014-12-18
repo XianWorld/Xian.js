@@ -23,6 +23,8 @@ function Component(opts) {
 
     this._comp_state = undefined;
     this.gameObject = undefined;
+
+    this.enabled = opts.enabled !== undefined ? opts.enabled : true;
 }
 
 Class.extend(Component);
@@ -108,6 +110,7 @@ Component.prototype.toJSON = function (json) {
     json.sync = this.sync;
     json.json = this.json;
 
+    json.enabled = this.enabled;
     return json;
 };
 
@@ -119,6 +122,7 @@ Component.prototype.fromJSON = function (json) {
     this.sync = json.sync;
     this.json = json.json;
 
+    this.enabled = json.enabled;
     return this;
 };
 

@@ -765,6 +765,15 @@ function singleToHEX(value) {
     return str.length === 1 ? "0" + str : str;
 }
 
+Color.hexString = function(hex) {
+    return "#" + ("00000" + ( hex | 0).toString(16)).substr(-6);
+}
+Color.hex2rgb = function(hex) {
+    return [(hex >> 16 & 0xFF) / 255, ( hex >> 8 & 0xFF) / 255, (hex & 0xFF)/ 255];
+};
+Color.rgb2hex = function(rgb) {
+    return ((rgb[0]*255 << 16) + (rgb[1]*255 << 8) + rgb[2]*255);
+};
 
 var colorNames = Color.colorNames = {
     aliceblue: "#f0f8ff",

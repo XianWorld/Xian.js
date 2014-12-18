@@ -25,7 +25,7 @@ module.exports = {
         LUMINOSITY:16
     },
 
-    Blending: new Enum("Default None Additive Subtractive Muliply Custom"),
+    //Blending: new Enum("Default None Additive Subtractive Muliply Custom"),
     Side: new Enum("Front Back Both"),
 
     CullFace: new Enum("None Back Front FrontBack"),
@@ -39,7 +39,12 @@ module.exports = {
 
     ShadowMapType: new Enum("BasicShadowMap PCFShadowMap PCFSoftShadowMap"),
 
-    FilterMode: new Enum("None Linear"),
+    filterMode: {
+        DEFAULT: 0,
+        LINEAR: 0,
+        NEAREST: 1
+    },
+    //FilterMode: new Enum("None Linear"),
     TextureFormat: new Enum("RGB RGBA Luminance Alpha LuminanceAlpha"),
     TextureWrap: new Enum("Repeat Clamp MirrorRepeat"),
 

@@ -640,6 +640,23 @@ Mat3.prototype.fromMat4 = function (m) {
     return this;
 };
 
+Mat3.prototype.fromMat32 = function (m) {
+    var te = this.elements,
+        me = m.elements;
+
+    te[0] = me[0];
+    te[1] = me[1];
+    te[2] = 0.0;
+    te[3] = me[2];
+    te[4] = me[3];
+    te[5] = 0.0;
+    te[6] = me[4];
+    te[7] = me[5];
+    te[8] = 1;
+
+    return this;
+};
+
 /**
  * @method fromQuat
  * @memberof Odin.Mat3

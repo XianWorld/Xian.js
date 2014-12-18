@@ -1,10 +1,4 @@
-/**
- * Created by Dianyan on 2014/12/13.
- */
-/**
- * @author Mat Groves http://matgroves.com/ @Doormat23
- */
-var Enums2D = require("../../../common/enums_2d");
+var Enums2D = require("../../../../common/enums_2d");
 
 function CanvasGraphics()
 {
@@ -18,17 +12,17 @@ function CanvasGraphics()
  * @param graphics {Graphics} the actual graphics object to render
  * @param context {CanvasRenderingContext2D} the 2d drawing method of the canvas
  */
-CanvasGraphics.renderGraphics = function(renderer, worldTransform, graphicsData, worldAlpha, tint)
+CanvasGraphics.renderGraphics = function(renderer, graphics)//, worldTransform, graphicsData, worldAlpha, tint
 {
-    //var worldAlpha = graphics.worldAlpha;
+    var worldAlpha = graphics.worldAlpha;
     var context = renderer.canvasContext;
     var color = '';
 
-    renderer.setTransform(worldTransform);
+    renderer._setTransform(graphics.worldTransform);
 
-    for (var i = 0; i < graphicsData.length; i++)
+    for (var i = 0; i < graphics.graphicsData.length; i++)
     {
-        var data = graphicsData[i];
+        var data = graphics.graphicsData[i];
         var shape = data.shape;
 
         context.strokeStyle = color = '#' + ('00000' + ( data.lineColor | 0).toString(16)).substr(-6);
@@ -194,24 +188,24 @@ CanvasGraphics.renderGraphics = function(renderer, worldTransform, graphicsData,
  * @param graphics {Graphics} the graphics which will be used as a mask
  * @param context {CanvasRenderingContext2D} the context 2d method of the canvas
  */
-CanvasGraphics.renderGraphicsMask = function(renderer, worldTransform, graphicsData, worldAlpha, tint)
+CanvasGraphics.renderGraphicsMask = function(renderer, graphics)//worldTransform, graphicsData, worldAlpha, tint
 {
     var context = renderer.canvasContext;
-    var len = graphicsData.length;
+    var len = graphics.graphicsData.length;
 
     if(len === 0) return;
 
-    renderer.setTransform(worldTransform);
+    renderer._setTransform(graphics.worldTransform);
 
     if(len > 1)
     {
         len = 1;
-        window.console.log('js warning: masks in canvas can only mask using the first path in the graphics object');
+        //window.console.log('js warning: masks in canvas can only mask using the first path in the graphics object');
     }
 
     for (var i = 0; i < 1; i++)
     {
-        var data = graphicsData[i];
+        var data = graphics.graphicsData[i];
         var shape = data.shape;
 
         if(data.type === Enums2D.ShapeTypes.POLY)

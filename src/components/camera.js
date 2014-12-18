@@ -41,7 +41,7 @@ function Camera(opts) {
     //this.view = new Mat4;
 
     this.needsUpdate = true;
-    this._active = true;
+    //this._active = opts.active !== undefined ? opts.active : false;
 }
 
 Component.extend(Camera);
@@ -226,6 +226,8 @@ Camera.prototype.toJSON = function (json) {
     json.minOrthographicSize = this.minOrthographicSize;
     json.maxOrthographicSize = this.maxOrthographicSize;
 
+    //json.active = this._active;
+
     return json;
 };
 
@@ -248,6 +250,8 @@ Camera.prototype.fromJSON = function (json) {
     this.orthographicSize = json.orthographicSize;
     this.minOrthographicSize = json.minOrthographicSize;
     this.maxOrthographicSize = json.maxOrthographicSize;
+
+    //this._active = json.active;
 
     this.needsUpdate = true;
 

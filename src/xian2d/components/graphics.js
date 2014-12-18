@@ -648,8 +648,9 @@ Graphics.prototype.startRender = function (renderer) {
         return;
     }
     var transform = this.transform;
+    this.worldMatrix = transform.modelView;
     if (this.isMask) {
-        renderer.pushMask(transform.modelView, this.graphicsData, this.worldAlpha, this.tint);
+        renderer.pushMask(this);
         //renderer.renderGraphicsMask(transform.modelView, this.graphicsData, this.worldAlpha, this.tint);
     }
     //else{
@@ -658,21 +659,22 @@ Graphics.prototype.startRender = function (renderer) {
     //}
     //renderer.setTransform(transform.modelView);
 
-    this._draw(renderer);
+    this._render(renderer);
 };
 
-Graphics.prototype._draw = function (renderer) {
+Graphics.prototype._render = function (renderer) {
     if (!this.isMask) {
         var transform = this.transform;
-        renderer.setAlpha(this.worldAlpha, this.blendMode);
-        renderer.renderGraphics(transform.modelView, this.graphicsData, this.worldAlpha, this.tint);
+        //renderer._setAlpha(this.worldAlpha, this.blendMode);
+        //renderer.renderGraphics(transform.modelView, this.graphicsData, this.worldAlpha, this.tint);
+        renderer.renderGraphics(this);
     }
 };
 
 Graphics.prototype.finishRender = function (renderer) {
     if (this.isMask) {
         var transform = this.transform;
-        renderer.popMask(transform.modelView, this.graphicsData, this.worldAlpha, this.tint);
+        renderer.popMask(this);
     }
 };
 

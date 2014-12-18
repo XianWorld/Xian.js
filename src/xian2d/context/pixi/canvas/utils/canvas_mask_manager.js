@@ -11,9 +11,9 @@ function CanvasMaskManager(renderer)
 
 CanvasMaskManager.prototype.constructor = CanvasMaskManager;
 
-CanvasMaskManager.prototype.pushMask = function(worldTransform, graphicsData, worldAlpha, tint)
+CanvasMaskManager.prototype.pushMask = function(renderer, graphics)
 {
-    var context = this.renderer.canvasContext;
+    var context = renderer.canvasContext;
 
     context.save();
 
@@ -29,7 +29,7 @@ CanvasMaskManager.prototype.pushMask = function(worldTransform, graphicsData, wo
     //    transform.tx * resolution,
     //    transform.ty * resolution);
 
-    CanvasGraphics.renderGraphicsMask(this.renderer, worldTransform, graphicsData, worldAlpha, tint);
+    CanvasGraphics.renderGraphicsMask(renderer, graphics);
 
     context.clip();
 
@@ -42,9 +42,9 @@ CanvasMaskManager.prototype.pushMask = function(worldTransform, graphicsData, wo
  * @method popMask
  * @param renderSession {Object} The renderSession whose context will be used for this mask manager.
  */
-CanvasMaskManager.prototype.popMask = function(renderSession)
+CanvasMaskManager.prototype.popMask = function(renderer, graphics)
 {
-    var context = this.renderer.canvasContext;
+    var context = renderer.canvasContext;
     context.restore();
 };
 

@@ -8,7 +8,7 @@ function TransformSystem(opts) {
 
     ComponentSystem.call(this, opts);
 
-    this.order = 99999;
+    this.order = -99999;
 
     //this.addEventName = "startComponent";
     //this.removeEventName = "removeComponent";

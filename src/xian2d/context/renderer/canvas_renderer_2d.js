@@ -15,19 +15,21 @@ function CanvasRenderer2D(canvas, opts) {
     this.globalAlpha = 1;
     this.canvas = canvas;
     //this.canvasContext = this.canvas.getContext("2d", {alpha: this.transparent});
-    this.canvasContext = this.canvas.getContext("2d");
+    this.mainContext = this.canvas.getContext("2d");
 
-    var f = this.canvasContext.setTransform;
-    var that = this;
-    this.canvasContext.setTransform = function (a, b, c, d, tx, ty) {
-        that._matrixA = a;
-        that._matrixB = b;
-        that._matrixC = c;
-        that._matrixD = d;
-        that._matrixTx = tx;
-        that._matrixTy = ty;
-        f.call(that.canvasContext, a, b, c, d, tx, ty);
-    };
+    //var f = this.canvasContext.setTransform;
+    //var that = this;
+    //this.canvasContext.setTransform = function (a, b, c, d, tx, ty) {
+    //    that._matrixA = a;
+    //    that._matrixB = b;
+    //    that._matrixC = c;
+    //    that._matrixD = d;
+    //    that._matrixTx = tx;
+    //    that._matrixTy = ty;
+    //    f.call(that.canvasContext, a, b, c, d, tx, ty);
+    //};
+    this._initContext(this.mainContext);
+
     this._matrixA = 1;
     this._matrixB = 0;
     this._matrixC = 0;
@@ -41,11 +43,32 @@ function CanvasRenderer2D(canvas, opts) {
 
     //this.clearBeforeRender = opts.clearBeforeRender !== undefined ? opts.clearBeforeRender : true;
 
-    this.initBlendMode();
+    this._initBlendMode();
 
 }
 
 Renderer2D.extend(CanvasRenderer2D);
+
+CanvasRenderer2D.prototype.startRender = function (renderTexture) {
+    if(renderTexture !== undefined){
+        var buffer = renderTexture.getBuffer(this);
+        if(!buffer.context._inited)
+            this._initContext(buffer.context);
+        this.canvasContext = buffer.context;
+    }else{
+        this.canvasContext = this.mainContext;
+    }
+
+    this.rendering = true;
+    this.canvasContext.save();
+};
+
+CanvasRenderer2D.prototype.finishRender = function (renderTexture) {
+    this.canvasContext.restore();
+    this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+
+    this.rendering = false;
+};
 
 CanvasRenderer2D.prototype.clearScreen = function (transparent, background) {
     //if (navigator.isCocoonJS && this.canvas.screencanvas) {
@@ -56,7 +79,7 @@ CanvasRenderer2D.prototype.clearScreen = function (transparent, background) {
 
     if (transparent)
     {
-        this.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this._clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
     else
     {
@@ -69,11 +92,63 @@ CanvasRenderer2D.prototype.clearScreen = function (transparent, background) {
     this.renderCost = 0;
 };
 
-CanvasRenderer2D.prototype.clearRect = function (x, y, w, h) {
-    this.canvasContext.clearRect(x, y, w, h);
+CanvasRenderer2D.prototype.renderSprite2D = function (sprite2D) {
+
+    var texture = sprite2D.texture,
+        sourceX = sprite2D.sourceX,
+        sourceY = sprite2D.sourceY,
+        sourceWidth = sprite2D.sourceWidth,
+        sourceHeight = sprite2D.sourceHeight,
+        destX = sprite2D.destX,
+        destY = sprite2D.destY,
+        destWidth = sprite2D.destWidth,
+        destHeight = sprite2D.destHeight,
+        tint = sprite2D.tint,
+        alpha = sprite2D.worldAlpha,
+        blendMode = sprite2D.blendMode,
+        worldMatrix = sprite2D.worldMatrix;
+
+    this._setAlpha(alpha, blendMode);
+    this._setTransform(worldMatrix);
+    this._drawImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint);
 };
 
-CanvasRenderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, repeat) {
+//CanvasRenderer2D.prototype.pushMask = function (mask) {
+//    this.canvasContext.save();
+//    this.canvasContext.beginPath();
+//    this.canvasContext.rect(mask.x + this._transformTx, mask.y + this._transformTy, mask.width, mask.height);
+//    this.canvasContext.clip();
+//    this.canvasContext.closePath();
+//};
+//
+//CanvasRenderer2D.prototype.popMask = function () {
+//    this.canvasContext.restore();
+//    this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+//};
+//
+
+//CanvasRenderer2D.prototype.drawRepeatImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
+//    if (texture['pattern'] === undefined) {
+//        var image = texture.raw;
+//        var tempImage = image;
+//        if (image.width != sourceWidth || image.height != sourceHeight) {
+//            var tempCanvas = document.createElement("canvas");
+//            tempCanvas.width = sourceWidth;
+//            tempCanvas.height = sourceHeight;
+//            tempCanvas.getContext("2d").drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, sourceWidth, sourceHeight);
+//            tempImage = tempCanvas;
+//        }
+//        var pat = this.canvasContext.createPattern(tempImage, repeat);
+//        texture['pattern'] = pat;
+//    }
+//    var pattern = texture['pattern'];
+//    this.canvasContext.fillStyle = pattern;
+//    this.canvasContext.translate(destX, destY);
+//    this.canvasContext.fillRect(0, 0, destWidth, destHeight);
+//    this.canvasContext.translate(-destX, -destY);
+//};
+
+CanvasRenderer2D.prototype._drawImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
     if (repeat === void 0) {
         repeat = undefined;
     }
@@ -92,34 +167,33 @@ CanvasRenderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sour
         this.canvasContext.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
     }
     else {
-        this.drawRepeatImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, repeat);
+        //this.drawRepeatImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat);
     }
     //super.drawImage.call(this, texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, repeat);
     //this.renderCost += egret.getTimer() - beforeDraw;
 };
 
-CanvasRenderer2D.prototype.drawRepeatImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, repeat) {
-    if (texture['pattern'] === undefined) {
-        var image = texture.raw;
-        var tempImage = image;
-        if (image.width != sourceWidth || image.height != sourceHeight) {
-            var tempCanvas = document.createElement("canvas");
-            tempCanvas.width = sourceWidth;
-            tempCanvas.height = sourceHeight;
-            tempCanvas.getContext("2d").drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, sourceWidth, sourceHeight);
-            tempImage = tempCanvas;
-        }
-        var pat = this.canvasContext.createPattern(tempImage, repeat);
-        texture['pattern'] = pat;
-    }
-    var pattern = texture['pattern'];
-    this.canvasContext.fillStyle = pattern;
-    this.canvasContext.translate(destX, destY);
-    this.canvasContext.fillRect(0, 0, destWidth, destHeight);
-    this.canvasContext.translate(-destX, -destY);
+CanvasRenderer2D.prototype._initContext = function (context) {
+    var f = context.setTransform;
+    var that = this;
+    context.setTransform = function (a, b, c, d, tx, ty) {
+        that._matrixA = a;
+        that._matrixB = b;
+        that._matrixC = c;
+        that._matrixD = d;
+        that._matrixTx = tx;
+        that._matrixTy = ty;
+        f.call(context, a, b, c, d, tx, ty);
+    };
+    context._inited = true;
 };
 
-CanvasRenderer2D.prototype.setTransform = function (matrix) {
+
+CanvasRenderer2D.prototype._clearRect = function (x, y, w, h) {
+    this.canvasContext.clearRect(x, y, w, h);
+};
+
+CanvasRenderer2D.prototype._setTransform = function (matrix) {
     if(!matrix){
         this._transformTx = this._transformTy = 0;
         this.canvasContext.setTransform(1,0,0,1,0,0);
@@ -145,7 +219,7 @@ CanvasRenderer2D.prototype.setTransform = function (matrix) {
     }
 };
 
-CanvasRenderer2D.prototype.setAlpha = function (alpha, blendMode) {
+CanvasRenderer2D.prototype._setAlpha = function (alpha, blendMode) {
     if (alpha != this.globalAlpha) {
         this.canvasContext.globalAlpha = this.globalAlpha = alpha;
     }
@@ -161,7 +235,7 @@ CanvasRenderer2D.prototype.setAlpha = function (alpha, blendMode) {
 
 CanvasRenderer2D.blendModes = undefined;
 
-CanvasRenderer2D.prototype.initBlendMode = function () {
+CanvasRenderer2D.prototype._initBlendMode = function () {
     var blendModesCanvas = CanvasRenderer2D.blendModes;//this.blendModes;
 
     if(blendModesCanvas) return;
@@ -208,84 +282,47 @@ CanvasRenderer2D.prototype.initBlendMode = function () {
     }
 };
 
-CanvasRenderer2D.prototype.setupFont = function (textField) {
-    var ctx = this.canvasContext;
-    var font = textField._italic ? "italic " : "normal ";
-    font += textField._bold ? "bold " : "normal ";
-    font += textField._size + "px " + textField._fontFamily;
-    ctx.font = font;
-    ctx.textAlign = "left";
-    ctx.textBaseline = "middle";
-};
+//CanvasRenderer2D.prototype.drawText = function (textField, text, x, y, maxWidth, style) {
+//    var textColor;
+//    if (style["textColor"]) {
+//
+//        textColor = util.toColorString(parseInt(style["textColor"]));
+//    }
+//    else {
+//        textColor = textField._textColorString;
+//    }
+//    var strokeColor;
+//    if (style["strokeColor"]) {
+//        strokeColor = util.toColorString(style["strokeColor"]);
+//    }
+//    else {
+//        strokeColor = textField._strokeColorString;
+//    }
+//    var outline;
+//    if (style["outline"]) {
+//        outline = style["outline"];
+//    }
+//    else {
+//        outline = textField._stroke;
+//    }
+//    var renderContext = this.canvasContext;
+//    renderContext.fillStyle = textColor;
+//    renderContext.strokeStyle = strokeColor;
+//    if (outline) {
+//        renderContext.lineWidth = outline * 2;
+//        renderContext.strokeText(text, x + this._transformTx, y + this._transformTy, maxWidth || 0xFFFF);
+//    }
+//    renderContext.fillText(text, x + this._transformTx, y + this._transformTy, maxWidth || 0xFFFF);
+//    //super.drawText.call(this, textField, text, x, y, maxWidth, style);
+//};
+//
+//CanvasRenderer2D.prototype.strokeRect = function (x, y, w, h, color) {
+//    this.canvasContext.strokeStyle = color;
+//    this.canvasContext.strokeRect(x, y, w, h);
+//};
 
-CanvasRenderer2D.prototype.measureText = function (text) {
-    var result = this.canvasContext.measureText(text);
-    return result.width;
-};
-
-CanvasRenderer2D.prototype.drawText = function (textField, text, x, y, maxWidth, style) {
-    var textColor;
-    if (style["textColor"]) {
-
-        textColor = util.toColorString(parseInt(style["textColor"]));
-    }
-    else {
-        textColor = textField._textColorString;
-    }
-    var strokeColor;
-    if (style["strokeColor"]) {
-        strokeColor = util.toColorString(style["strokeColor"]);
-    }
-    else {
-        strokeColor = textField._strokeColorString;
-    }
-    var outline;
-    if (style["outline"]) {
-        outline = style["outline"];
-    }
-    else {
-        outline = textField._stroke;
-    }
-    var renderContext = this.canvasContext;
-    renderContext.fillStyle = textColor;
-    renderContext.strokeStyle = strokeColor;
-    if (outline) {
-        renderContext.lineWidth = outline * 2;
-        renderContext.strokeText(text, x + this._transformTx, y + this._transformTy, maxWidth || 0xFFFF);
-    }
-    renderContext.fillText(text, x + this._transformTx, y + this._transformTy, maxWidth || 0xFFFF);
-    //super.drawText.call(this, textField, text, x, y, maxWidth, style);
-};
-
-CanvasRenderer2D.prototype.strokeRect = function (x, y, w, h, color) {
-    this.canvasContext.strokeStyle = color;
-    this.canvasContext.strokeRect(x, y, w, h);
-};
-
-CanvasRenderer2D.prototype.pushMask = function (mask) {
-    this.canvasContext.save();
-    this.canvasContext.beginPath();
-    this.canvasContext.rect(mask.x + this._transformTx, mask.y + this._transformTy, mask.width, mask.height);
-    this.canvasContext.clip();
-    this.canvasContext.closePath();
-};
-
-CanvasRenderer2D.prototype.popMask = function () {
-    this.canvasContext.restore();
-    this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
-};
-
-CanvasRenderer2D.prototype.onRenderStart = function () {
-    this.canvasContext.save();
-};
-
-CanvasRenderer2D.prototype.onRenderFinish = function () {
-    this.canvasContext.restore();
-    this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
-};
-
-CanvasRenderer2D.prototype.setGlobalColorTransform = function (colorTransformMatrix) {
-};
+//CanvasRenderer2D.prototype.setGlobalColorTransform = function (colorTransformMatrix) {
+//};
 
 CanvasRenderer2D.prototype.toJSON = function (json) {
     return json;

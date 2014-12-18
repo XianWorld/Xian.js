@@ -165,21 +165,22 @@ Transform.prototype.addChild = function (child, others) {
         index = children.indexOf(child),
         root, depth, scene, childScene;
 
-    //when the transform attached, then automatically add to/remove from the scene
-    scene = this.gameObject.scene;
-    childScene = child.gameObject.scene;
-    if (scene) {
-        if(!childScene){
-            scene.addGameObject(child.gameObject);
-        }
-    }
-    else{
-        if(childScene){
-            childScene.removeGameObject(child.gameObject);
-        }
-    }
 
     if (index === -1) {
+        //when the transform attached, then automatically add to/remove from the scene
+        scene = this.gameObject.scene;
+        childScene = child.gameObject.scene;
+        if (scene) {
+            if(!childScene){
+                scene.addGameObject(child.gameObject);
+            }
+        }
+        else{
+            if(childScene){
+                childScene.removeGameObject(child.gameObject);
+            }
+        }
+
         if (child.parent) child.parent.removeChild(child);
 
         //child.parent = this;
@@ -197,6 +198,8 @@ Transform.prototype.addChild = function (child, others) {
         this.root = root;
 
         updateDepth(this, depth);
+
+        child.gameObject.updateActive();
         //if (!others) {
         //    if (this.gameObject && (scene = this.gameObject.scene)) {
         //        scene.componentManagers.Transform.sort();
@@ -244,6 +247,8 @@ Transform.prototype.removeChild = function (child, others) {
         //this.root = root;
 
         updateDepth(child, 0);
+        child.gameObject.updateActive();
+
         //if (!others) {
         //    if (this.gameObject && (scene = this.gameObject.scene)) {
         //        scene.componentManagers.Transform.sort();

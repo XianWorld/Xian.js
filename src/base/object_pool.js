@@ -11,7 +11,33 @@ function ObjectPool(constructor) {
 
 ObjectPool.prototype.create = function () {
     var pooled = this.pooled,
-        object = pooled.length ? pooled.pop() : new this.object;
+        object;// = pooled.length ? pooled.pop() : new this.object;
+
+    if(pooled.length)
+        object = pooled.pop();
+    else{
+        object = new this.object;
+
+        object._objectPool = this;
+        object._refCount = 0;
+        object.retain = retain;
+        if(object.destroy){
+            var f = object.destroy;
+            object.destroy = function(){
+                if(--this._refCount) return;
+
+                f.call(this);
+                this._objectPool.removeObject(this);
+            };
+        }
+        else{
+            object.destroy = function(){
+                if(--this._refCount) return;
+                this._objectPool.removeObject(this);
+            };
+        }
+    }
+    object.retain();
 
     this.objects.push(object);
     return object;
@@ -40,7 +66,7 @@ ObjectPool.prototype.remove = ObjectPool.prototype.removeObjects = function () {
     return this;
 };
 
-
+//TODO what is this function want? who will and dare call this function?
 ObjectPool.prototype.clear = function () {
     var objects = this.objects,
         pooled = this.pooled,
@@ -78,5 +104,25 @@ ObjectPool.prototype.empty = function () {
     return this;
 };
 
+var pools = {};
+ObjectPool.getPool = function(constructor){
+    var pool = pools[constructor];
+    if(!pool){
+        pool = new ObjectPool(constructor);
+        pools[constructor] = pool;
+    }
+    return pool;
+};
+
+//ObjectPool.clearPool = function(constructor){
+//    var pool = pools[constructor];
+//    if(pool){
+//        pool.clear();
+//    }
+//};
+
+function retain() {
+    this._refCount++;
+}
 
 module.exports = ObjectPool;

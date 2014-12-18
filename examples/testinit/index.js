@@ -59,8 +59,8 @@ seajs.use(['index-debug.js'], function (Xian) {
         graphics.lineTo(600, 300);
     };
 
-    function Sprite2DBehaviour(){
-        Behaviour.call(this);
+    function Sprite2DBehaviour(opts){
+        Behaviour.call(this,opts);
     }
     Behaviour.extend(Sprite2DBehaviour);
     Sprite2DBehaviour.prototype.onStart = function(){
@@ -76,21 +76,51 @@ seajs.use(['index-debug.js'], function (Xian) {
         //    sprite2d.mask.width += 1;
         //    sprite2d.mask.height += 1;
         //}
+    };
 
+    function CacheAsBitmapBehaviour(opts){
+        Behaviour.call(this,opts);
 
+        this.cached = false;
+    }
+    Behaviour.extend(CacheAsBitmapBehaviour);
+    CacheAsBitmapBehaviour.prototype.onStart = function(){
+
+    };
+    CacheAsBitmapBehaviour.prototype.onUpdate = function(){
+        if(this.cached) return;
+
+        var gameObject = this.gameObject;
+        var sprite2d = gameObject.addComponent(new Sprite2D());
+        var camera2d = gameObject.addComponent(new Camera2D({name: "camera_temp"}));
+
+        var children = gameObject.transform.children;
+        camera2d.update();
+        camera2d.renderTexture = new RenderTexture({width: 300, height: 300});
+        camera2d.render(children);
+        camera2d.enabled = false;
+        //sprite2d.enabled = false;
+
+        sprite2d.texture = camera2d.renderTexture;
+
+        //var i = children.length;
+        //while(i--)
+        //    children[i].gameObject.setActive(false);
+
+        this.cached = true;
     };
 
     Assets.addAssets(
         new Texture({
             name: "img_player",
             flipY: true,
-            filter: Enums.FilterMode.None,
+            //filter: Enums.FilterMode.None,
             src: "../content/images/player.png"
         }),
         new Texture({
             name: "img_hospital",
             flipY: true,
-            filter: Enums.FilterMode.None,
+            //filter: Enums.FilterMode.None,
             src: "../content/images/hospital.png"
         })
     );
@@ -102,8 +132,10 @@ seajs.use(['index-debug.js'], function (Xian) {
             height: 640
         },
         renderer: {
-            canvasRenderer: PIXICanvasRenderer2D,//CanvasRenderer2D,
+            //canvasRenderer: CanvasRenderer2D,
+            //canvasRenderer: PIXICanvasRenderer2D,
             //webglRenderer: WebGLRenderer2D
+            webglRenderer: PIXIWebGLRenderer2D,
         }
     });
 
@@ -123,25 +155,30 @@ seajs.use(['index-debug.js'], function (Xian) {
                 //identity: true
             }),
             new Camera2D({
+                //enabled: false,
                 transparent: false,
                 clearBeforeRender: true,
                 background: new Color(0.5, 0.5, 0.5)
             }),
-            new Sprite2D({
-                name: "sprite2d_0",
-                alpha: 0.5,
-                //mask: new Rect(10,10,20,20),
-                texture: Assets.get("img_player")
-            }),
-            new Graphics({
-                //name: "graphics_0",
-                isMask: true
-            }),
-            new GraphicsBehaviour()
+            //new Sprite2D({
+            //    //enabled: false,
+            //    name: "sprite2d_0",
+            //    alpha: 1,
+            //    tint: 0xff0000,
+            //    //mask: new Rect(10,10,20,20),
+            //    texture: Assets.get("img_player")
+            //}),
+            //new Graphics({
+            //    //name: "graphics_0",
+            //    isMask: true
+            //}),
+            //new GraphicsBehaviour()
+            new CacheAsBitmapBehaviour
         ]
     });
     level1 = new GameObject({
         name: "level1",
+        //active: false,
         components: [
             new Transform2D({
                 //identity: true
@@ -150,13 +187,38 @@ seajs.use(['index-debug.js'], function (Xian) {
             new Sprite2D({
                 name: "sprite2d_1",
                 alpha: 0.5,
-                //blendMode: Enums.blendModes.DIFFERENCE,
+                tint: 0x00ff00,
+                blendMode: Enums.blendModes.ADD,
                 texture: Assets.get("img_player")
             }),
-            new Sprite2DBehaviour()
+            new Sprite2DBehaviour({
+                //enabled: false
+            })
+        ]
+    });
+    level2 = new GameObject({
+        name: "level2",
+        //active: false,
+        components: [
+            new Transform2D({
+                //identity: true
+                position: new Vec2(-50,-50),
+                rotation: 1.7
+            }),
+            new Sprite2D({
+                name: "sprite2d_1",
+                alpha: 0.5,
+                tint: 0x00ff00,
+                //blendMode: Enums.blendModes.ADD,
+                texture: Assets.get("img_player")
+            }),
+            new Sprite2DBehaviour({
+                //enabled: false
+            })
         ]
     });
 
+    level1.transform.addChild(level2.transform);
     level0.transform.addChild(level1.transform);
 
     scene.addGameObjects(level0);

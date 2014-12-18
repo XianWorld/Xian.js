@@ -4,6 +4,8 @@ var Vec2 = require("../../math/vec2");
 var Mat32 = require("../../math/mat32");
 var Mat4 = require("../../math/mat4");
 var Camera = require("./../../components/camera");
+var Transform = require("./../../components/transform");
+var Renderable2D = require("./renderable_2d");
 "use strict";
 
 
@@ -47,8 +49,8 @@ function Camera2D(opts) {
     this.transparent = opts.transparent !== undefined ? opts.transparent : false;
     this.clearBeforeRender = opts.clearBeforeRender !== undefined ? opts.clearBeforeRender : true;
 
-    //TODO support render target: default(main)/RenderTexture
-    this.renderTarget = undefined;
+    //render target: default(main)/RenderTexture
+    this.renderTexture = undefined;
 
 }
 
@@ -180,10 +182,90 @@ Camera2D.prototype.update = function () {
         changed = true;
     }
 
-    if(changed)
+    if (changed)
         this._projectionView.mmul(this.projection, this.view);
 };
 
+Camera2D.prototype.render = function (target) {
+
+    var j, transform,
+        _projectionView = this._projectionView;
+
+    var renderer = this.renderer || MainContext.RendererContext.renderer;
+
+    renderer.startRender(this.renderTexture);
+    if (this.clearBeforeRender) renderer.clearScreen(this.transparent, this.background);
+
+    if (!target) {
+
+    }
+    else if (target instanceof Array) {
+        var transforms = target;
+        for (j = 0; j < transforms.length; j++) {
+            transform = transforms[j];
+            //if(transform.gameObject.activeInHierarchy)
+            this._renderTransform(renderer, _projectionView, transform, 1.0);
+        }
+    }
+    else if (target instanceof Transform) {
+        transform = target;
+        //if(transform.gameObject.activeInHierarchy)
+        this._renderTransform(renderer, _projectionView, transform, 1.0);
+    }
+    else if (target instanceof Renderable2D) {
+        var component = target;
+        if(component.enabled){
+            component.worldAlpha = component.alpha;
+
+            component.startRender(renderer);
+            component.finishRender(renderer);
+        }
+    }
+
+    renderer.finishRender(this.renderTexture);
+
+};
+
+Camera2D.prototype._renderTransform = function (renderer, viewMatrix, transform, alpha) {
+    if(!transform.gameObject.activeInHierarchy) return;
+
+    var children = transform.children,
+        len = children.length,
+        gameObject, components, component,
+        i, mask, colorTransform;
+
+    transform.updateMatrices(viewMatrix);
+
+    gameObject = transform.gameObject;
+    //TODO local iterate gameObject.components and add a bool to the renderable2d component
+    components = gameObject.getComponents("Renderable2D", true);
+    if (components && components.length > 0) {
+        len = components.length;
+        for (i = 0; i < len; i++) {
+            component = components[i];
+            if(!component.enabled) continue;
+
+            alpha = component.worldAlpha = alpha * component.alpha;
+
+            component.startRender(renderer);
+        }
+    }
+
+    len = children.length;
+    for (i = 0; i < len; i++) {
+        this._renderTransform(renderer, viewMatrix, children[i], alpha);
+    }
+
+    if (components && components.length > 0) {
+        i = components.length;
+        while (i--) {
+            component = components[i];
+            if(!component.enabled) continue;
+
+            component.finishRender(renderer);
+        }
+    }
+};
 
 Camera2D.prototype.toJSON = function (json) {
     json = Camera.prototype.toJSON.call(this, json);

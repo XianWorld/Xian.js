@@ -876,6 +876,19 @@ Mat32.prototype.toArray = function (array) {
     return array;
 };
 
+Mat32.prototype.toArray3 = function (array) {
+    array || (array = new Float32Array(9));
+    var te = this.elements;
+
+    array[0] = te[0];
+    array[1] = te[1];
+    array[2] = te[2];
+    array[3] = te[3];
+    array[4] = te[4];
+    array[5] = te[5];
+
+    return array;
+};
 /**
  * @method toString
  * @memberof Odin.Mat32

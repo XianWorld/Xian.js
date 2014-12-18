@@ -78,7 +78,7 @@ ComponentSystem.prototype.update = function () {
     }
 
     for (; i < il; i++)
-        if ((component = components[i])) component.update();
+        if ((component = components[i]) && component.enabled && component.gameObject.activeInHierarchy) component.update();
 };
 
 ComponentSystem.prototype.add = function (component) {

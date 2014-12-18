@@ -18,19 +18,11 @@ function Renderable2D(opts) {
 
     this.alpha = opts.alpha !== undefined ? opts.alpha : 1;
 
-    //this.material = opts.material !== undefined ? opts.material : undefined;
-
-    //this.width = opts.width || 1;
-    //this.height = opts.height || 1;
-    //
-    //this.x = opts.x || 0;
-    //this.y = opts.y || 0;
-    //this.w = opts.w || 1;
-    //this.h = opts.h || 1;
-    //
-    //this._webglInitted = false;
+    this.tint = opts.tint !== undefined ? opts.tint : 0xFFFFFF;
 
     this.worldAlpha = 1.0;
+
+    this.worldMatrix = undefined;
 
     //this.mask = opts.mask !== undefined ? opts.mask : undefined;
 }
@@ -47,6 +39,7 @@ Renderable2D.prototype.copy = function (other) {
     //this.z = other.z;
 
     this.alpha = other.alpha;
+    this.tint = other.tint;
 
     //this.material = other.material;
     //
@@ -68,7 +61,7 @@ Renderable2D.prototype.clear = function () {
     Component.prototype.clear.call(this);
 
     //this.material = undefined;
-    this._webglInitted = false;
+    //this._webglInitted = false;
 
     return this;
 };
@@ -85,14 +78,16 @@ Renderable2D.prototype.startRender = function (renderer) {
         return;
     }
     var transform = this.transform;
-    renderer.setAlpha(this.worldAlpha, this.blendMode);
-    renderer.setTransform(transform.modelView);
+    //renderer.setAlpha(this.worldAlpha, this.blendMode);
+    //renderer.setTransform(transform.modelView);
 
-    this._draw(renderer);
+    this.worldMatrix = transform.modelView;
+
+    this._render(renderer);
 
 };
 
-Renderable2D.prototype._draw = function (renderer) {
+Renderable2D.prototype._render = function (renderer) {
 
 };
 
@@ -110,6 +105,7 @@ Renderable2D.prototype.toJSON = function (json) {
     //json.z = this.z;
 
     json.alpha = this.alpha;
+    json.tint = this.tint;
 
     //if(this.mask)
     //    json.mask = this.mask.toJSON(json.mask);
@@ -138,6 +134,7 @@ Renderable2D.prototype.fromJSON = function (json) {
     //this.z = json.z;
 
     this.alpha = json.alpha;
+    this.tint = json.tint;
 
     //if(json.mask){
     //    this.mask = new Rect();

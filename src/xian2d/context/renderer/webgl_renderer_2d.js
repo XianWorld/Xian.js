@@ -24,8 +24,8 @@ function WebGLRenderer2D(canvas, opts) {
     this.canvasContext = document.createElement("canvas").getContext("2d");
 
     this.canvas = canvas;
-    this.canvas.addEventListener("webglcontextlost", this.handleContextLost.bind(this), false);
-    this.canvas.addEventListener("webglcontextrestored", this.handleContextRestored.bind(this), false);
+    this.canvas.addEventListener("webglcontextlost", this._handleContextLost.bind(this), false);
+    this.canvas.addEventListener("webglcontextrestored", this._handleContextRestored.bind(this), false);
 
     this.projectionX = this.canvas.width / 2;
     this.projectionY = -this.canvas.height / 2;
@@ -41,114 +41,50 @@ function WebGLRenderer2D(canvas, opts) {
         this.indices[i + 4] = j + 2;
         this.indices[i + 5] = j + 3;
     }
-    this.initWebGL();
+    this._initWebGL();
     this.shaderManager = new WebGLShaderManager(this.gl);
     this.worldTransform = new Mat32;
-    this.initBlendMode();
+    this._initBlendMode();
 
     this.colorTransformMatrix = undefined;
+    this.renderTexture = undefined;
 }
 
 Renderer2D.extend(WebGLRenderer2D);
 
-WebGLRenderer2D.prototype.handleContextLost = function () {
-    this.contextLost = true;
-};
+WebGLRenderer2D.prototype.startRender = function (renderTexture) {
 
-WebGLRenderer2D.prototype.handleContextRestored = function () {
-    this.initWebGL();
-    this.shaderManager.setContext(this.gl);
-    this.contextLost = false;
-};
-
-WebGLRenderer2D.prototype.initWebGL = function () {
-    var options = {
-        stencil: true //设置可以使用模板（用于遮罩实现）
-    };
-    var gl;
-    var names = ["experimental-webgl", "webgl"];
-    for (var i = 0; i < names.length; i++) {
-        try {
-            gl = this.canvas.getContext(names[i], options);
-        }
-        catch (e) {
-        }
-        if (gl) {
-            break;
-        }
-    }
-    if (!gl) {
-        throw new Error("当前浏览器不支持webgl");
-    }
-    this.setContext(gl);
-};
-
-WebGLRenderer2D.prototype.setContext = function (gl) {
-    this.gl = gl;
-    gl.id = this.glContextId++;
-    this.vertexBuffer = gl.createBuffer();
-    this.indexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.DYNAMIC_DRAW);
-    gl.disable(gl.DEPTH_TEST);
-    gl.disable(gl.CULL_FACE);
-    gl.enable(gl.BLEND);
+    var gl = this.gl;
     gl.colorMask(true, true, true, true);
+
+    if(renderTexture !== undefined){
+        this.renderTexture = renderTexture;
+        var buffer = renderTexture.getBuffer(this);
+
+        this.projectionX = renderTexture.width / 2;
+        this.projectionY = -renderTexture.height / 2;
+
+        gl.viewport(0, 0, renderTexture.width, renderTexture.height);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, buffer.frameBuffer);
+    }else{
+        this.renderTexture = undefined;
+
+        this.projectionX = this.canvas.width / 2;
+        this.projectionY = -this.canvas.height / 2;
+
+        gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    }
+    this.rendering = true;
+
+    //gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 };
 
-WebGLRenderer2D.blendModesWebGL = undefined;
-
-WebGLRenderer2D.prototype.initBlendMode = function () {
-    var blendModesWebGL = WebGLRenderer2D.blendModesWebGL;
-    if(blendModesWebGL) return;
-
-    var gl = this.gl;
-    blendModesWebGL = WebGLRenderer2D.blendModesWebGL = [];
-
-    blendModesWebGL[Enums.blendModes.NORMAL]        = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.ADD]           = [gl.SRC_ALPHA, gl.DST_ALPHA];
-    blendModesWebGL[Enums.blendModes.MULTIPLY]      = [gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.SCREEN]        = [gl.SRC_ALPHA, gl.ONE];
-    blendModesWebGL[Enums.blendModes.OVERLAY]       = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.DARKEN]        = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.LIGHTEN]       = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.COLOR_DODGE]   = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.COLOR_BURN]    = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.HARD_LIGHT]    = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.SOFT_LIGHT]    = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.DIFFERENCE]    = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.EXCLUSION]     = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.HUE]           = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.SATURATION]    = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.COLOR]         = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-    blendModesWebGL[Enums.blendModes.LUMINOSITY]    = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
-
-};
-
-WebGLRenderer2D.prototype.start = function () {
-    if (this.contextLost) {
-        return;
-    }
-    var gl = this.gl;
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-    var shader;
-    if (this.colorTransformMatrix) {
-        shader = this.shaderManager.colorTransformShader;
-    }
-    else {
-        shader = this.shaderManager.defaultShader;
-    }
-    this.shaderManager.activateShader(shader);
-    shader.syncUniforms();
-    gl.uniform2f(shader.projectionVector, this.projectionX, this.projectionY);
-    var stride = this.vertSize * 4;
-    gl.vertexAttribPointer(shader.aVertexPosition, 2, gl.FLOAT, false, stride, 0);
-    gl.vertexAttribPointer(shader.aTextureCoord, 2, gl.FLOAT, false, stride, 2 * 4);
-    gl.vertexAttribPointer(shader.colorAttribute, 2, gl.FLOAT, false, stride, 4 * 4);
+WebGLRenderer2D.prototype.finishRender = function (renderTexture) {
+    this._draw();
+    this.rendering = false;
+    this.renderTexture = undefined;
 };
 
 WebGLRenderer2D.prototype.clearScreen = function (transparent, background) {
@@ -157,9 +93,9 @@ WebGLRenderer2D.prototype.clearScreen = function (transparent, background) {
     //
     //gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    if(transparent)
+    if (transparent)
         gl.clearColor(0, 0, 0, 0);
-    else if(background){
+    else if (background) {
         gl.clearColor(background.r, background.g, background.b, 1);
     }
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -167,21 +103,29 @@ WebGLRenderer2D.prototype.clearScreen = function (transparent, background) {
     this.renderCost = 0;
 };
 
-WebGLRenderer2D.prototype.setBlendMode = function (blendMode) {
-    if (!blendMode) {
-        blendMode = Enums.blendModes.NORMAL;
-    }
-    if (this.currentBlendMode != blendMode) {
-        var blendModeWebGL = WebGLRenderer2D.blendModesWebGL[blendMode];
-        if (blendModeWebGL) {
-            this._draw();
-            this.gl.blendFunc(blendModeWebGL[0], blendModeWebGL[1]);
-            this.currentBlendMode = blendMode;
-        }
-    }
+WebGLRenderer2D.prototype.renderSprite2D = function (sprite2D) {
+
+    var texture = sprite2D.texture,
+        sourceX = sprite2D.sourceX,
+        sourceY = sprite2D.sourceY,
+        sourceWidth = sprite2D.sourceWidth,
+        sourceHeight = sprite2D.sourceHeight,
+        destX = sprite2D.destX,
+        destY = sprite2D.destY,
+        destWidth = sprite2D.destWidth,
+        destHeight = sprite2D.destHeight,
+        tint = sprite2D.tint,
+        alpha = sprite2D.worldAlpha,
+        blendMode = sprite2D.blendMode,
+        worldMatrix = sprite2D.worldMatrix;
+
+    this._setAlpha(alpha, blendMode);
+    this._setTransform(worldMatrix);
+    this._drawImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint);
 };
 
-WebGLRenderer2D.prototype.drawRepeatImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, repeat) {
+
+WebGLRenderer2D.prototype._drawRepeatImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
     for (var x = destX; x < destWidth; x += sourceWidth) {
         for (var y = destY; y < destHeight; y += sourceHeight) {
             var destW = Math.min(sourceWidth, destWidth - x);
@@ -191,13 +135,15 @@ WebGLRenderer2D.prototype.drawRepeatImage = function (texture, sourceX, sourceY,
     }
 };
 
-WebGLRenderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, repeat) {
-    if (repeat === void 0) { repeat = undefined; }
+WebGLRenderer2D.prototype._drawImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
+    if (repeat === void 0) {
+        repeat = undefined;
+    }
     if (this.contextLost) {
         return;
     }
     if (repeat !== undefined) {
-        this.drawRepeatImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, repeat);
+        this._drawRepeatImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat);
         return;
     }
     var texture_scale_factor = this.texture_scale_factor;
@@ -205,7 +151,7 @@ WebGLRenderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sourc
     sourceY = sourceY / texture_scale_factor;
     sourceWidth = sourceWidth / texture_scale_factor;
     sourceHeight = sourceHeight / texture_scale_factor;
-    this.createWebGLTexture(texture);
+    this._createWebGLTexture(texture);
     if (texture.webGLTexture !== this.currentBaseTexture || this.currentBatchSize >= this.size) {
         this._draw();
         this.currentBaseTexture = texture.webGLTexture;
@@ -227,6 +173,20 @@ WebGLRenderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sourc
     //var originalD = locWorldTransform.d;
     //var originalTx = locWorldTransform.tx;
     //var originalTy = locWorldTransform.ty;
+
+    if(this.renderTexture){
+
+        ty = this.renderTexture.height-ty;
+
+        b = -b;
+        d = -d;
+        //tx = -c * this.renderTexture.height + tx;
+        //ty = -d * this.renderTexture.height + ty;
+        //
+        //c = -c;
+        //d = -d;
+    }
+
     if (destX != 0 || destY != 0) {
         //locWorldTransform.append(1, 0, 0, 1, destX, destY);
         //locWorldTransform.translate0(destX, destY);
@@ -307,7 +267,7 @@ WebGLRenderer2D.prototype._draw = function () {
         return;
     }
     //var beforeDraw = getTimer();
-    this.start();
+    this._start();
     var gl = this.gl;
     gl.bindTexture(gl.TEXTURE_2D, this.currentBaseTexture);
     var view = this.vertices.subarray(0, this.currentBatchSize * 4 * this.vertSize);
@@ -318,7 +278,7 @@ WebGLRenderer2D.prototype._draw = function () {
     //Profiler.getInstance().onDrawImage();
 };
 
-WebGLRenderer2D.prototype.setTransform = function (matrix) {
+WebGLRenderer2D.prototype._setTransform = function (matrix) {
     var locWorldTransform = this.worldTransform;
     //locWorldTransform.a = matrix.a;
     //locWorldTransform.b = matrix.b;
@@ -330,12 +290,12 @@ WebGLRenderer2D.prototype.setTransform = function (matrix) {
     locWorldTransform.copy(matrix);
 };
 
-WebGLRenderer2D.prototype.setAlpha = function (value, blendMode) {
+WebGLRenderer2D.prototype._setAlpha = function (value, blendMode) {
     this.worldAlpha = value;
-    this.setBlendMode(blendMode);
+    this._setBlendMode(blendMode);
 };
 
-WebGLRenderer2D.prototype.createWebGLTexture = function (texture) {
+WebGLRenderer2D.prototype._createWebGLTexture = function (texture) {
     if (!texture.webGLTexture) {
         var gl = this.gl;
         texture.webGLTexture = gl.createTexture();
@@ -409,22 +369,6 @@ WebGLRenderer2D.prototype.createWebGLTexture = function (texture) {
 //        }
 //    }
 //};
-
-WebGLRenderer2D.prototype.setupFont = function (textField) {
-    var ctx = this.canvasContext;
-    var font = textField.italic ? "italic " : "normal ";
-    font += textField.bold ? "bold " : "normal ";
-    font += textField.size + "px " + textField.fontFamily;
-    ctx.font = font;
-    ctx.textAlign = "left";
-    ctx.textBaseline = "middle";
-};
-
-WebGLRenderer2D.prototype.measureText = function (text) {
-    var result = this.canvasContext.measureText(text);
-    return result.width;
-};
-
 //WebGLRenderer2D.prototype.renderGraphics = function (graphics) {
 //    var gl = this.gl;
 //    var shader = this.shaderManager.primitiveShader;
@@ -486,16 +430,120 @@ WebGLRenderer2D.prototype.measureText = function (text) {
 //    indices.push(vertPos, vertPos, vertPos + 1, vertPos + 2, vertPos + 3, vertPos + 3);
 //};
 
-WebGLRenderer2D.prototype.onRenderStart = function () {
-    var gl = this.gl;
+WebGLRenderer2D.prototype._setBlendMode = function (blendMode) {
+    if (!blendMode) {
+        blendMode = Enums.blendModes.NORMAL;
+    }
+    if (this.currentBlendMode !== blendMode) {
+        var blendModeWebGL = WebGLRenderer2D.blendModesWebGL[blendMode];
+        if (blendModeWebGL) {
+            this._draw();
+            this.gl.blendFunc(blendModeWebGL[0], blendModeWebGL[1]);
+            this.currentBlendMode = blendMode;
+        }
+    }
+};
+
+WebGLRenderer2D.prototype._initWebGL = function () {
+    var options = {
+        stencil: true //设置可以使用模板（用于遮罩实现）
+    };
+    var gl;
+    var names = ["experimental-webgl", "webgl"];
+    for (var i = 0; i < names.length; i++) {
+        try {
+            gl = this.canvas.getContext(names[i], options);
+        }
+        catch (e) {
+        }
+        if (gl) {
+            break;
+        }
+    }
+    if (!gl) {
+        throw new Error("当前浏览器不支持webgl");
+    }
+    this._setContext(gl);
+};
+
+WebGLRenderer2D.prototype._setContext = function (gl) {
+    this.gl = gl;
+    gl.id = this.glContextId++;
+    this.vertexBuffer = gl.createBuffer();
+    this.indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.DYNAMIC_DRAW);
+    gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.CULL_FACE);
+    gl.enable(gl.BLEND);
     gl.colorMask(true, true, true, true);
-
-    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 };
 
-WebGLRenderer2D.prototype.onRenderFinish = function () {
+WebGLRenderer2D.blendModesWebGL = undefined;
+
+WebGLRenderer2D.prototype._initBlendMode = function () {
+    var blendModesWebGL = WebGLRenderer2D.blendModesWebGL;
+    if (blendModesWebGL) return;
+
+    var gl = this.gl;
+    blendModesWebGL = WebGLRenderer2D.blendModesWebGL = [];
+
+    blendModesWebGL[Enums.blendModes.NORMAL] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.ADD] = [gl.SRC_ALPHA, gl.DST_ALPHA];
+    blendModesWebGL[Enums.blendModes.MULTIPLY] = [gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.SCREEN] = [gl.SRC_ALPHA, gl.ONE];
+    blendModesWebGL[Enums.blendModes.OVERLAY] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.DARKEN] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.LIGHTEN] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.COLOR_DODGE] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.COLOR_BURN] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.HARD_LIGHT] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.SOFT_LIGHT] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.DIFFERENCE] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.EXCLUSION] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.HUE] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.SATURATION] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.COLOR] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+    blendModesWebGL[Enums.blendModes.LUMINOSITY] = [gl.ONE, gl.ONE_MINUS_SRC_ALPHA];
+
 };
+
+WebGLRenderer2D.prototype._start = function () {
+    if (this.contextLost) {
+        return;
+    }
+    var gl = this.gl;
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    var shader;
+    if (this.colorTransformMatrix) {
+        shader = this.shaderManager.colorTransformShader;
+    }
+    else {
+        shader = this.shaderManager.defaultShader;
+    }
+    this.shaderManager.activateShader(shader);
+    shader.syncUniforms();
+    gl.uniform2f(shader.projectionVector, this.projectionX, this.projectionY);
+    var stride = this.vertSize * 4;
+    gl.vertexAttribPointer(shader.aVertexPosition, 2, gl.FLOAT, false, stride, 0);
+    gl.vertexAttribPointer(shader.aTextureCoord, 2, gl.FLOAT, false, stride, 2 * 4);
+    gl.vertexAttribPointer(shader.colorAttribute, 2, gl.FLOAT, false, stride, 4 * 4);
+};
+
+WebGLRenderer2D.prototype._handleContextLost = function () {
+    this.contextLost = true;
+};
+
+WebGLRenderer2D.prototype._handleContextRestored = function () {
+    this._initWebGL();
+    this.shaderManager.setContext(this.gl);
+    this.contextLost = false;
+};
+
 
 WebGLRenderer2D.prototype.toJSON = function (json) {
     return json;

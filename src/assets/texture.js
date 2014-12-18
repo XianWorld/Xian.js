@@ -20,15 +20,23 @@ function Texture(opts) {
 
     this.anisotropy = opts.anisotropy !== undefined ? opts.anisotropy : 1;
 
-    this.filter = opts.filter !== undefined ? opts.filter : Enums.FilterMode.Linear;
+    this.filter = opts.filter !== undefined ? opts.filter : Enums.filterMode.LINEAR;
     this.format = opts.format !== undefined ? opts.format : Enums.TextureFormat.RGBA;
     this.wrap = opts.wrap !== undefined ? opts.wrap : Enums.TextureWrap.Repeat;
+
+    this.resolution = 1;
 
     //this._webgl = undefined;
     this.webGLTexture = undefined;
     //this._webglUsed = 0;
 
+    this._glTextures = [];
+
+    this._dirty = [true, true, true, true];
+
     this.needsUpdate = true;
+
+    this._powerOf2 = false;
 }
 
 Asset.extend(Texture);

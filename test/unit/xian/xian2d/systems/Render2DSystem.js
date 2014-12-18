@@ -11,13 +11,13 @@ describe('xian/xian2d/systems/Render2DSystem', function () {
             new Texture({
                 name: "img_player",
                 flipY: true,
-                filter: Enums.FilterMode.None,
+                //filter: Enums.FilterMode.None,
                 src: "../../../content/images/player.png"
             }),
             new Texture({
                 name: "img_hospital",
                 flipY: true,
-                filter: Enums.FilterMode.None,
+                //filter: Enums.FilterMode.None,
                 src: "../../../content/images/hospital.png"
             })
         );

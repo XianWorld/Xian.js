@@ -10,7 +10,7 @@ function Render2DSystem(opts) {
 
     ComponentSystem.call(this, opts);
 
-    this.order = -99999;
+    this.order = 99999;
 
     this.addEventName = "startCamera2D";
     this.removeEventName = "removeCamera2D";
@@ -46,110 +46,99 @@ Render2DSystem.prototype.render = function () {
 
     for (i = 0; i < len; i++) {
         camera = components[i];
-        if (!camera._active) continue;
+        if (!camera.gameObject.activeInHierarchy) continue;
+        if (!camera.enabled) continue;
 
         //camera.update();
 
-        this._renderCamera(camera, rootTransforms);
-        //renderer.setTransform();
-        //if(camera.clearBeforeRender) renderer.clearScreen(camera.background);
-        //
-        //_projScreenMatrix.mmul(camera.projection, camera.view);
-        ////viewMatrix = camera.view;
-        //
-        //for (j = 0; j < rootTransforms.length; j++) {
-        //    transform = rootTransforms[j];
-        //
-        //    this._renderTransform(renderer, _projScreenMatrix, transform, 1);
-        //}
-
-        //break;
+        //this._renderCamera(camera, rootTransforms);
+        camera.render(rootTransforms);
     }
 };
 
-Render2DSystem.prototype._renderCamera = function (camera, transforms) {
-
-    var j, transform,
-        _projectionView = camera._projectionView;
-
-    var renderer = camera.renderer || MainContext.RendererContext.renderer;
-
-    //renderer.setTransform();
-    renderer.onRenderStart();
-    if(camera.clearBeforeRender) renderer.clearScreen(camera.transparent, camera.background);
-
-    for (j = 0; j < transforms.length; j++) {
-        transform = transforms[j];
-
-        this._renderTransform(renderer, _projectionView, transform, 1.0);
-    }
-
-    renderer.onRenderFinish();
-};
-
-Render2DSystem.prototype._renderTransform = function (renderer, viewMatrix, transform, alpha) {
-
-    var children = transform.children,
-        len = children.length,
-        gameObject, components, component,
-        i, mask, colorTransform;
-
-    transform.updateMatrices(viewMatrix);
-
-    gameObject = transform.gameObject;
-    //TODO local iterate gameObject.components and add a bool to the renderable2d component
-    components = gameObject.getComponents("Renderable2D", true);
-    if (components && components.length > 0) {
-        len = components.length;
-        for (i = 0; i < len; i++) {
-            component = components[i];
-            //if (!component.visible) {
-            //    continue;
-            //}
-
-            //colorTransform = component._colorTransform;
-            //if (colorTransform){
-            //    renderer.setGlobalColorTransform(colorTransform.matrix);
-            //}
-
-            alpha = component.worldAlpha = alpha * component.alpha;
-
-            //mask = component.mask;
-            //if (mask) {
-            //    renderer.pushMask(mask);
-            //}
-
-            //renderer.setAlpha(alpha, component.blendMode);
-            //renderer.setTransform(transform.modelView, true);
-
-            //component._draw(renderer);
-
-            component.startRender(renderer);
-        }
-    }
-
-    len = children.length;
-    for (i = 0; i < len; i++) {
-        this._renderTransform(renderer, viewMatrix, children[i], alpha);
-    }
-
-    if (components && components.length > 0) {
-        i = components.length;
-        while (i--) {
-            component = components[i];
-            component.finishRender(renderer);
-
-            //if (component._colorTransform){
-            //    renderer.setGlobalColorTransform(null);
-            //}
-            //
-            //mask = component.mask;
-            //if (mask) {
-            //    renderer.popMask(mask);
-            //}
-        }
-    }
-};
+//Render2DSystem.prototype._renderCamera = function (camera, transforms) {
+//
+//    var j, transform,
+//        _projectionView = camera._projectionView;
+//
+//    var renderer = camera.renderer || MainContext.RendererContext.renderer;
+//
+//    //renderer.setTransform();
+//    renderer.startRender();
+//    if(camera.clearBeforeRender) renderer.clearScreen(camera.transparent, camera.background);
+//
+//    for (j = 0; j < transforms.length; j++) {
+//        transform = transforms[j];
+//
+//        this._renderTransform(renderer, _projectionView, transform, 1.0);
+//    }
+//
+//    renderer.finishRender();
+//};
+//
+//Render2DSystem.prototype._renderTransform = function (renderer, viewMatrix, transform, alpha) {
+//
+//    var children = transform.children,
+//        len = children.length,
+//        gameObject, components, component,
+//        i, mask, colorTransform;
+//
+//    transform.updateMatrices(viewMatrix);
+//
+//    gameObject = transform.gameObject;
+//    //TODO local iterate gameObject.components and add a bool to the renderable2d component
+//    components = gameObject.getComponents("Renderable2D", true);
+//    if (components && components.length > 0) {
+//        len = components.length;
+//        for (i = 0; i < len; i++) {
+//            component = components[i];
+//            //if (!component.visible) {
+//            //    continue;
+//            //}
+//
+//            //colorTransform = component._colorTransform;
+//            //if (colorTransform){
+//            //    renderer.setGlobalColorTransform(colorTransform.matrix);
+//            //}
+//
+//            alpha = component.worldAlpha = alpha * component.alpha;
+//
+//            //mask = component.mask;
+//            //if (mask) {
+//            //    renderer.pushMask(mask);
+//            //}
+//
+//            //renderer.setAlpha(alpha, component.blendMode);
+//            //renderer.setTransform(transform.modelView, true);
+//
+//            //component._draw(renderer);
+//
+//            component.startRender(renderer);
+//        }
+//    }
+//
+//    len = children.length;
+//    for (i = 0; i < len; i++) {
+//        this._renderTransform(renderer, viewMatrix, children[i], alpha);
+//    }
+//
+//    if (components && components.length > 0) {
+//        i = components.length;
+//        while (i--) {
+//            component = components[i];
+//            component.finishRender(renderer);
+//
+//            //if (component._colorTransform){
+//            //    renderer.setGlobalColorTransform(null);
+//            //}
+//            //
+//            //mask = component.mask;
+//            //if (mask) {
+//            //    renderer.popMask(mask);
+//            //}
+//        }
+//    }
+//};
 
 Render2DSystem.prototype.sortFunction = function (a, b) {
 

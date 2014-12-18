@@ -6,26 +6,26 @@ function Behaviour(opts) {
 
     Component.call(this, opts);
 
-    this._enabled = true;
+    //this._enabled = true;
 }
 
 Component.extend(Behaviour);
 
-Object.defineProperty(Behaviour.prototype, "enabled", {
-    get: function () {
-        return this._enabled;
-    },
-    set: function (value) {
-        if (this._enabled === value) return;
-
-        this._enabled = value;
-
-        if (value)
-            this.onEnabled();
-        else
-            this.onDisabled();
-    }
-});
+//Object.defineProperty(Behaviour.prototype, "enabled", {
+//    get: function () {
+//        return this._enabled;
+//    },
+//    set: function (value) {
+//        if (this._enabled === value) return;
+//
+//        this._enabled = value;
+//
+//        if (value)
+//            this.onEnabled();
+//        else
+//            this.onDisabled();
+//    }
+//});
 
 Behaviour.prototype.copy = function (other) {
 
@@ -45,7 +45,7 @@ Behaviour.prototype.start = function () {
 };
 
 Behaviour.prototype.update = function () {
-    if (!this._enabled) return;
+    //if (!this._enabled) return;
 
     this.onUpdate();
 };
@@ -62,17 +62,17 @@ Behaviour.prototype.onStart = function () {
 };
 Behaviour.prototype.onUpdate = function () {
 };
-Behaviour.prototype.onEnabled = function () {
-};
-Behaviour.prototype.onDisabled = function () {
-};
+//Behaviour.prototype.onEnabled = function () {
+//};
+//Behaviour.prototype.onDisabled = function () {
+//};
 Behaviour.prototype.onDestory = function () {
 };
 
 Behaviour.prototype.toJSON = function (json) {
     json = Component.prototype.toJSON.call(this, json);
 
-    json.enabled = this._enabled;
+    //json.enabled = this._enabled;
     return json;
 };
 
@@ -80,7 +80,7 @@ Behaviour.prototype.toJSON = function (json) {
 Behaviour.prototype.fromJSON = function (json) {
     Component.prototype.fromJSON.call(this, json);
 
-    this._enabled = json.enabled;
+    //this._enabled = json.enabled;
     return this;
 };
 

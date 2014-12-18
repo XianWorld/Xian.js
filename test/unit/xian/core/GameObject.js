@@ -148,4 +148,69 @@ describe('xian/core/GameObject', function () {
         expect(level2).to.not.be.undefined;
 
     });
+
+    it('GameObject active test1', function () {
+        scene = game.scene;
+        //scene.clear();
+        scene.removeGameObjects(level0, level1, level2);
+
+        level0.transform.detachChildren();
+        level1.transform.detachChildren();
+        level2.transform.detachChildren();
+
+        level0.transform.addChild(level1.transform);
+        level1.transform.addChild(level2.transform);
+        scene.addGameObject(level0);
+
+        expect(level0.activeSelf).to.be.true;
+
+        level0.setActive(false);
+        expect(level0.activeSelf).to.be.false;
+        expect(level0.activeInHierarchy).to.be.false;
+
+        expect(level1.activeSelf).to.be.true;
+        expect(level1.activeInHierarchy).to.be.false;
+
+        expect(level2.activeSelf).to.be.true;
+        expect(level2.activeInHierarchy).to.be.false;
+
+        level1.setActive(false);
+        expect(level1.activeSelf).to.be.false;
+        expect(level1.activeInHierarchy).to.be.false;
+
+        expect(level2.activeSelf).to.be.true;
+        expect(level2.activeInHierarchy).to.be.false;
+
+        level0.setActive(true);
+        expect(level0.activeSelf).to.be.true;
+        expect(level0.activeInHierarchy).to.be.true;
+
+        expect(level1.activeSelf).to.be.false;
+        expect(level1.activeInHierarchy).to.be.false;
+
+        expect(level2.activeSelf).to.be.true;
+        expect(level2.activeInHierarchy).to.be.false;
+
+        level1.transform.removeChild(level2.transform);
+        expect(level2.activeSelf).to.be.true;
+        expect(level2.activeInHierarchy).to.be.true;
+
+        level0.setActive(false);
+        expect(level0.activeSelf).to.be.false;
+        expect(level0.activeInHierarchy).to.be.false;
+
+        level0.transform.addChild(level2.transform);
+        expect(level2.activeSelf).to.be.true;
+        expect(level2.activeInHierarchy).to.be.false;
+
+        scene.removeGameObject(level2);
+        expect(level2.activeSelf).to.be.true;
+        expect(level2.activeInHierarchy).to.be.true;
+
+        level0.transform.addChild(level2.transform);
+        expect(level2.activeSelf).to.be.true;
+        expect(level2.activeInHierarchy).to.be.false;
+
+    });
+
 });

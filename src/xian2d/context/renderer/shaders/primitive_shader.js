@@ -5,7 +5,7 @@ var XianShader = require("./xian_shader");
 var WebGLUtils = require("../webgl_utils");
 
 function PrimitiveShader(gl) {
-    XianShader.call(this, gl);
+    //XianShader.call(this, gl);
 
     this.program = null;
     this.projectionVector = null;
@@ -21,7 +21,8 @@ function PrimitiveShader(gl) {
     this.gl = gl;
     this.init();
 }
-XianShader.extend(PrimitiveShader);
+//XianShader.extend(PrimitiveShader);
+PrimitiveShader.prototype.constructor = PrimitiveShader;
 
 PrimitiveShader.prototype.init = function () {
     var gl = this.gl;

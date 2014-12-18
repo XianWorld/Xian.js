@@ -17,6 +17,10 @@ function GameObject(opts) {
 
     this.name = opts.name !== undefined ? opts.name : "GameObject_" + this._id;
 
+    this._activeSelf = opts.active !== undefined ? opts.active : true;
+    this.activeInHierarchy = true;
+    //this._activeParent = true;
+
     this.scene = undefined;
 
     this.tags = [];
@@ -35,6 +39,41 @@ function GameObject(opts) {
 
 Class.extend(GameObject);
 
+Object.defineProperty(GameObject.prototype, "activeSelf", {
+   get: function(){
+        return this._activeSelf;
+   }
+});
+
+GameObject.prototype.setActive = function (active) {
+    if(this._activeSelf === active) return;
+
+    this._activeSelf = active;
+
+    this.updateActive();
+
+};
+
+GameObject.prototype.updateActive = function() {
+
+    var transform = this.transform,
+        children, child, i;
+
+    if (!transform) return;
+
+    var parentActive = transform.parent ? transform.parent.gameObject.activeInHierarchy : true;
+    this.activeInHierarchy = parentActive && this._activeSelf;
+
+    children = transform.children;
+    i = children.length;
+
+    while (i--) {
+        child = children[i];
+
+        //child.gameObject._activeParent = gameObject.activeInHierarchy;
+        child.gameObject.updateActive();
+    }
+};
 
 GameObject.prototype.copy = function (other) {
     var components = this.components,
@@ -169,7 +208,7 @@ GameObject.prototype.addComponent = function (component, others) {
     if (typeof(component) === "string") component = new Class._classes[component];
     if (!(component instanceof Component)) {
         Log.error("GameObject.addComponent: can't add passed argument, it is not an instance of Component");
-        return this;
+        return undefined;
     }
     var name = component._name,
         components = this.components,
@@ -214,11 +253,13 @@ GameObject.prototype.addComponent = function (component, others) {
         component.emit("add", this);
 
         if (this.scene) this.scene._addComponent(component);
+
+        return component;
     } else {
         Log.error("GameObject.addComponent: GameObject already has a(n) " + name + " named Component");
     }
 
-    return this;
+    return undefined;
 };
 
 
@@ -444,13 +485,15 @@ GameObject.prototype.toJSON = function (json) {
         component,
         i = components.length;
 
+    json.name = this.name;
+    json.active = this._activeSelf;
+
     while (i--) {
         if ((component = components[i]).json) jsonComponents[i] = component.toJSON(jsonComponents[i]);
     }
     i = tags.length;
     while (i--) jsonTags[i] = tags[i];
 
-    json.name = this.name;
 
     return json;
 };
@@ -490,6 +533,10 @@ GameObject.prototype.fromJSON = function (json) {
     //        this.addComponent(Class.fromJSON(jsonComponent));
     //    }
     //}
+    this.name = json.name;
+    this._activeSelf = json.active;
+    this.activeInHierarchy = this._activeSelf;
+
     while (i--) {
         component = components[i];
         this.removeComponent(component);
@@ -506,8 +553,6 @@ GameObject.prototype.fromJSON = function (json) {
     while (i--) {
         if (tags.indexOf((tag = jsonTags[i])) === -1) tags.push(tag);
     }
-
-    this.name = json.name;
 
     return this;
 };

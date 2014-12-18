@@ -51,6 +51,7 @@ function Xian() {
     this.Assets = require("./src/assets/assets");
     this.AudioClip = require("./src/assets/audio_clip");
     this.Texture = require("./src/assets/texture");
+    this.RenderTexture = require("./src/assets/render_texture");
 
     //components
     this.AudioSource = require("./src/components/audio_source");
@@ -103,7 +104,8 @@ function Xian() {
     this.Transform2DSystem = require("./src/xian2d/systems/transform_2d_system");
 
     this.Graphics = require("./src/xian2d/components/graphics");
-    this.PIXICanvasRenderer2D = require("./src/xian2d/context/pixi/pixi_canvas_renderer_2d");
+    this.PIXICanvasRenderer2D = require("./src/xian2d/context/pixi/canvas/pixi_canvas_renderer_2d");
+    this.PIXIWebGLRenderer2D = require("./src/xian2d/context/pixi/webgl/pixi_webgl_renderer_2d");
 
 }
 
