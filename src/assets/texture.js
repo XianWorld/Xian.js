@@ -16,7 +16,7 @@ function Texture(opts) {
 
     this.generateMipmap = opts.generateMipmap !== undefined ? !!opts.generateMipmap : true;
     this.flipY = opts.flipY !== undefined ? !!opts.flipY : true;
-    this.premultiplyAlpha = opts.premultiplyAlpha !== undefined ? !!opts.premultiplyAlpha : false;
+    this.premultiplyAlpha = opts.premultiplyAlpha !== undefined ? !!opts.premultiplyAlpha : true;
 
     this.anisotropy = opts.anisotropy !== undefined ? opts.anisotropy : 1;
 

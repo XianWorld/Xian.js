@@ -1,0 +1,260 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Xian.js example 15 - Filters</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+        }
+    </style>
+
+    <!--<script src="../../bin/pixi.dev.js"></script>-->
+    <script src="../../../spm_modules/seajs/2.3.0/dist/sea.js"></script>
+    <!--<script src="pixi.js"></script>-->
+</head>
+<body>
+<script>
+
+    // Set configuration
+    seajs.config({
+        base: "../../../dist/"
+    });
+
+    seajs.use(['index-debug.js'], function (Xian) {
+        console.log(Xian);
+
+        Xian.globalize();
+
+        function BlurBehaviour(opts){
+            Behaviour.call(this,opts);
+            this.count = 0;
+        }
+        Behaviour.extend(BlurBehaviour);
+        BlurBehaviour.prototype.onStart = function(){
+            var littleDudes = this.gameObject.scene.find("littleDudes");
+            var littleRobot = this.gameObject.scene.find("littleRobot");
+
+            this.blurFilter1 = littleDudes.renderer2d.filters[0];
+            this.blurFilter2 = littleRobot.renderer2d.filters[0];
+        };
+        BlurBehaviour.prototype.onUpdate = function(){
+
+            this.count += 0.01;
+
+            var blurAmount = Math.cos(this.count) ;
+            var blurAmount2 = Math.sin(this.count) ;
+
+            this.blurFilter1.blur = 20 * (blurAmount);
+            this.blurFilter2.blur = 20 * (blurAmount2);
+        };
+
+        var game, scene;
+
+        Assets.addAssets(
+                new Texture({
+                    name: "bg",
+                    src: "./depth_blur_BG.jpg"
+                }),
+                new Texture({
+                    name: "littleDudes",
+                    src: "./depth_blur_dudes.jpg"
+                }),
+                new Texture({
+                    name: "littleRobot",
+                    src: "./depth_blur_moby.jpg"
+                })
+        );
+
+        game = new Game({
+            debug: true,
+            canvas: {
+                width: 960,
+                height: 640
+            },
+            renderer: {
+                //canvasRenderer: CanvasRenderer2D,
+                canvasRenderer: PIXICanvasRenderer2D,
+                //webglRenderer: WebGLRenderer2D
+                webglRenderer: PIXIWebGLRenderer2D,
+                width: 630,
+                height: 410
+            }
+        });
+
+        scene = new Scene({
+            name: "PlayGround",
+            systems: [
+                new Transform2DSystem(),
+                new BehaviourSystem(),
+                new Render2DSystem(),
+            ]
+        });
+
+        var bg = new GameObject({
+            name: "bg",
+            components: [
+                new Transform2D({
+                    //identity: true
+                }),
+                new Camera2D({
+                    transparent: true,
+                    clearBeforeRender: true,
+                }),
+                new Sprite2D({
+                    texture: Assets.get("bg")
+                }),
+                new Renderer2D,
+                new BlurBehaviour()
+            ]
+        });
+        var littleDudes = new GameObject({
+            name: "littleDudes",
+            components: [
+                new Transform2D({
+                    position: new Vec2(0, 100)
+                }),
+                new Sprite2D({
+                    texture: Assets.get("littleDudes")
+                }),
+                new Renderer2D({
+                    filters: [
+                        new FilterLib._classes.BlurFilter
+                    ],
+                }),
+            ]
+        });
+        var littleRobot = new GameObject({
+            name: "littleRobot",
+            components: [
+                new Transform2D({
+                    position: new Vec2(120, 0)
+                }),
+                new Sprite2D({
+                    texture: Assets.get("littleRobot")
+                }),
+                new Renderer2D({
+                    filters: [
+                        new FilterLib._classes.BlurFilter()
+                    ]
+                }),
+            ]
+        });
+
+        bg.transform.addChild(littleDudes.transform);
+        bg.transform.addChild(littleRobot.transform);
+        scene.addGameObject(bg);
+
+//        scene.addGameObjects(bg, littleDudes, littleRobot);
+
+        game.addScene(scene);
+
+        function start() {
+            game.setScene("PlayGround");
+            console.log("Game Started!");
+        }
+
+        game.on("start", function () {
+            start();
+        });
+        //game.start();
+
+        AssetLoader.on("load", function () {
+            game.start();
+        }).load();
+
+    });
+    //    var renderer = PIXI.autoDetectRenderer(630, 410);
+    //
+    //    // create an new instance of a pixi stage
+    //    var stage = new PIXI.Stage(0xFFFFFF, true);
+    //
+    //    stage.interactive = true;
+    //
+    //    var bg = PIXI.Sprite.fromImage("depth_blur_BG.jpg");
+    //    stage.addChild(bg);
+    //
+    //    var littleDudes = PIXI.Sprite.fromImage("depth_blur_dudes.jpg");
+    //    littleDudes.position.y = 100;
+    //    stage.addChild(littleDudes);
+    //
+    //    var littleRobot = PIXI.Sprite.fromImage("depth_blur_moby.jpg");
+    //    littleRobot.position.x = 120;
+    //    stage.addChild(littleRobot);
+    //
+    //    var blurFilter1 = new PIXI.BlurFilter();
+    //    var blurFilter2 = new PIXI.BlurFilter();
+    //
+    //    littleDudes.filters = [blurFilter1];
+    //    littleRobot.filters = [blurFilter2];
+    //
+    //    renderer.view.style.position = "absolute"
+    //    renderer.view.style.width = window.innerWidth + "px";
+    //    renderer.view.style.height = window.innerHeight + "px";
+    //    renderer.view.style.display = "block";
+    //
+    //    // add render view to DOM
+    //    document.body.appendChild(renderer.view);
+    //
+    //
+    //
+    //    var count = 0;
+    //    var switchy = false;
+    //
+    //    stage.click = stage.tap = function()
+    //    {
+    //        switchy = !switchy
+    //
+    //        if(!switchy)
+    //        {
+    //            //stage.filters = [filter];
+    //        }
+    //        else
+    //        {
+    //        //    stage.filters = null;
+    //        }
+    //
+    //    }
+    //
+    //    /*
+    //     * Add a pixi Logo!
+    //     */
+    //    var logo = PIXI.Sprite.fromImage("../../logo_small.png")
+    //    stage.addChild(logo);
+    //
+    //    logo.anchor.x = 1;
+    //    logo.anchor.y = 1;
+    //
+    //    logo.position.x = 630
+    //    logo.scale.x = logo.scale.y = 0.5;
+    //    logo.position.y = 400;
+    //    logo.interactive = true;
+    //    logo.buttonMode = true;
+    //
+    //    logo.click = logo.tap = function()
+    //    {
+    //        window.open("https://github.com/GoodBoyDigital/pixi.js", "_blank")
+    //    }
+    //
+    //
+    //    requestAnimFrame(animate);
+    //
+    //    function animate() {
+    //
+    //        count += 0.01;
+    //
+    //        var blurAmount = Math.cos(count) ;
+    //        var blurAmount2 = Math.sin(count) ;
+    //
+    //
+    //        blurFilter1.blur = 20 * (blurAmount);
+    //        blurFilter2.blur = 20 * (blurAmount2);
+    //        renderer.render(stage);
+    //        requestAnimFrame( animate );
+    //    }
+
+</script>
+
+</body>
+</html>

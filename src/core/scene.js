@@ -116,18 +116,18 @@ Scene.prototype._updateNewInit = function () {
         len, i, il;
 
     len = newComponents.length;
-    if(len > 0) {
+    if (len > 0) {
         for (i = 0, il = len; i < il; i++) {
             newComponents[i].init();
             newComponents[i].emit("init");
         }
     }
     len = gameObjects.length;
-    if(len > 0) {
+    if (len > 0) {
         for (i = 0, il = len; i < il; i++) gameObjects[i].emit("init");
     }
     len = systems.length;
-    if(len > 0) {
+    if (len > 0) {
         for (i = 0, il = len; i < il; i++) {
             systems[i].init();
             systems[i].emit("init");
@@ -139,11 +139,11 @@ Scene.prototype._updateNewStart = function () {
     var systems = this._newSystems,
         gameObjects = this._newGameObjects,
         newComponents = this._newComponents,
-        system,gameObject,component,
+        system, gameObject, component,
         len, i, il;
 
     len = newComponents.length;
-    if(len > 0) {
+    if (len > 0) {
         for (i = 0, il = len; i < il; i++) {
             component = newComponents[i];
             component.start();
@@ -156,7 +156,7 @@ Scene.prototype._updateNewStart = function () {
         newComponents.length = 0;
     }
     len = gameObjects.length;
-    if(len > 0) {
+    if (len > 0) {
         for (i = 0, il = len; i < il; i++) {
             gameObject = gameObjects[i];
             gameObject.emit("start", gameObject);
@@ -170,7 +170,7 @@ Scene.prototype._updateNewStart = function () {
         gameObjects.length = 0;
     }
     len = systems.length;
-    if(len > 0) {
+    if (len > 0) {
         for (i = 0, il = len; i < il; i++) {
             system = systems[i];
             system.start();
@@ -291,11 +291,12 @@ Scene.prototype.fromJSON = function (json) {
     //}
 
     var jsonGameObjects = json.gameObjects,
-        gameObject, jsonGameObject;
+        gameObject, jsonGameObject, len;
 
-    i = jsonGameObjects.length;
+    len = jsonGameObjects.length;
 
-    while (i--) {
+    //while (i--) {
+    for (i = 0; i < len; i++) {
         if (!(jsonGameObject = jsonGameObjects[i])) continue;
 
         if ((gameObject = this._gameObjectJSONHash[jsonGameObject._id])) {
@@ -315,10 +316,10 @@ Scene.prototype.addGameObject = function (gameObject) {
         return this;
     }
     var gameObjects = this.gameObjects,
-        //roots = this.rootGameObjects,
+    //roots = this.rootGameObjects,
         index = gameObjects.indexOf(gameObject),
         components, transform, children, child,
-        i;
+        i, len;
 
     if (index === -1) {
         if (gameObject.scene) gameObject.scene.removeGameObject(gameObject);
@@ -335,9 +336,10 @@ Scene.prototype.addGameObject = function (gameObject) {
 
         if ((transform = gameObject.transform/* || gameObject.transform2d*/)) {
 
-            i = (children = transform.children).length;
+            len = (children = transform.children).length;
 
-            while (i--) {
+            //while (i--) {
+            for (i = 0; i < len; i++) {
                 if ((child = children[i].gameObject) && !this.hasGameObject(child)) {
                     this.addGameObject(child);
                 }
@@ -369,7 +371,7 @@ Scene.prototype.removeGameObject = function (gameObject, clear) {
         return this;
     }
     var gameObjects = this.gameObjects,
-        //roots = this.rootGameObjects,
+    //roots = this.rootGameObjects,
         index = gameObjects.indexOf(gameObject),
         components, transform, children, child,
         i;
@@ -394,7 +396,7 @@ Scene.prototype.removeGameObject = function (gameObject, clear) {
             //}
 
             //disattach the removed gameobject's transform from it's parent when it's parent is in the scene
-            if(transform.parent && transform.parent.gameObject.scene){
+            if (transform.parent && transform.parent.gameObject.scene) {
                 transform.parent.removeChild(transform);
             }
 
@@ -408,8 +410,8 @@ Scene.prototype.removeGameObject = function (gameObject, clear) {
         }
 
         i = this._newGameObjects.indexOf(gameObject);
-        if(i !== -1)
-            this._newGameObjects.splice(i,1);
+        if (i !== -1)
+            this._newGameObjects.splice(i, 1);
 
         this.emit("removeGameObject", gameObject);
         gameObject.emit("remove", gameObject);
@@ -439,9 +441,10 @@ Scene.prototype.hasGameObject = function (gameObject) {
 Scene.prototype.findByTag = function (tag, out) {
     out || (out = []);
     var gameObjects = this.gameObjects,
-        gameObject, i = gameObjects.length;
+        gameObject, len = gameObjects.length, i;
 
-    while (i--) {
+    //while (i--) {
+    for(i=0;i<len;i++){
         if ((gameObject = gameObjects[i]).hasTag(tag)) out.push(gameObject);
     }
 
@@ -451,9 +454,10 @@ Scene.prototype.findByTag = function (tag, out) {
 
 Scene.prototype.findByTagFirst = function (tag) {
     var gameObjects = this.gameObjects,
-        gameObject, i = gameObjects.length;
+        gameObject, len = gameObjects.length, i;
 
-    while (i--) {
+    //while (i--) {
+    for(i=0;i<len;i++){
         if ((gameObject = gameObjects[i]).hasTag(tag)) return gameObject;
     }
 
@@ -510,8 +514,7 @@ Scene.prototype._addComponent = function (component) {
     this._componentHash[component._id] = component;
     if (component._jsonId !== -1) this._componentJSONHash[component._jsonId] = component;
 
-    if(component._comp_state === undefined)
-    {
+    if (component._comp_state === undefined) {
         this._newComponents.push(component);
     }
 
@@ -543,10 +546,9 @@ Scene.prototype._removeComponent = function (component, clear) {
     //    componentManager.scene = undefined;
     //}
 
-    if(component._comp_state === undefined)
-    {
+    if (component._comp_state === undefined) {
         var index = this._newComponents.indexOf(component);
-        if(index !== -1) this._newComponents.splice(index, 1);
+        if (index !== -1) this._newComponents.splice(index, 1);
     }
 
     this.emit("remove" + type, component);
@@ -613,7 +615,7 @@ Scene.prototype.removeSystem = function (system, clear) {
         system.scene = undefined;
 
         index = this._newSystems.indexOf(system);
-        if(index !== -1) this._newSystems.splice(index, 1);
+        if (index !== -1) this._newSystems.splice(index, 1);
 
         this.emit("removeSystem", system);
         if (clear) system.clear();

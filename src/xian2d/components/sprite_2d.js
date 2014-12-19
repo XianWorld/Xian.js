@@ -90,7 +90,90 @@ Sprite2D.prototype.clear = function () {
     return this;
 };
 
+Sprite2D.prototype.getBounds = function(matrix)
+{
+    if(this._dirtyRenderSize){
+        this._updateRenderSize();
+        this._dirtyRenderSize = false;
+    }
+
+    //var width = this.texture.frame.width;
+    //var height = this.texture.frame.height;
+    //
+    //var w0 = width * (1-this.anchor.x);
+    //var w1 = width * -this.anchor.x;
+    //
+    //var h0 = height * (1-this.anchor.y);
+    //var h1 = height * -this.anchor.y;
+    var w0 = this.destX + this.destWidth;
+    var w1 = this.destX;
+
+    var h0 = this.destY + this.destHeight;
+    var h1 = this.destY;
+
+    var worldTransform = matrix || this.transform.modelView;
+    var m = worldTransform.elements;
+    var a = m[0];
+    var b = m[1];
+    var c = m[2];
+    var d = m[3];
+    var tx = m[4];
+    var ty = m[5];
+
+    var x1 = a * w1 + c * h1 + tx;
+    var y1 = d * h1 + b * w1 + ty;
+
+    var x2 = a * w0 + c * h1 + tx;
+    var y2 = d * h1 + b * w0 + ty;
+
+    var x3 = a * w0 + c * h0 + tx;
+    var y3 = d * h0 + b * w0 + ty;
+
+    var x4 =  a * w1 + c * h0 + tx;
+    var y4 =  d * h0 + b * w1 + ty;
+
+    var maxX = -Infinity;
+    var maxY = -Infinity;
+
+    var minX = Infinity;
+    var minY = Infinity;
+
+    minX = x1 < minX ? x1 : minX;
+    minX = x2 < minX ? x2 : minX;
+    minX = x3 < minX ? x3 : minX;
+    minX = x4 < minX ? x4 : minX;
+
+    minY = y1 < minY ? y1 : minY;
+    minY = y2 < minY ? y2 : minY;
+    minY = y3 < minY ? y3 : minY;
+    minY = y4 < minY ? y4 : minY;
+
+    maxX = x1 > maxX ? x1 : maxX;
+    maxX = x2 > maxX ? x2 : maxX;
+    maxX = x3 > maxX ? x3 : maxX;
+    maxX = x4 > maxX ? x4 : maxX;
+
+    maxY = y1 > maxY ? y1 : maxY;
+    maxY = y2 > maxY ? y2 : maxY;
+    maxY = y3 > maxY ? y3 : maxY;
+    maxY = y4 > maxY ? y4 : maxY;
+
+    var bounds = this._bounds;
+
+    bounds.x = minX;
+    bounds.width = maxX - minX;
+
+    bounds.y = minY;
+    bounds.height = maxY - minY;
+
+    // store a reference so that if this function gets called again in the render cycle we do not have to recalculate
+    //this._currentBounds = bounds;
+
+    return bounds;
+};
+
 Sprite2D.prototype._render = function (renderer) {
+    this.worldMatrix = this.transform.modelView;
 
     if(this._dirtyRenderSize){
         this._updateRenderSize();

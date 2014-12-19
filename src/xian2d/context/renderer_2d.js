@@ -1,7 +1,7 @@
 var Class = require("../../base/class");
 "use strict";
 
-function Renderer2D(opts) {
+function AbstractRenderer2D(opts) {
     opts || (opts = {});
 
     Class.call(this);
@@ -20,43 +20,49 @@ function Renderer2D(opts) {
 
 }
 
-Class.extend(Renderer2D);
+Class.extend(AbstractRenderer2D);
 
-Renderer2D.prototype.startRender = function (renderTexture) {
+AbstractRenderer2D.prototype.startRender = function (renderTexture) {
 };
 
-Renderer2D.prototype.finishRender = function () {
+AbstractRenderer2D.prototype.finishRender = function () {
 };
 
-Renderer2D.prototype.clearScreen = function (transparent, background) {
+AbstractRenderer2D.prototype.clearScreen = function (transparent, background) {
 };
 
-//Renderer2D.prototype.clearRect = function (x, y, w, h) {
+//AbstractRenderer2D.prototype.clearRect = function (x, y, w, h) {
 //};
 
-Renderer2D.prototype.renderSprite2D = function (sprite2D) {
+AbstractRenderer2D.prototype.renderSprite2D = function (sprite2D) {
 
 };
 
-Renderer2D.prototype.pushMask = function (mask) {
+AbstractRenderer2D.prototype.pushMask = function (mask) {
 };
 
-Renderer2D.prototype.popMask = function () {
+AbstractRenderer2D.prototype.popMask = function (mask) {
 };
 
-//Renderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
+AbstractRenderer2D.prototype.pushFilter = function (filterBlock) {
+};
+
+AbstractRenderer2D.prototype.popFilter = function () {
+};
+
+//AbstractRenderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
 //    if (repeat === void 0) {
 //        repeat = "no-repeat";
 //    }
 //};
 //
-//Renderer2D.prototype.setTransform = function (matrix) {
+//AbstractRenderer2D.prototype.setTransform = function (matrix) {
 //};
 //
-//Renderer2D.prototype.setAlpha = function (value, blendMode) {
+//AbstractRenderer2D.prototype.setAlpha = function (value, blendMode) {
 //};
 
-//Renderer2D.prototype.setupFont = function (textField) {
+//AbstractRenderer2D.prototype.setupFont = function (textField) {
 //    var ctx = this.canvasContext;
 //    var font = textField.italic ? "italic " : "normal ";
 //    font += textField.bold ? "bold " : "normal ";
@@ -66,26 +72,26 @@ Renderer2D.prototype.popMask = function () {
 //    ctx.textBaseline = "middle";
 //};
 //
-//Renderer2D.prototype.measureText = function (text) {
+//AbstractRenderer2D.prototype.measureText = function (text) {
 //    var result = this.canvasContext.measureText(text);
 //    return result.width;
 //};
 //
-//Renderer2D.prototype.drawText = function (textField, text, x, y, maxWidth, style) {
+//AbstractRenderer2D.prototype.drawText = function (textField, text, x, y, maxWidth, style) {
 //};
 //
-//Renderer2D.prototype.strokeRect = function (x, y, w, h, color) {
+//AbstractRenderer2D.prototype.strokeRect = function (x, y, w, h, color) {
 //};
 //
-//Renderer2D.prototype.setGlobalColorTransform = function (colorTransformMatrix) {
+//AbstractRenderer2D.prototype.setGlobalColorTransform = function (colorTransformMatrix) {
 //};
 
-Renderer2D.prototype.toJSON = function (json) {
+AbstractRenderer2D.prototype.toJSON = function (json) {
     return json;
 };
 
-Renderer2D.prototype.fromJSON = function (json) {
+AbstractRenderer2D.prototype.fromJSON = function (json) {
     return this;
 };
 
-module.exports = Renderer2D;
+module.exports = AbstractRenderer2D;

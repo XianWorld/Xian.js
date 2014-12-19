@@ -1,3 +1,4 @@
+var AbstractFilter = require("./AbstractFilter");
 /**
  * The ConvolutionFilter class applies a matrix convolution filter effect. 
  * A convolution combines pixels in the input image with neighboring pixels to produce a new image. 
@@ -11,18 +12,27 @@
  * @param width {Number} Width of the object you are transforming
  * @param height {Number} Height of the object you are transforming
  */
-PIXI.ConvolutionFilter = function(matrix, width, height)
+ConvolutionFilter = function(opts)//matrix, width, height
 {
-    PIXI.AbstractFilter.call( this );
+    opts || (opts = {});
 
-    this.passes = [this];
+    AbstractFilter.call( this,opts );
 
+    //this.passes = [this];
+
+    var matrix = [1,0,0,0,1,0,0,0,1];
+    var width = 2;
+    var height = 2;
     // set the uniforms
     this.uniforms = {
-        m : {type: '1fv', value: new PIXI.Float32Array(matrix)},
+        m : {type: '1fv', value: new Float32Array(matrix)},
         texelSizeX: {type: '1f', value: 1 / width},
         texelSizeY: {type: '1f', value: 1 / height}
     };
+
+    if(opts.matrix) this.matrix = opts.matrix;
+    if(opts.width) this.width = opts.width;
+    if(opts.height) this.height = opts.height;
 
     this.fragmentSrc = [
         'precision mediump float;',
@@ -48,7 +58,7 @@ PIXI.ConvolutionFilter = function(matrix, width, height)
             'vec4 c33 = texture2D(texture, vTextureCoord + px );', // bottom right
 
             'gl_FragColor = ',
-            'c11 * m[0] + c12 * m[1] + c22 * m[2] +',
+            'c11 * m[0] + c12 * m[1] + c13 * m[2] +',
             'c21 * m[3] + c22 * m[4] + c23 * m[5] +',
             'c31 * m[6] + c32 * m[7] + c33 * m[8];',
             'gl_FragColor.a = c22.a;',
@@ -57,8 +67,8 @@ PIXI.ConvolutionFilter = function(matrix, width, height)
 
 };
 
-PIXI.ConvolutionFilter.prototype = Object.create( PIXI.AbstractFilter.prototype );
-PIXI.ConvolutionFilter.prototype.constructor = PIXI.ConvolutionFilter;
+ConvolutionFilter.prototype = Object.create( AbstractFilter.prototype );
+ConvolutionFilter.prototype.constructor = ConvolutionFilter;
 
 /**
  * An array of values used for matrix transformation. Specified as a 9 point Array.
@@ -66,12 +76,12 @@ PIXI.ConvolutionFilter.prototype.constructor = PIXI.ConvolutionFilter;
  * @property matrix
  * @type Array
  */
-Object.defineProperty(PIXI.ConvolutionFilter.prototype, 'matrix', {
+Object.defineProperty(ConvolutionFilter.prototype, 'matrix', {
     get: function() {
         return this.uniforms.m.value;
     },
     set: function(value) {
-        this.uniforms.m.value = new PIXI.Float32Array(value);
+        this.uniforms.m.value = new Float32Array(value);
     }
 });
 
@@ -81,7 +91,7 @@ Object.defineProperty(PIXI.ConvolutionFilter.prototype, 'matrix', {
  * @property width
  * @type Number
  */
-Object.defineProperty(PIXI.ConvolutionFilter.prototype, 'width', {
+Object.defineProperty(ConvolutionFilter.prototype, 'width', {
     get: function() {
         return this.uniforms.texelSizeX.value;
     },
@@ -96,7 +106,7 @@ Object.defineProperty(PIXI.ConvolutionFilter.prototype, 'width', {
  * @property height
  * @type Number
  */
-Object.defineProperty(PIXI.ConvolutionFilter.prototype, 'height', {
+Object.defineProperty(ConvolutionFilter.prototype, 'height', {
     get: function() {
         return this.uniforms.texelSizeY.value;
     },
@@ -104,3 +114,27 @@ Object.defineProperty(PIXI.ConvolutionFilter.prototype, 'height', {
         this.uniforms.texelSizeY.value = 1/value;
     }
 });
+
+ConvolutionFilter.prototype.fromJSON = function (json) {
+
+    this.matrix = json.matrix;
+    this.width = json.width;
+    this.height = json.height;
+
+    return this;
+};
+
+ConvolutionFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "ConvolutionFilter";
+    json.matrix = this.matrix;
+    json.width = this.width;
+    json.height = this.height;
+
+    return json;
+};
+
+//AbstractFilter._classes.ColorMatrixFilter = ColorMatrixFilter;
+
+module.exports = ConvolutionFilter;

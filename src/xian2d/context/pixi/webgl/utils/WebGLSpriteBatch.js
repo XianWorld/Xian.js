@@ -1,27 +1,24 @@
-
 var AbstractFilter = require("../filters/AbstractFilter");
 var PixiShader = require("../shaders/PixiShader");
 var Utils = require("../utils/WebGLShaderUtils");
 
-WebGLSpriteBatch = function()
-{
+WebGLSpriteBatch = function () {
     this.vertSize = 6;
 
     this.size = 2000;//Math.pow(2, 16) /  this.vertSize;
 
     //the total number of floats in our batch
-    var numVerts = this.size * 4 *  this.vertSize;
+    var numVerts = this.size * 4 * this.vertSize;
     //the total number of indices in our batch
     var numIndices = this.size * 6;
 
     this.vertices = new Float32Array(numVerts);
 
     this.indices = new Uint16Array(numIndices);
-    
+
     this.lastIndexCount = 0;
 
-    for (var i=0, j=0; i < numIndices; i += 6, j += 4)
-    {
+    for (var i = 0, j = 0; i < numIndices; i += 6, j += 4) {
         this.indices[i + 0] = j + 0;
         this.indices[i + 1] = j + 1;
         this.indices[i + 2] = j + 2;
@@ -46,19 +43,20 @@ WebGLSpriteBatch = function()
 
     this.sprites = [];
 
-    this.defaultShader = new AbstractFilter([
-        'precision lowp float;',
-        'varying vec2 vTextureCoord;',
-        'varying vec4 vColor;',
-        'uniform sampler2D uSampler;',
-        'void main(void) {',
-        '   gl_FragColor = texture2D(uSampler, vTextureCoord) * vColor ;',
-        '}'
-    ]);
+    this.defaultShader = new AbstractFilter({
+        fragmentSrc: [
+            'precision lowp float;',
+            'varying vec2 vTextureCoord;',
+            'varying vec4 vColor;',
+            'uniform sampler2D uSampler;',
+            'void main(void) {',
+            '   gl_FragColor = texture2D(uSampler, vTextureCoord) * vColor ;',
+            '}'
+        ]
+    });
 };
 
-WebGLSpriteBatch.prototype.setContext = function(gl)
-{
+WebGLSpriteBatch.prototype.setContext = function (gl) {
     this.gl = gl;
 
     // create a couple of buffers
@@ -85,27 +83,23 @@ WebGLSpriteBatch.prototype.setContext = function(gl)
     this.defaultShader.shaders[gl.id] = shader;
 };
 
-WebGLSpriteBatch.prototype.begin = function(renderSession)
-{
+WebGLSpriteBatch.prototype.begin = function (renderSession) {
     this.renderSession = renderSession;
     this.shader = this.renderSession.shaderManager.defaultShader;
 
     this.start();
 };
 
-WebGLSpriteBatch.prototype.end = function()
-{
+WebGLSpriteBatch.prototype.end = function () {
     this.flush();
 };
 
-WebGLSpriteBatch.prototype.render = function(sprite)
-{
+WebGLSpriteBatch.prototype.render = function (sprite) {
     var texture = sprite.texture;
-    
-   //TODO set blend modes.. 
+
+    //TODO set blend modes..
     // check texture..
-    if(this.currentBatchSize >= this.size)
-    {
+    if (this.currentBatchSize >= this.size) {
         this.flush();
         this.currentBaseTexture = texture;
     }
@@ -130,7 +124,7 @@ WebGLSpriteBatch.prototype.render = function(sprite)
         destY = sprite.destY,
         destWidth = sprite.destWidth,
         destHeight = sprite.destHeight,
-        //blendMode = sprite.blendMode,
+    //blendMode = sprite.blendMode,
         worldMatrix = sprite.worldMatrix;
 
     //var texture_scale_factor = this.texture_scale_factor;
@@ -146,9 +140,9 @@ WebGLSpriteBatch.prototype.render = function(sprite)
     var tx = m[4];
     var ty = m[5];
 
-    if(this.renderSession.renderTexture){
+    if (this.renderSession.renderTexture) {
 
-        ty = this.renderSession.renderTexture.height-ty;
+        ty = this.renderSession.renderTexture.height - ty;
 
         b = -b;
         d = -d;
@@ -299,7 +293,7 @@ WebGLSpriteBatch.prototype.render = function(sprite)
     //// color
     //verticies[index++] = alpha;
     //verticies[index++] = tint;
-    
+
     // increment the batchsize
     this.sprites[this.currentBatchSize++] = sprite;
 
@@ -420,16 +414,14 @@ WebGLSpriteBatch.prototype.render = function(sprite)
 //    this.sprites[this.currentBatchSize++] = tilingSprite;
 //};
 
-WebGLSpriteBatch.prototype.flush = function()
-{
+WebGLSpriteBatch.prototype.flush = function () {
     // If the batch is length 0 then return as there is nothing to draw
-    if (this.currentBatchSize===0)return;
+    if (this.currentBatchSize === 0)return;
 
     var gl = this.gl;
     var shader;
 
-    if(this.dirty)
-    {
+    if (this.dirty) {
         this.dirty = false;
         // bind the main texture
         gl.activeTexture(gl.TEXTURE0);
@@ -438,22 +430,20 @@ WebGLSpriteBatch.prototype.flush = function()
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 
-        shader =  this.defaultShader.shaders[gl.id];
+        shader = this.defaultShader.shaders[gl.id];
 
         // this is the same for each shader?
-        var stride =  this.vertSize * 4;
+        var stride = this.vertSize * 4;
         gl.vertexAttribPointer(shader.aVertexPosition, 2, gl.FLOAT, false, stride, 0);
         gl.vertexAttribPointer(shader.aTextureCoord, 2, gl.FLOAT, false, stride, 2 * 4);
         gl.vertexAttribPointer(shader.colorAttribute, 2, gl.FLOAT, false, stride, 4 * 4);
     }
 
     // upload the verts to the buffer  
-    if(this.currentBatchSize > ( this.size * 0.5 ) )
-    {
+    if (this.currentBatchSize > ( this.size * 0.5 )) {
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.vertices);
     }
-    else
-    {
+    else {
         var view = this.vertices.subarray(0, this.currentBatchSize * 4 * this.vertSize);
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, view);
     }
@@ -471,7 +461,7 @@ WebGLSpriteBatch.prototype.flush = function()
     var sprite;
 
     for (var i = 0, j = this.currentBatchSize; i < j; i++) {
-        
+
         sprite = this.sprites[i];
 
         nextTexture = sprite.texture;//.baseTexture;
@@ -481,32 +471,28 @@ WebGLSpriteBatch.prototype.flush = function()
         blendSwap = currentBlendMode !== nextBlendMode;
         shaderSwap = currentShader !== nextShader; // should I use _UIDS???
 
-        if(currentBaseTexture !== nextTexture || blendSwap || shaderSwap)
-        {
+        if (currentBaseTexture !== nextTexture || blendSwap || shaderSwap) {
             this.renderBatch(currentBaseTexture, batchSize, start);
 
             start = i;
             batchSize = 0;
             currentBaseTexture = nextTexture;
 
-            if( blendSwap )
-            {
+            if (blendSwap) {
                 currentBlendMode = nextBlendMode;
-                this.renderSession.blendModeManager.setBlendMode( currentBlendMode );
+                this.renderSession.blendModeManager.setBlendMode(currentBlendMode);
             }
 
-            if( shaderSwap )
-            {
+            if (shaderSwap) {
                 currentShader = nextShader;
-                
+
                 shader = currentShader.shaders[gl.id];
 
-                if(!shader)
-                {
+                if (!shader) {
                     shader = new PixiShader(gl);
 
-                    shader.fragmentSrc =currentShader.fragmentSrc;
-                    shader.uniforms =currentShader.uniforms;
+                    shader.fragmentSrc = currentShader.fragmentSrc;
+                    shader.uniforms = currentShader.uniforms;
                     shader.init();
 
                     currentShader.shaders[gl.id] = shader;
@@ -515,8 +501,8 @@ WebGLSpriteBatch.prototype.flush = function()
                 // set shader function???
                 this.renderSession.shaderManager.setShader(shader);
 
-                if(shader.dirty)shader.syncUniforms();
-                
+                if (shader.dirty)shader.syncUniforms();
+
                 // both thease only need to be set if they are changing..
                 // set the projection
                 var projection = this.renderSession.projection;
@@ -539,52 +525,46 @@ WebGLSpriteBatch.prototype.flush = function()
     this.currentBatchSize = 0;
 };
 
-WebGLSpriteBatch.prototype.renderBatch = function(texture, size, startIndex)
-{
-    if(size === 0)return;
+WebGLSpriteBatch.prototype.renderBatch = function (texture, size, startIndex) {
+    if (size === 0)return;
 
     var gl = this.gl;
 
     // check if a texture is dirty..
-    if(texture._dirty[gl.id])
-    {
+    if (texture._dirty[gl.id]) {
         //this.renderSession._updateTexture(texture);
         Utils.updateTexture(gl, texture);
     }
-    else
-    {
+    else {
         // bind the current texture
         gl.bindTexture(gl.TEXTURE_2D, texture._glTextures[gl.id]);
     }
 
     // now draw those suckas!
     gl.drawElements(gl.TRIANGLES, size * 6, gl.UNSIGNED_SHORT, startIndex * 6 * 2);
-    
+
     // increment the draw count
     this.renderSession.drawCount++;
 };
 
-WebGLSpriteBatch.prototype.stop = function()
-{
+WebGLSpriteBatch.prototype.stop = function () {
     this.flush();
     this.dirty = true;
 };
 
-WebGLSpriteBatch.prototype.start = function()
-{
+WebGLSpriteBatch.prototype.start = function () {
     this.dirty = true;
 };
 
-WebGLSpriteBatch.prototype.destroy = function()
-{
+WebGLSpriteBatch.prototype.destroy = function () {
     this.vertices = null;
     this.indices = null;
-    
-    this.gl.deleteBuffer( this.vertexBuffer );
-    this.gl.deleteBuffer( this.indexBuffer );
-    
+
+    this.gl.deleteBuffer(this.vertexBuffer);
+    this.gl.deleteBuffer(this.indexBuffer);
+
     this.currentBaseTexture = null;
-    
+
     this.gl = null;
 };
 

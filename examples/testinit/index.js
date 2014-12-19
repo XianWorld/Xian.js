@@ -173,7 +173,7 @@ seajs.use(['index-debug.js'], function (Xian) {
             //    isMask: true
             //}),
             //new GraphicsBehaviour()
-            new CacheAsBitmapBehaviour
+            //new CacheAsBitmapBehaviour
         ]
     });
     level1 = new GameObject({
@@ -187,9 +187,28 @@ seajs.use(['index-debug.js'], function (Xian) {
             new Sprite2D({
                 name: "sprite2d_1",
                 alpha: 0.5,
-                tint: 0x00ff00,
-                blendMode: Enums.blendModes.ADD,
+                //tint: 0x00ff00,
+                //blendMode: Enums.blendModes.ADD,
                 texture: Assets.get("img_player")
+            }),
+            new Renderer2D({
+                filters: [
+                    //new FilterLib._classes.BlurXFilter({
+                    //    blur: 30
+                    //}),
+                    //new FilterLib._classes.AsciiFilter({
+                    //    size: 16
+                    //}),
+                    //new FilterLib._classes.ColorMatrixFilter({
+                    //    matrix: [
+                    //        1, 0, 0, 0,
+                    //        0, 1, 0, 0,
+                    //        0, 0, 0, 0,
+                    //        0, 0, 0, 1
+                    //    ]
+                    //})
+                    new FilterLib._classes.ColorStepFilter(),
+                ],
             }),
             new Sprite2DBehaviour({
                 //enabled: false
@@ -203,7 +222,7 @@ seajs.use(['index-debug.js'], function (Xian) {
             new Transform2D({
                 //identity: true
                 position: new Vec2(-50,-50),
-                rotation: 1.7
+                rotation: 0.5
             }),
             new Sprite2D({
                 name: "sprite2d_1",
@@ -211,6 +230,14 @@ seajs.use(['index-debug.js'], function (Xian) {
                 tint: 0x00ff00,
                 //blendMode: Enums.blendModes.ADD,
                 texture: Assets.get("img_player")
+            }),
+            new Renderer2D({
+                alpha: 0.5,
+                filters: [
+                    new FilterLib._classes.BlurXFilter({
+                        blur: 30
+                    }),
+                ]
             }),
             new Sprite2DBehaviour({
                 //enabled: false

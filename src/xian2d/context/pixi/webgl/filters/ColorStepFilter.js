@@ -1,6 +1,4 @@
-/**
- * @author Mat Groves http://matgroves.com/ @Doormat23
- */
+var AbstractFilter = require("./AbstractFilter");
 
 /**
  * This lowers the color depth of your image by the given amount, producing an image with a smaller palette.
@@ -9,11 +7,12 @@
  * @extends AbstractFilter
  * @constructor
  */
-PIXI.ColorStepFilter = function()
+ColorStepFilter = function(opts)
 {
-    PIXI.AbstractFilter.call( this );
+    opts || (opts = {});
+    AbstractFilter.call( this,opts );
 
-    this.passes = [this];
+    //this.passes = [this];
 
     // set the uniforms
     this.uniforms = {
@@ -35,8 +34,8 @@ PIXI.ColorStepFilter = function()
     ];
 };
 
-PIXI.ColorStepFilter.prototype = Object.create( PIXI.AbstractFilter.prototype );
-PIXI.ColorStepFilter.prototype.constructor = PIXI.ColorStepFilter;
+ColorStepFilter.prototype = Object.create( AbstractFilter.prototype );
+ColorStepFilter.prototype.constructor = ColorStepFilter;
 
 /**
  * The number of steps to reduce the palette by.
@@ -44,7 +43,7 @@ PIXI.ColorStepFilter.prototype.constructor = PIXI.ColorStepFilter;
  * @property step
  * @type Number
  */
-Object.defineProperty(PIXI.ColorStepFilter.prototype, 'step', {
+Object.defineProperty(ColorStepFilter.prototype, 'step', {
     get: function() {
         return this.uniforms.step.value;
     },
@@ -52,3 +51,21 @@ Object.defineProperty(PIXI.ColorStepFilter.prototype, 'step', {
         this.uniforms.step.value = value;
     }
 });
+
+ColorStepFilter.prototype.fromJSON = function (json) {
+
+    this.step = json.step;
+
+    return this;
+};
+
+ColorStepFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "ColorStepFilter";
+    json.step = this.step;
+
+    return json;
+};
+
+module.exports = ColorStepFilter;

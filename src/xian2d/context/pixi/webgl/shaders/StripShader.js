@@ -1,7 +1,7 @@
 var Utils = require("../utils/WebGLShaderUtils");
 var Class = require("../../../../../base/class");
 
-StripShader = function(gl)
+function StripShader(gl)
 {
     Class.call(this);
     /**

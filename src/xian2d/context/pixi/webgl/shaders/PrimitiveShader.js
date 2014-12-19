@@ -1,7 +1,7 @@
 var Utils = require("../utils/WebGLShaderUtils");
 var Class = require("../../../../../base/class");
 
-PrimitiveShader = function(gl)
+function PrimitiveShader(gl)
 {
     Class.call(this);
     /**

@@ -106,6 +106,7 @@ Class.extend = function (child, parent) {
     (this._children || (this._children = {}))[child.name] = child;
     child._parent = this;
 
+    if(Class._classes[child.name]) console.log("Class exist: "+child.name);
     Class._classes[child.name] = child;
 
     if (parent.onExtend) {

@@ -1,6 +1,7 @@
 
-AbstractFilter = function(fragmentSrc, uniforms)
+AbstractFilter = function(opts)
 {
+    opts || (opts = {});
     /**
     * An array of passes - some filters contain a few steps this array simply stores the steps in a liniear fashion.
     * For example the blur filter has two passes blurX and blurY.
@@ -34,14 +35,14 @@ AbstractFilter = function(fragmentSrc, uniforms)
     * @type object
     * @private
     */
-    this.uniforms = uniforms || {};
+    this.uniforms = opts.uniforms || {};
 
     /**
     * @property fragmentSrc
     * @type Array
     * @private
     */
-    this.fragmentSrc = fragmentSrc || [];
+    this.fragmentSrc = opts.fragmentSrc || [];
 };
 
 AbstractFilter.prototype.constructor = AbstractFilter;
@@ -65,4 +66,29 @@ AbstractFilter.prototype.apply = function(frameBuffer)
     // TODO :)
 };
 */
+
+AbstractFilter.prototype.fromJSON = function (json) {
+
+    return this;
+};
+
+AbstractFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    return json;
+};
+
+//AbstractFilter.fromJSON = function (json) {
+//
+//    return new AbstractFilter._classes[json._className]().fromJSON(json);
+//};
+//
+//AbstractFilter.create = function (type) {
+//
+//    return new AbstractFilter._classes[type];
+//};
+//
+//
+//AbstractFilter._classes = {};
+//
 module.exports = AbstractFilter;

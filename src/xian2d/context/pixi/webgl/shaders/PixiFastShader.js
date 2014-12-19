@@ -2,7 +2,7 @@
 var Utils = require("../utils/WebGLShaderUtils");
 var Class = require("../../../../../base/class");
 
-PixiFastShader = function(gl)
+function PixiFastShader(gl)
 {
     Class.call(this);
     /**

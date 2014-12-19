@@ -71,6 +71,7 @@ PIXICanvasRenderer2D.prototype.startRender = function (renderTexture) {
 PIXICanvasRenderer2D.prototype.finishRender = function (renderTexture) {
     this.canvasContext.restore();
     this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+    this.canvasContext.globalAlpha = this.globalAlpha = 1;
 
     this.rendering = false;
 };

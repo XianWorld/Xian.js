@@ -94,18 +94,22 @@ function Xian() {
     this.Transform2D = require("./src/xian2d/components/transform_2d");
     this.Camera2D = require("./src/xian2d/components/camera_2d");
     this.TextureClip = require("./src/xian2d/assets/texture_clip");
-    this.Renderer2D = require("./src/xian2d/context/renderer/canvas_renderer_2d");
+    //this.Renderer2D = require("./src/xian2d/context/renderer/canvas_renderer_2d");
+    this.Renderer2D = require("./src/xian2d/components/renderer_2d");
     this.Renderable2D = require("./src/xian2d/components/renderable_2d");
     this.Sprite2D = require("./src/xian2d/components/sprite_2d");
+    this.Graphics = require("./src/xian2d/components/graphics");
+
     this.CanvasRenderer2D = require("./src/xian2d/context/renderer/canvas_renderer_2d");
     this.WebGLRenderer2D = require("./src/xian2d/context/renderer/webgl_renderer_2d");
     this.XianShader = require("./src/xian2d/context/renderer/shaders/xian_shader");
     this.Render2DSystem = require("./src/xian2d/systems/render_2d_system");
     this.Transform2DSystem = require("./src/xian2d/systems/transform_2d_system");
 
-    this.Graphics = require("./src/xian2d/components/graphics");
     this.PIXICanvasRenderer2D = require("./src/xian2d/context/pixi/canvas/pixi_canvas_renderer_2d");
     this.PIXIWebGLRenderer2D = require("./src/xian2d/context/pixi/webgl/pixi_webgl_renderer_2d");
+
+    this.FilterLib = require("./src/xian2d/context/pixi/webgl/filters/FilterLib");
 
 }
 

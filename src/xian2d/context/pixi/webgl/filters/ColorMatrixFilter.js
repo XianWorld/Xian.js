@@ -1,29 +1,23 @@
-/**
- * @author Mat Groves http://matgroves.com/ @Doormat23
- */
+var AbstractFilter = require("./AbstractFilter");
 
-/**
- * The ColorMatrixFilter class lets you apply a 4x4 matrix transformation on the RGBA
- * color and alpha values of every pixel on your displayObject to produce a result
- * with a new set of RGBA color and alpha values. It's pretty powerful!
- * 
- * @class ColorMatrixFilter
- * @extends AbstractFilter
- * @constructor
- */
-PIXI.ColorMatrixFilter = function()
-{
-    PIXI.AbstractFilter.call( this );
+function ColorMatrixFilter(opts) {
+    opts || (opts = {});
 
-    this.passes = [this];
+    AbstractFilter.call(this, opts);
+
+    //this.passes = [this];
 
     // set the uniforms
     this.uniforms = {
-        matrix: {type: 'mat4', value: [1,0,0,0,
-                                       0,1,0,0,
-                                       0,0,1,0,
-                                       0,0,0,1]}
+        matrix: {
+            type: 'mat4', value: [1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1]
+        }
     };
+
+    if(opts.matrix) this.matrix = opts.matrix;
 
     this.fragmentSrc = [
         'precision mediump float;',
@@ -35,26 +29,39 @@ PIXI.ColorMatrixFilter = function()
 
         'void main(void) {',
         '   gl_FragColor = texture2D(uSampler, vTextureCoord) * matrix;',
-      //  '   gl_FragColor = gl_FragColor;',
+        //  '   gl_FragColor = gl_FragColor;',
         '}'
     ];
 };
 
-PIXI.ColorMatrixFilter.prototype = Object.create( PIXI.AbstractFilter.prototype );
-PIXI.ColorMatrixFilter.prototype.constructor = PIXI.ColorMatrixFilter;
+ColorMatrixFilter.prototype = Object.create(AbstractFilter.prototype);
+ColorMatrixFilter.prototype.constructor = ColorMatrixFilter;
 
-/**
- * Sets the matrix of the color matrix filter
- *
- * @property matrix
- * @type Array and array of 26 numbers
- * @default [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
- */
-Object.defineProperty(PIXI.ColorMatrixFilter.prototype, 'matrix', {
-    get: function() {
+Object.defineProperty(ColorMatrixFilter.prototype, 'matrix', {
+    get: function () {
         return this.uniforms.matrix.value;
     },
-    set: function(value) {
+    set: function (value) {
         this.uniforms.matrix.value = value;
     }
 });
+
+ColorMatrixFilter.prototype.fromJSON = function (json) {
+
+    this.matrix = json.matrix;
+
+    return this;
+};
+
+ColorMatrixFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "ColorMatrixFilter";
+    json.matrix = this.matrix;
+
+    return json;
+};
+
+//AbstractFilter._classes.ColorMatrixFilter = ColorMatrixFilter;
+
+module.exports = ColorMatrixFilter;

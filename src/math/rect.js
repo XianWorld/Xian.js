@@ -112,7 +112,6 @@ defineProperty(Rect.prototype, "w", {
     }
 });
 
-
 Rect.prototype.clone = function () {
 
     return new Rect(this.x, this.y, this.width, this.height);
@@ -141,6 +140,16 @@ Rect.prototype.set = function (x, y, width, height) {
     this.y = y;
     this.width = width;
     this.height = height;
+
+    return this;
+};
+
+Rect.prototype.infinity = function () {
+
+    this._x = this._xMin = Infinity;
+    this._y = this._yMin = Infinity;
+    this._width = this._xMax = -Infinity;
+    this._height = this._yMax = -Infinity;
 
     return this;
 };
@@ -174,6 +183,13 @@ Rect.prototype.contains = function (point) {
     );
 };
 
+Rect.prototype.updateBounds = function (rect) {
+    if(this._xMin > rect._xMin) this.xMin = rect._xMin;
+    if(this._yMin > rect._yMin) this.yMin = rect._yMin;
+
+    if(this._xMax < rect._xMax) this.xMax = rect._xMax;
+    if(this._yMax < rect._yMax) this.yMax = rect._yMax;
+};
 
 Rect.prototype.toJSON = function (json) {
     json || (json = {});
@@ -203,5 +219,6 @@ Rect.prototype.toString = function () {
     return "Rect( " + this._x + ", " + this._y + ", " + this._width + ", " + this._height + " )";
 };
 
+Rect.Empty = new Rect(0,0,0,0);
 
 module.exports = Rect;

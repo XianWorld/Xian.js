@@ -373,11 +373,12 @@ Transform.prototype.toJSON = function (json) {
 Transform.prototype.fromJSON = function (json) {
     Component.prototype.fromJSON.call(this, json);
     var children = json.children,
-        i = children.length,
+        i, len = children.length,
         child, scene;
 
     if (this.gameObject && (scene = this.gameObject.scene)) {
-        while (i--) {
+        //while (i--) {
+        for(i=0;i<len;i++){
             child = scene.findComponentByJSONId(children[i]);
 
             if (!this.hasChild(child)) {
@@ -388,7 +389,8 @@ Transform.prototype.fromJSON = function (json) {
         this.once("init", function () {
             var scene = this.gameObject.scene;
 
-            while (i--) {
+            //while (i--) {
+            for(i=0;i<len;i++){
                 child = scene.findComponentByJSONId(children[i]);
 
                 if (!this.hasChild(child)) {

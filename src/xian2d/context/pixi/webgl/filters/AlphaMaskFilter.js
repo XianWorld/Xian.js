@@ -1,24 +1,15 @@
-/**
- * @author Mat Groves http://matgroves.com/ @Doormat23
- */
 var AbstractFilter = require("./AbstractFilter");
-/**
- * The AlphaMaskFilter class uses the pixel values from the specified texture (called the displacement map) to perform a displacement of an object.
- * You can use this filter to apply all manor of crazy warping effects
- * Currently the r property of the texture is used to offset the x and the g property of the texture is used to offset the y.
- * 
- * @class AlphaMaskFilter
- * @extends AbstractFilter
- * @constructor
- * @param texture {Texture} The texture used for the displacement map * must be power of 2 texture at the moment
- */
-AlphaMaskFilter = function(texture)
+var Assets = require("../../../../../assets/assets");
+
+AlphaMaskFilter = function(opts)
 {
-    AbstractFilter.call( this );
+    opts || (opts = {});
 
-    this.passes = [this];
-    texture._powerOf2 = true;
+    AbstractFilter.call( this, opts );
 
+    //this.passes = [this];
+
+    var texture = opts.map;
     // set the uniforms
     this.uniforms = {
         mask: {type: 'sampler2D', value:texture},
@@ -26,8 +17,11 @@ AlphaMaskFilter = function(texture)
         dimensions:   {type: '4fv', value:[0,0,0,0]}
     };
 
-    this.uniforms.mask.value.x = texture.width;
-    this.uniforms.mask.value.y = texture.height;
+    if(texture) this.map = texture;
+    //texture._powerOf2 = true;
+    //this.uniforms.mapDimensions.value.x = this.uniforms.mask.value.width;
+    //this.uniforms.mapDimensions.value.y = this.uniforms.mask.value.height;
+
     //if(texture.baseTexture.hasLoaded)
     //{
     //    this.uniforms.mask.value.x = texture.width;
@@ -96,5 +90,30 @@ Object.defineProperty(AlphaMaskFilter.prototype, 'map', {
     },
     set: function(value) {
         this.uniforms.mask.value = value;
+
+        value._powerOf2 = true;
+
+        this.uniforms.mapDimensions.value.x = value.width;
+        this.uniforms.mapDimensions.value.y = value.height;
     }
 });
+
+AlphaMaskFilter.prototype.fromJSON = function (json) {
+
+    this.map = json.map ? Assets.get(json.map) : undefined;
+
+    return this;
+};
+
+AlphaMaskFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "AlphaMaskFilter";
+    json.map = this.map ? this.map.name : undefined;
+
+    return json;
+};
+
+//AbstractFilter._classes.AlphaMaskFilter = AlphaMaskFilter;
+
+module.exports = AlphaMaskFilter;

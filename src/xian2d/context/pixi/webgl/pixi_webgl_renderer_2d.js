@@ -14,7 +14,7 @@ var WebGLGraphics = require("./utils/WebGLGraphics");
 
 "use strict";
 
-function WebGLRenderer2D(canvas, opts) {
+function PIXIWebGLRenderer2D(canvas, opts) {
     opts || (opts = {});
 
     Renderer2D.call(this, opts);
@@ -33,8 +33,8 @@ function WebGLRenderer2D(canvas, opts) {
     this.canvas.addEventListener("webglcontextrestored", this._handleContextRestored.bind(this), false);
 
     //TODO should a total solution for autosize
-    this.width = this.canvas.width;
-    this.height = this.canvas.height;
+    //this.width = this.canvas.width;
+    //this.height = this.canvas.height;
 
     this.projection = new Vec2;
     this.offset = new Vec2;
@@ -45,9 +45,9 @@ function WebGLRenderer2D(canvas, opts) {
     this.projection.y =  -this.height / 2;// / this.resolution;
 
     this._contextOptions = {
-        //alpha: this.transparent,
+        alpha: true,//this.transparent,
         //antialias: opts.antialias, // SPEED UP??
-        //premultipliedAlpha: this.transparent && this.transparent !== 'notMultiplied',
+        premultipliedAlpha: true,//this.transparent && this.transparent !== 'notMultiplied',
         stencil:true,
         //preserveDrawingBuffer: opts.preserveDrawingBuffer
     };
@@ -69,10 +69,10 @@ function WebGLRenderer2D(canvas, opts) {
     this.drawCount = 0;
 }
 
-Renderer2D.extend(WebGLRenderer2D);
+Renderer2D.extend(PIXIWebGLRenderer2D);
 
 
-WebGLRenderer2D.prototype.startRender = function (renderTexture) {
+PIXIWebGLRenderer2D.prototype.startRender = function (renderTexture) {
     if(this.contextLost)return;
 
     var gl = this.gl;
@@ -130,7 +130,7 @@ WebGLRenderer2D.prototype.startRender = function (renderTexture) {
 
 };
 
-WebGLRenderer2D.prototype.finishRender = function (renderTexture) {
+PIXIWebGLRenderer2D.prototype.finishRender = function (renderTexture) {
     // finish the sprite batch
     this.spriteBatch.end();
 
@@ -138,7 +138,7 @@ WebGLRenderer2D.prototype.finishRender = function (renderTexture) {
     this.renderTexture = undefined;
 };
 
-WebGLRenderer2D.prototype.clearScreen = function (transparent, background) {
+PIXIWebGLRenderer2D.prototype.clearScreen = function (transparent, background) {
     var gl = this.gl;
     //gl.colorMask(true, true, true, true);
     //
@@ -154,7 +154,7 @@ WebGLRenderer2D.prototype.clearScreen = function (transparent, background) {
     this.renderCost = 0;
 };
 
-//WebGLRenderer2D.prototype.drawRepeatImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
+//PIXIWebGLRenderer2D.prototype.drawRepeatImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
 //    for (var x = destX; x < destWidth; x += sourceWidth) {
 //        for (var y = destY; y < destHeight; y += sourceHeight) {
 //            var destW = Math.min(sourceWidth, destWidth - x);
@@ -164,7 +164,7 @@ WebGLRenderer2D.prototype.clearScreen = function (transparent, background) {
 //    }
 //};
 
-//WebGLRenderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
+//PIXIWebGLRenderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
 //    if (repeat === void 0) { repeat = undefined; }
 //    if (this.contextLost) {
 //        return;
@@ -194,11 +194,11 @@ WebGLRenderer2D.prototype.clearScreen = function (transparent, background) {
 //    this.spriteBatch.render(spriteData);
 //};
 
-WebGLRenderer2D.prototype.renderSprite2D = function (sprite2D) {
+PIXIWebGLRenderer2D.prototype.renderSprite2D = function (sprite2D) {
     this.spriteBatch.render(sprite2D)
 };
 
-WebGLRenderer2D.prototype.renderGraphics = function (graphics) {
+PIXIWebGLRenderer2D.prototype.renderGraphics = function (graphics) {
     //CanvasGraphics.renderGraphics(this, worldTransform, graphicsData, worldAlpha, tint);
 
     //this._setAlpha(graphics.worldAlpha, graphics.blendMode);
@@ -206,24 +206,36 @@ WebGLRenderer2D.prototype.renderGraphics = function (graphics) {
     WebGLGraphics.renderGraphics(this, graphics);
 };
 
-//WebGLRenderer2D.prototype.renderGraphicsMask = function (graphics) {
+//PIXIWebGLRenderer2D.prototype.renderGraphicsMask = function (graphics) {
 //    //CanvasGraphics.renderGraphicsMask(this, worldTransform, graphicsData, worldAlpha, tint);
 //    WebGLGraphics.renderGraphicsMask(this, graphics);
 //};
 
-WebGLRenderer2D.prototype.pushMask = function (graphics) {
+PIXIWebGLRenderer2D.prototype.pushMask = function (graphics) {
     this.spriteBatch.stop();
     this.maskManager.pushMask(graphics, this);
     this.spriteBatch.start();
 };
 
-WebGLRenderer2D.prototype.popMask = function (graphics) {
+PIXIWebGLRenderer2D.prototype.popMask = function (graphics) {
     this.spriteBatch.stop();
     this.maskManager.popMask(graphics, this);
     this.spriteBatch.start();
 };
 
-//WebGLRenderer2D.prototype.setTransform = function (matrix) {
+PIXIWebGLRenderer2D.prototype.pushFilter = function (filterBlock) {
+    this.spriteBatch.stop();
+    this.filterManager.pushFilter(filterBlock);
+    this.spriteBatch.start();
+};
+
+PIXIWebGLRenderer2D.prototype.popFilter = function () {
+    this.spriteBatch.stop();
+    this.filterManager.popFilter();
+    this.spriteBatch.start();
+};
+
+//PIXIWebGLRenderer2D.prototype.setTransform = function (matrix) {
 //    var locWorldTransform = this.worldTransform;
 //    //locWorldTransform.a = matrix.a;
 //    //locWorldTransform.b = matrix.b;
@@ -235,12 +247,12 @@ WebGLRenderer2D.prototype.popMask = function (graphics) {
 //    locWorldTransform.copy(matrix);
 //};
 //
-//WebGLRenderer2D.prototype.setBlendMode = function (blendMode) {
+//PIXIWebGLRenderer2D.prototype.setBlendMode = function (blendMode) {
 //    if (!blendMode) {
 //        blendMode = Enums.blendModes.NORMAL;
 //    }
 //    //if (this.currentBlendMode != blendMode) {
-//    //    var blendModeWebGL = WebGLRenderer2D.blendModesWebGL[blendMode];
+//    //    var blendModeWebGL = PIXIWebGLRenderer2D.blendModesWebGL[blendMode];
 //    //    if (blendModeWebGL) {
 //    //        this._draw();
 //    //        this.gl.blendFunc(blendModeWebGL[0], blendModeWebGL[1]);
@@ -249,12 +261,12 @@ WebGLRenderer2D.prototype.popMask = function (graphics) {
 //    //}
 //};
 //
-//WebGLRenderer2D.prototype.setAlpha = function (value, blendMode) {
+//PIXIWebGLRenderer2D.prototype.setAlpha = function (value, blendMode) {
 //    this.worldAlpha = value;
 //    this.setBlendMode(blendMode);
 //};
 
-//WebGLRenderer2D.prototype._updateTexture = function(gl, texture)
+//PIXIWebGLRenderer2D.prototype._updateTexture = function(gl, texture)
 //{
 //    //var gl = this.gl;
 //
@@ -286,7 +298,7 @@ WebGLRenderer2D.prototype.popMask = function (graphics) {
 //    return  texture._glTextures[gl.id];
 //};
 
-//WebGLRenderer2D.prototype.createWebGLTexture = function (texture) {
+//PIXIWebGLRenderer2D.prototype.createWebGLTexture = function (texture) {
 //    if (!texture.webGLTexture) {
 //        var gl = this.gl;
 //        texture.webGLTexture = gl.createTexture();
@@ -302,15 +314,15 @@ WebGLRenderer2D.prototype.popMask = function (graphics) {
 //};
 
 
-WebGLRenderer2D.prototype.toJSON = function (json) {
+PIXIWebGLRenderer2D.prototype.toJSON = function (json) {
     return json;
 };
 
-WebGLRenderer2D.prototype.fromJSON = function (json) {
+PIXIWebGLRenderer2D.prototype.fromJSON = function (json) {
     return this;
 };
 
-WebGLRenderer2D.prototype._initContext = function()
+PIXIWebGLRenderer2D.prototype._initContext = function()
 {
     var gl = this.canvas.getContext('webgl', this._contextOptions) || this.view.getContext('experimental-webgl', this._contextOptions);
     this.gl = gl;
@@ -320,10 +332,10 @@ WebGLRenderer2D.prototype._initContext = function()
         throw new Error('This browser does not support webGL. Try using the canvas renderer');
     }
     //gl.id = this.glContextId++;
-    this.glContextId = gl.id = WebGLRenderer2D.glContextId ++;
+    this.glContextId = gl.id = PIXIWebGLRenderer2D.glContextId ++;
 
-    WebGLRenderer2D.glContexts[this.glContextId] = gl;
-    WebGLRenderer2D.instances[this.glContextId] = this;
+    PIXIWebGLRenderer2D.glContexts[this.glContextId] = gl;
+    PIXIWebGLRenderer2D.instances[this.glContextId] = this;
 
     // set up the default pixi settings..
     gl.disable(gl.DEPTH_TEST);
@@ -344,7 +356,7 @@ WebGLRenderer2D.prototype._initContext = function()
     this._resize(this.width, this.height);
 };
 
-WebGLRenderer2D.prototype._resize = function(width, height)
+PIXIWebGLRenderer2D.prototype._resize = function(width, height)
 {
     this.width = width * this.resolution;
     this.height = height * this.resolution;
@@ -363,26 +375,26 @@ WebGLRenderer2D.prototype._resize = function(width, height)
     this.projection.y =  -this.height / 2 / this.resolution;
 };
 
-WebGLRenderer2D.prototype._handleContextLost = function (event) {
+PIXIWebGLRenderer2D.prototype._handleContextLost = function (event) {
     event.preventDefault();
     this.contextLost = true;
 };
 
-WebGLRenderer2D.prototype._handleContextRestored = function () {
+PIXIWebGLRenderer2D.prototype._handleContextRestored = function () {
     this.initWebGL();
     this.shaderManager.setContext(this.gl);
     this.contextLost = false;
 };
 
 
-//WebGLRenderer2D.blendModesWebGL = undefined;
+//PIXIWebGLRenderer2D.blendModesWebGL = undefined;
 //
-//WebGLRenderer2D.prototype.initBlendMode = function () {
-//    var blendModesWebGL = WebGLRenderer2D.blendModesWebGL;
+//PIXIWebGLRenderer2D.prototype.initBlendMode = function () {
+//    var blendModesWebGL = PIXIWebGLRenderer2D.blendModesWebGL;
 //    if(blendModesWebGL) return;
 //
 //    var gl = this.gl;
-//    blendModesWebGL = WebGLRenderer2D.blendModesWebGL = [];
+//    blendModesWebGL = PIXIWebGLRenderer2D.blendModesWebGL = [];
 //
 //    blendModesWebGL[Enums.blendModes.NORMAL]        = [gl.ONE,       gl.ONE_MINUS_SRC_ALPHA];
 //    blendModesWebGL[Enums.blendModes.ADD]           = [gl.SRC_ALPHA, gl.DST_ALPHA];
@@ -404,8 +416,8 @@ WebGLRenderer2D.prototype._handleContextRestored = function () {
 //
 //};
 
-WebGLRenderer2D.glContextId = 0;
-WebGLRenderer2D.glContexts = []; // this is where we store the webGL contexts for easy access.
-WebGLRenderer2D.instances = [];
+PIXIWebGLRenderer2D.glContextId = 0;
+PIXIWebGLRenderer2D.glContexts = []; // this is where we store the webGL contexts for easy access.
+PIXIWebGLRenderer2D.instances = [];
 
-module.exports = WebGLRenderer2D;
+module.exports = PIXIWebGLRenderer2D;

@@ -904,5 +904,6 @@ Mat32.prototype.toString = function () {
     );
 };
 
+Mat32.Identity = new Mat32();
 
 module.exports = Mat32;

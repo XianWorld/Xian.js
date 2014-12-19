@@ -1,6 +1,4 @@
-/**
- * @author Mat Groves http://matgroves.com/ @Doormat23
- */
+var AbstractFilter = require("./AbstractFilter");
 
 /**
  * A Cross Hatch effect filter.
@@ -9,16 +7,20 @@
  * @extends AbstractFilter
  * @constructor
  */
-PIXI.CrossHatchFilter = function()
+function CrossHatchFilter(opts)
 {
-    PIXI.AbstractFilter.call( this );
+    opts || (opts = {});
 
-    this.passes = [this];
+    AbstractFilter.call( this,opts );
+
+    //this.passes = [this];
 
     // set the uniforms
     this.uniforms = {
         blur: {type: '1f', value: 1 / 512}
     };
+
+    if(opts.blur) this.blur = opts.blur;
 
     this.fragmentSrc = [
         'precision mediump float;',
@@ -59,8 +61,8 @@ PIXI.CrossHatchFilter = function()
     ];
 };
 
-PIXI.CrossHatchFilter.prototype = Object.create( PIXI.AbstractFilter.prototype );
-PIXI.CrossHatchFilter.prototype.constructor = PIXI.CrossHatchFilter;
+CrossHatchFilter.prototype = Object.create( AbstractFilter.prototype );
+CrossHatchFilter.prototype.constructor = CrossHatchFilter;
 
 /**
  * Sets the strength of both the blur.
@@ -69,7 +71,7 @@ PIXI.CrossHatchFilter.prototype.constructor = PIXI.CrossHatchFilter;
  * @type Number the strength of the blur
  * @default 2
  */
-Object.defineProperty(PIXI.CrossHatchFilter.prototype, 'blur', {
+Object.defineProperty(CrossHatchFilter.prototype, 'blur', {
     get: function() {
         return this.uniforms.blur.value / (1/7000);
     },
@@ -78,3 +80,21 @@ Object.defineProperty(PIXI.CrossHatchFilter.prototype, 'blur', {
         this.uniforms.blur.value = (1/7000) * value;
     }
 });
+CrossHatchFilter.prototype.fromJSON = function (json) {
+
+    this.blur = json.blur;
+
+    return this;
+};
+
+CrossHatchFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "CrossHatchFilter";
+    json.blur = this.blur;
+
+    return json;
+};
+
+
+module.exports = CrossHatchFilter;

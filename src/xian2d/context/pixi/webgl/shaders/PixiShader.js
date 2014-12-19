@@ -3,7 +3,7 @@ var Utils = require("../utils/WebGLShaderUtils");
 //var WebGLRenderer2D = require("../pixi_webgl_renderer_2d");
 var Class = require("../../../../../base/class");
 
-PixiShader = function(gl)
+function PixiShader(gl)
 {
     Class.call(this);
 

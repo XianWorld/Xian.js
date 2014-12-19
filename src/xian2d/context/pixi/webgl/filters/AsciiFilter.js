@@ -1,27 +1,20 @@
-/**
- * @author Vico @vicocotea
- * original shader : https://www.shadertoy.com/view/lssGDj by @movAX13h
- */
 var AbstractFilter = require("./AbstractFilter");
 
-/**
- * An ASCII filter.
- * 
- * @class AsciiFilter
- * @extends AbstractFilter
- * @constructor
- */
-AsciiFilter = function()
+AsciiFilter = function(opts)
 {
-    AbstractFilter.call( this );
+    opts || (opts = {});
 
-    this.passes = [this];
+    AbstractFilter.call(this, opts);
+
+    //this.passes = [this];
 
     // set the uniforms
     this.uniforms = {
         dimensions: {type: '4fv', value:new Float32Array([10000, 100, 10, 10])},
         pixelSize: {type: '1f', value:8}
     };
+
+    if(opts.size) this.size = opts.size;
 
     this.fragmentSrc = [
         
@@ -71,12 +64,6 @@ AsciiFilter = function()
 AsciiFilter.prototype = Object.create( AbstractFilter.prototype );
 AsciiFilter.prototype.constructor = AsciiFilter;
 
-/**
- * The pixel size used by the filter.
- *
- * @property size
- * @type Number
- */
 Object.defineProperty(AsciiFilter.prototype, 'size', {
     get: function() {
         return this.uniforms.pixelSize.value;
@@ -86,3 +73,23 @@ Object.defineProperty(AsciiFilter.prototype, 'size', {
         this.uniforms.pixelSize.value = value;
     }
 });
+
+AsciiFilter.prototype.fromJSON = function (json) {
+
+    this.size = json.size;
+
+    return this;
+};
+
+AsciiFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "AsciiFilter";
+    json.size = this.size;
+
+    return json;
+};
+
+//AbstractFilter._classes.AsciiFilter = AsciiFilter;
+
+module.exports = AsciiFilter;

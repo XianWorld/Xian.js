@@ -66,6 +66,7 @@ CanvasRenderer2D.prototype.startRender = function (renderTexture) {
 CanvasRenderer2D.prototype.finishRender = function (renderTexture) {
     this.canvasContext.restore();
     this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+    this.canvasContext.globalAlpha = this.globalAlpha = 1;
 
     this.rendering = false;
 };
@@ -75,7 +76,6 @@ CanvasRenderer2D.prototype.clearScreen = function (transparent, background) {
     //    this.canvasContext.fillStyle = "black";
     //    this.canvasContext.clear();
     //}
-    //this.canvasContext.globalAlpha = this.globalAlpha = 1;
 
     if (transparent)
     {
