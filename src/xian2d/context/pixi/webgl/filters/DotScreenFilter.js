@@ -1,7 +1,4 @@
-/**
- * @author Mat Groves http://matgroves.com/ @Doormat23
- * original filter: https://github.com/evanw/glfx.js/blob/master/src/filters/fun/dotscreen.js
- */
+var AbstractFilter = require("./AbstractFilter");
 
 /**
  * This filter applies a dotscreen effect making display objects appear to be made out of black and white halftone dots like an old printer.
@@ -10,11 +7,13 @@
  * @extends AbstractFilter
  * @constructor
  */
-PIXI.DotScreenFilter = function()
+function DotScreenFilter(opts)
 {
-    PIXI.AbstractFilter.call( this );
+    opts || (opts = {});
 
-    this.passes = [this];
+    AbstractFilter.call( this, opts );
+
+    //this.passes = [this];
 
     // set the uniforms
     this.uniforms = {
@@ -22,6 +21,8 @@ PIXI.DotScreenFilter = function()
         angle: {type: '1f', value:5},
         dimensions:   {type: '4fv', value:[0,0,0,0]}
     };
+    if(opts.angle) this.angle = opts.angle;
+    if(opts.scale) this.scale = opts.scale;
 
     this.fragmentSrc = [
         'precision mediump float;',
@@ -51,15 +52,15 @@ PIXI.DotScreenFilter = function()
     ];
 };
 
-PIXI.DotScreenFilter.prototype = Object.create( PIXI.AbstractFilter.prototype );
-PIXI.DotScreenFilter.prototype.constructor = PIXI.DotScreenFilter;
+DotScreenFilter.prototype = Object.create( AbstractFilter.prototype );
+DotScreenFilter.prototype.constructor = DotScreenFilter;
 
 /**
  * The scale of the effect.
  * @property scale
  * @type Number
  */
-Object.defineProperty(PIXI.DotScreenFilter.prototype, 'scale', {
+Object.defineProperty(DotScreenFilter.prototype, 'scale', {
     get: function() {
         return this.uniforms.scale.value;
     },
@@ -74,7 +75,7 @@ Object.defineProperty(PIXI.DotScreenFilter.prototype, 'scale', {
  * @property angle
  * @type Number
  */
-Object.defineProperty(PIXI.DotScreenFilter.prototype, 'angle', {
+Object.defineProperty(DotScreenFilter.prototype, 'angle', {
     get: function() {
         return this.uniforms.angle.value;
     },
@@ -83,3 +84,23 @@ Object.defineProperty(PIXI.DotScreenFilter.prototype, 'angle', {
         this.uniforms.angle.value = value;
     }
 });
+DotScreenFilter.prototype.fromJSON = function (json) {
+
+    this.angle = json.angle;
+    this.scale = json.scale;
+
+    return this;
+};
+
+DotScreenFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "DotScreenFilter";
+    json.angle = this.angle;
+    json.scale = this.scale;
+
+    return json;
+};
+
+
+module.exports = DotScreenFilter;

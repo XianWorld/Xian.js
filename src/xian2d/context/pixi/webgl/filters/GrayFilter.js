@@ -1,6 +1,4 @@
-/**
- * @author Mat Groves http://matgroves.com/ @Doormat23
- */
+var AbstractFilter = require("./AbstractFilter");
 
 /**
  * This greyscales the palette of your Display Objects.
@@ -9,11 +7,13 @@
  * @extends AbstractFilter
  * @constructor
  */
-PIXI.GrayFilter = function()
+function GrayFilter(opts)
 {
-    PIXI.AbstractFilter.call( this );
+    opts || (opts = {});
 
-    this.passes = [this];
+    AbstractFilter.call( this, opts );
+
+    //this.passes = [this];
 
     // set the uniforms
     this.uniforms = {
@@ -35,15 +35,15 @@ PIXI.GrayFilter = function()
     ];
 };
 
-PIXI.GrayFilter.prototype = Object.create( PIXI.AbstractFilter.prototype );
-PIXI.GrayFilter.prototype.constructor = PIXI.GrayFilter;
+GrayFilter.prototype = Object.create( AbstractFilter.prototype );
+GrayFilter.prototype.constructor = GrayFilter;
 
 /**
  * The strength of the gray. 1 will make the object black and white, 0 will make the object its normal color.
  * @property gray
  * @type Number
  */
-Object.defineProperty(PIXI.GrayFilter.prototype, 'gray', {
+Object.defineProperty(GrayFilter.prototype, 'gray', {
     get: function() {
         return this.uniforms.gray.value;
     },
@@ -51,3 +51,21 @@ Object.defineProperty(PIXI.GrayFilter.prototype, 'gray', {
         this.uniforms.gray.value = value;
     }
 });
+GrayFilter.prototype.fromJSON = function (json) {
+
+    this.gray = json.gray;
+
+    return this;
+};
+
+GrayFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "GrayFilter";
+    json.gray = this.gray;
+
+    return json;
+};
+
+
+module.exports = GrayFilter;

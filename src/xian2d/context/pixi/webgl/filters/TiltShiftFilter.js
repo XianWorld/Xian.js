@@ -1,7 +1,6 @@
-/**
- * @author Vico @vicocotea
- * original filter https://github.com/evanw/glfx.js/blob/master/src/filters/blur/tiltshift.js by Evan Wallace : http://madebyevan.com/
- */
+var AbstractFilter = require("./AbstractFilter");
+var TiltShiftXFilter = require("./TiltShiftXFilter");
+var TiltShiftYFilter = require("./TiltShiftYFilter");
 
 /**
  * A TiltShift Filter. Manages the pass of both a TiltShiftXFilter and TiltShiftYFilter.
@@ -9,17 +8,21 @@
  * @class TiltShiftFilter
  * @constructor
  */
-PIXI.TiltShiftFilter = function()
+TiltShiftFilter = function(opts)
 {
-    this.tiltShiftXFilter = new PIXI.TiltShiftXFilter();
-    this.tiltShiftYFilter = new PIXI.TiltShiftYFilter();
-    this.tiltShiftXFilter.updateDelta();
-    this.tiltShiftXFilter.updateDelta();
+    opts || (opts = {});
+    AbstractFilter.call( this,opts );
+
+    this.tiltShiftXFilter = new TiltShiftXFilter(opts);
+    this.tiltShiftYFilter = new TiltShiftYFilter(opts);
+    //this.tiltShiftXFilter.updateDelta();
+    //this.tiltShiftXFilter.updateDelta();
 
     this.passes = [this.tiltShiftXFilter, this.tiltShiftYFilter];
 };
 
-PIXI.TiltShiftFilter.prototype.constructor = PIXI.TiltShiftFilter;
+TiltShiftFilter.prototype = Object.create( AbstractFilter.prototype );
+TiltShiftFilter.prototype.constructor = TiltShiftFilter;
 
 /**
  * The strength of the blur.
@@ -27,7 +30,7 @@ PIXI.TiltShiftFilter.prototype.constructor = PIXI.TiltShiftFilter;
  * @property blur
  * @type Number
  */
-Object.defineProperty(PIXI.TiltShiftFilter.prototype, 'blur', {
+Object.defineProperty(TiltShiftFilter.prototype, 'blur', {
     get: function() {
         return this.tiltShiftXFilter.blur;
     },
@@ -42,7 +45,7 @@ Object.defineProperty(PIXI.TiltShiftFilter.prototype, 'blur', {
  * @property gradientBlur
  * @type Number
  */
-Object.defineProperty(PIXI.TiltShiftFilter.prototype, 'gradientBlur', {
+Object.defineProperty(TiltShiftFilter.prototype, 'gradientBlur', {
     get: function() {
         return this.tiltShiftXFilter.gradientBlur;
     },
@@ -57,7 +60,7 @@ Object.defineProperty(PIXI.TiltShiftFilter.prototype, 'gradientBlur', {
  * @property start
  * @type Number
  */
-Object.defineProperty(PIXI.TiltShiftFilter.prototype, 'start', {
+Object.defineProperty(TiltShiftFilter.prototype, 'start', {
     get: function() {
         return this.tiltShiftXFilter.start;
     },
@@ -72,7 +75,7 @@ Object.defineProperty(PIXI.TiltShiftFilter.prototype, 'start', {
  * @property end
  * @type Number
  */
-Object.defineProperty(PIXI.TiltShiftFilter.prototype, 'end', {
+Object.defineProperty(TiltShiftFilter.prototype, 'end', {
     get: function() {
         return this.tiltShiftXFilter.end;
     },
@@ -80,3 +83,28 @@ Object.defineProperty(PIXI.TiltShiftFilter.prototype, 'end', {
         this.tiltShiftXFilter.end = this.tiltShiftYFilter.end = value;
     }
 });
+
+TiltShiftFilter.prototype.fromJSON = function (json) {
+
+    this.blur = json.blur;
+    this.gradientBlur = json.gradientBlur;
+    this.start = json.start;
+    this.end = json.end;
+
+    return this;
+};
+
+TiltShiftFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "TiltShiftFilter";
+    json.blur = this.blur;
+    json.gradientBlur = this.gradientBlur;
+    json.start = this.start;
+    json.end = this.end;
+
+    return json;
+};
+
+
+module.exports = TiltShiftFilter;

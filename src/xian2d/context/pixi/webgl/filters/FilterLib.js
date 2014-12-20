@@ -26,6 +26,19 @@ ShaderLib._classes = {
     ConvolutionFilter: require("./ConvolutionFilter"),
     CrossHatchFilter: require("./CrossHatchFilter"),
     DisplacementFilter: require("./DisplacementFilter"),
+    DotScreenFilter: require("./DotScreenFilter"),
+    GrayFilter: require("./GrayFilter"),
+    InvertFilter: require("./InvertFilter"),
+    NoiseFilter: require("./NoiseFilter"),
+    NormalMapFilter: require("./NormalMapFilter"),
+    PixelateFilter: require("./PixelateFilter"),
+    RGBSplitFilter: require("./RGBSplitFilter"),
+    SepiaFilter: require("./SepiaFilter"),
+    SmartBlurFilter: require("./SmartBlurFilter"),
+    TiltShiftXFilter: require("./TiltShiftXFilter"),
+    TiltShiftYFilter: require("./TiltShiftYFilter"),
+    TiltShiftFilter: require("./TiltShiftFilter"),
+    TwistFilter: require("./TwistFilter"),
 
 };
 

@@ -1,6 +1,4 @@
-/**
- * @author Mat Groves http://matgroves.com/ @Doormat23
- */
+var AbstractFilter = require("./AbstractFilter");
 
 /**
  * An RGB Split Filter.
@@ -9,11 +7,13 @@
  * @extends AbstractFilter
  * @constructor
  */
-PIXI.RGBSplitFilter = function()
+function RGBSplitFilter(opts)
 {
-    PIXI.AbstractFilter.call( this );
+    opts || (opts = {});
 
-    this.passes = [this];
+    AbstractFilter.call( this,opts );
+
+    //this.passes = [this];
 
     // set the uniforms
     this.uniforms = {
@@ -22,6 +22,9 @@ PIXI.RGBSplitFilter = function()
         blue: {type: '2f', value: {x:20, y:-20}},
         dimensions:   {type: '4fv', value:[0,0,0,0]}
     };
+    if(opts.red) this.red = opts.red;
+    if(opts.green) this.green = opts.green;
+    if(opts.blue) this.blue = opts.blue;
 
     this.fragmentSrc = [
         'precision mediump float;',
@@ -42,8 +45,8 @@ PIXI.RGBSplitFilter = function()
     ];
 };
 
-PIXI.RGBSplitFilter.prototype = Object.create( PIXI.AbstractFilter.prototype );
-PIXI.RGBSplitFilter.prototype.constructor = PIXI.RGBSplitFilter;
+RGBSplitFilter.prototype = Object.create( AbstractFilter.prototype );
+RGBSplitFilter.prototype.constructor = RGBSplitFilter;
 
 /**
  * Red channel offset.
@@ -51,7 +54,7 @@ PIXI.RGBSplitFilter.prototype.constructor = PIXI.RGBSplitFilter;
  * @property red
  * @type Point
  */
-Object.defineProperty(PIXI.RGBSplitFilter.prototype, 'red', {
+Object.defineProperty(RGBSplitFilter.prototype, 'red', {
     get: function() {
         return this.uniforms.red.value;
     },
@@ -66,7 +69,7 @@ Object.defineProperty(PIXI.RGBSplitFilter.prototype, 'red', {
  * @property green
  * @type Point
  */
-Object.defineProperty(PIXI.RGBSplitFilter.prototype, 'green', {
+Object.defineProperty(RGBSplitFilter.prototype, 'green', {
     get: function() {
         return this.uniforms.green.value;
     },
@@ -81,7 +84,7 @@ Object.defineProperty(PIXI.RGBSplitFilter.prototype, 'green', {
  * @property blue
  * @type Point
  */
-Object.defineProperty(PIXI.RGBSplitFilter.prototype, 'blue', {
+Object.defineProperty(RGBSplitFilter.prototype, 'blue', {
     get: function() {
         return this.uniforms.blue.value;
     },
@@ -89,3 +92,25 @@ Object.defineProperty(PIXI.RGBSplitFilter.prototype, 'blue', {
         this.uniforms.blue.value = value;
     }
 });
+RGBSplitFilter.prototype.fromJSON = function (json) {
+
+    this.red = json.red;
+    this.green = json.green;
+    this.blue = json.blue;
+
+    return this;
+};
+
+RGBSplitFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "RGBSplitFilter";
+    json.red = this.red;
+    json.green = this.green;
+    json.blue = this.blue;
+
+    return json;
+};
+
+
+module.exports = RGBSplitFilter;

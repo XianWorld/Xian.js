@@ -1,6 +1,4 @@
-/**
- * @author Mat Groves http://matgroves.com/ @Doormat23
- */
+var AbstractFilter = require("./AbstractFilter");
 
 /**
  * This inverts your Display Objects colors.
@@ -9,16 +7,20 @@
  * @extends AbstractFilter
  * @constructor
  */
-PIXI.InvertFilter = function()
+function InvertFilter(opts)
 {
-    PIXI.AbstractFilter.call( this );
+    opts || (opts = {});
 
-    this.passes = [this];
+    AbstractFilter.call( this,opts );
+
+    //this.passes = [this];
 
     // set the uniforms
     this.uniforms = {
         invert: {type: '1f', value: 1}
     };
+
+    if(opts.invert) this.invert = opts.invert;
 
     this.fragmentSrc = [
         'precision mediump float;',
@@ -36,15 +38,15 @@ PIXI.InvertFilter = function()
     ];
 };
 
-PIXI.InvertFilter.prototype = Object.create( PIXI.AbstractFilter.prototype );
-PIXI.InvertFilter.prototype.constructor = PIXI.InvertFilter;
+InvertFilter.prototype = Object.create( AbstractFilter.prototype );
+InvertFilter.prototype.constructor = InvertFilter;
 
 /**
  * The strength of the invert. 1 will fully invert the colors, 0 will make the object its normal color
  * @property invert
  * @type Number
 */
-Object.defineProperty(PIXI.InvertFilter.prototype, 'invert', {
+Object.defineProperty(InvertFilter.prototype, 'invert', {
     get: function() {
         return this.uniforms.invert.value;
     },
@@ -52,3 +54,21 @@ Object.defineProperty(PIXI.InvertFilter.prototype, 'invert', {
         this.uniforms.invert.value = value;
     }
 });
+InvertFilter.prototype.fromJSON = function (json) {
+
+    this.invert = json.invert;
+
+    return this;
+};
+
+InvertFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "InvertFilter";
+    json.invert = this.invert;
+
+    return json;
+};
+
+
+module.exports = InvertFilter;

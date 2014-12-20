@@ -1,6 +1,4 @@
-/**
- * @author Mat Groves http://matgroves.com/ @Doormat23
- */
+var AbstractFilter = require("./AbstractFilter");
 
 /**
  * This filter applies a pixelate effect making display objects appear 'blocky'.
@@ -9,18 +7,21 @@
  * @extends AbstractFilter
  * @constructor
  */
-PIXI.PixelateFilter = function()
+function PixelateFilter(opts)
 {
-    PIXI.AbstractFilter.call( this );
+    opts || (opts = {});
 
-    this.passes = [this];
+    AbstractFilter.call( this,opts );
+
+    //this.passes = [this];
 
     // set the uniforms
     this.uniforms = {
         invert: {type: '1f', value: 0},
-        dimensions: {type: '4fv', value:new PIXI.Float32Array([10000, 100, 10, 10])},
+        dimensions: {type: '4fv', value:new Float32Array([10000, 100, 10, 10])},
         pixelSize: {type: '2f', value:{x:10, y:10}}
     };
+    if(opts.size) this.size = opts.size;
 
     this.fragmentSrc = [
         'precision mediump float;',
@@ -42,8 +43,8 @@ PIXI.PixelateFilter = function()
     ];
 };
 
-PIXI.PixelateFilter.prototype = Object.create( PIXI.AbstractFilter.prototype );
-PIXI.PixelateFilter.prototype.constructor = PIXI.PixelateFilter;
+PixelateFilter.prototype = Object.create( AbstractFilter.prototype );
+PixelateFilter.prototype.constructor = PixelateFilter;
 
 /**
  * This a point that describes the size of the blocks. x is the width of the block and y is the height.
@@ -51,7 +52,7 @@ PIXI.PixelateFilter.prototype.constructor = PIXI.PixelateFilter;
  * @property size
  * @type Point
  */
-Object.defineProperty(PIXI.PixelateFilter.prototype, 'size', {
+Object.defineProperty(PixelateFilter.prototype, 'size', {
     get: function() {
         return this.uniforms.pixelSize.value;
     },
@@ -60,3 +61,21 @@ Object.defineProperty(PIXI.PixelateFilter.prototype, 'size', {
         this.uniforms.pixelSize.value = value;
     }
 });
+PixelateFilter.prototype.fromJSON = function (json) {
+
+    this.size = json.size;
+
+    return this;
+};
+
+PixelateFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "PixelateFilter";
+    json.size = this.size;
+
+    return json;
+};
+
+
+module.exports = PixelateFilter;

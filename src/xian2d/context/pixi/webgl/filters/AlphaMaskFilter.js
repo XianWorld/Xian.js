@@ -22,17 +22,17 @@ AlphaMaskFilter = function(opts)
     //this.uniforms.mapDimensions.value.x = this.uniforms.mask.value.width;
     //this.uniforms.mapDimensions.value.y = this.uniforms.mask.value.height;
 
-    //if(texture.baseTexture.hasLoaded)
-    //{
-    //    this.uniforms.mask.value.x = texture.width;
-    //    this.uniforms.mask.value.y = texture.height;
-    //}
-    //else
-    //{
-    //    this.boundLoadedFunction = this.onTextureLoaded.bind(this);
-    //
-    //    texture.baseTexture.on('loaded', this.boundLoadedFunction);
-    //}
+    if(texture._loaded)
+    {
+        this.uniforms.mapDimensions.value.x = texture.width;
+        this.uniforms.mapDimensions.value.y = texture.height;
+    }
+    else
+    {
+        this.boundLoadedFunction = this.onTextureLoaded.bind(this);
+
+        texture.on('load', this.boundLoadedFunction);
+    }
 
     this.fragmentSrc = [
         'precision mediump float;',
@@ -70,13 +70,13 @@ AlphaMaskFilter.prototype.constructor = AlphaMaskFilter;
  *
  * @method onTextureLoaded
  */
-//AlphaMaskFilter.prototype.onTextureLoaded = function()
-//{
-//    this.uniforms.mapDimensions.value.x = this.uniforms.mask.value.width;
-//    this.uniforms.mapDimensions.value.y = this.uniforms.mask.value.height;
-//
-//    this.uniforms.mask.value.baseTexture.off('loaded', this.boundLoadedFunction);
-//};
+AlphaMaskFilter.prototype.onTextureLoaded = function()
+{
+    this.uniforms.mapDimensions.value.x = this.uniforms.mask.value.width;
+    this.uniforms.mapDimensions.value.y = this.uniforms.mask.value.height;
+
+    this.uniforms.mask.value.off('loaded', this.boundLoadedFunction);
+};
 
 /**
  * The texture used for the displacement map. Must be power of 2 sized texture.

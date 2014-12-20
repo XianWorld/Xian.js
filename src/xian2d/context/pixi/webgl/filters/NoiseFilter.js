@@ -1,7 +1,4 @@
-/**
- * @author Vico @vicocotea
- * original filter: https://github.com/evanw/glfx.js/blob/master/src/filters/adjust/noise.js
- */
+var AbstractFilter = require("./AbstractFilter");
 
 /**
  * A Noise effect filter.
@@ -10,16 +7,19 @@
  * @extends AbstractFilter
  * @constructor
  */
-PIXI.NoiseFilter = function()
+function NoiseFilter(opts)
 {
-    PIXI.AbstractFilter.call( this );
+    opts || (opts = {});
 
-    this.passes = [this];
+    AbstractFilter.call( this,opts );
+
+    //this.passes = [this];
 
     // set the uniforms
     this.uniforms = {
         noise: {type: '1f', value: 0.5}
     };
+    if(opts.noise) this.noise = opts.noise;
 
     this.fragmentSrc = [
         'precision mediump float;',
@@ -43,15 +43,15 @@ PIXI.NoiseFilter = function()
     ];
 };
 
-PIXI.NoiseFilter.prototype = Object.create( PIXI.AbstractFilter.prototype );
-PIXI.NoiseFilter.prototype.constructor = PIXI.NoiseFilter;
+NoiseFilter.prototype = Object.create( AbstractFilter.prototype );
+NoiseFilter.prototype.constructor = NoiseFilter;
 
 /**
  * The amount of noise to apply.
  * @property noise
  * @type Number
 */
-Object.defineProperty(PIXI.NoiseFilter.prototype, 'noise', {
+Object.defineProperty(NoiseFilter.prototype, 'noise', {
     get: function() {
         return this.uniforms.noise.value;
     },
@@ -60,3 +60,21 @@ Object.defineProperty(PIXI.NoiseFilter.prototype, 'noise', {
         this.uniforms.noise.value = value;
     }
 });
+NoiseFilter.prototype.fromJSON = function (json) {
+
+    this.noise = json.noise;
+
+    return this;
+};
+
+NoiseFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "NoiseFilter";
+    json.noise = this.noise;
+
+    return json;
+};
+
+
+module.exports = NoiseFilter;

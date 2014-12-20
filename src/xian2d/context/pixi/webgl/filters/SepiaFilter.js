@@ -1,6 +1,4 @@
-/**
- * @author Mat Groves http://matgroves.com/ @Doormat23
- */
+var AbstractFilter = require("./AbstractFilter");
 
 /**
  * This applies a sepia effect to your Display Objects.
@@ -9,16 +7,19 @@
  * @extends AbstractFilter
  * @constructor
  */
-PIXI.SepiaFilter = function()
+function SepiaFilter(opts)
 {
-    PIXI.AbstractFilter.call( this );
+    opts || (opts = {});
 
-    this.passes = [this];
+    AbstractFilter.call( this,opts );
+
+    //this.passes = [this];
 
     // set the uniforms
     this.uniforms = {
         sepia: {type: '1f', value: 1}
     };
+    if(opts.sepia) this.sepia = opts.sepia;
 
     this.fragmentSrc = [
         'precision mediump float;',
@@ -37,15 +38,15 @@ PIXI.SepiaFilter = function()
     ];
 };
 
-PIXI.SepiaFilter.prototype = Object.create( PIXI.AbstractFilter.prototype );
-PIXI.SepiaFilter.prototype.constructor = PIXI.SepiaFilter;
+SepiaFilter.prototype = Object.create( AbstractFilter.prototype );
+SepiaFilter.prototype.constructor = SepiaFilter;
 
 /**
  * The strength of the sepia. 1 will apply the full sepia effect, 0 will make the object its normal color.
  * @property sepia
  * @type Number
 */
-Object.defineProperty(PIXI.SepiaFilter.prototype, 'sepia', {
+Object.defineProperty(SepiaFilter.prototype, 'sepia', {
     get: function() {
         return this.uniforms.sepia.value;
     },
@@ -53,3 +54,21 @@ Object.defineProperty(PIXI.SepiaFilter.prototype, 'sepia', {
         this.uniforms.sepia.value = value;
     }
 });
+SepiaFilter.prototype.fromJSON = function (json) {
+
+    this.sepia = json.sepia;
+
+    return this;
+};
+
+SepiaFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "SepiaFilter";
+    json.sepia = this.sepia;
+
+    return json;
+};
+
+
+module.exports = SepiaFilter;

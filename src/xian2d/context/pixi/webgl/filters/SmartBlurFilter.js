@@ -1,6 +1,4 @@
-/**
- * @author Mat Groves http://matgroves.com/ @Doormat23
- */
+var AbstractFilter = require("./AbstractFilter");
 
 /**
  * A Smart Blur Filter.
@@ -9,16 +7,19 @@
  * @extends AbstractFilter
  * @constructor
  */
-PIXI.SmartBlurFilter = function()
+function SmartBlurFilter(opts)
 {
-    PIXI.AbstractFilter.call( this );
+    opts || (opts = {});
 
-    this.passes = [this];
+    AbstractFilter.call( this,opts );
+
+    //this.passes = [this];
 
     // set the uniforms
     this.uniforms = {
         blur: {type: '1f', value: 1/512}
     };
+    if(opts.blur) this.blur = opts.blur;
 
     this.fragmentSrc = [
         'precision mediump float;',
@@ -55,8 +56,8 @@ PIXI.SmartBlurFilter = function()
     ];
 };
 
-PIXI.SmartBlurFilter.prototype = Object.create( PIXI.AbstractFilter.prototype );
-PIXI.SmartBlurFilter.prototype.constructor = PIXI.SmartBlurFilter;
+SmartBlurFilter.prototype = Object.create( AbstractFilter.prototype );
+SmartBlurFilter.prototype.constructor = SmartBlurFilter;
 
 /**
  * The strength of the blur.
@@ -65,7 +66,7 @@ PIXI.SmartBlurFilter.prototype.constructor = PIXI.SmartBlurFilter;
  * @type Number the strength of the blur
  * @default 2
  */
-Object.defineProperty(PIXI.SmartBlurFilter.prototype, 'blur', {
+Object.defineProperty(SmartBlurFilter.prototype, 'blur', {
     get: function() {
         return this.uniforms.blur.value;
     },
@@ -73,3 +74,21 @@ Object.defineProperty(PIXI.SmartBlurFilter.prototype, 'blur', {
         this.uniforms.blur.value = value;
     }
 });
+SmartBlurFilter.prototype.fromJSON = function (json) {
+
+    this.blur = json.blur;
+
+    return this;
+};
+
+SmartBlurFilter.prototype.toJSON = function (json) {
+    json || (json = {});
+
+    json._className = "SmartBlurFilter";
+    json.blur = this.blur;
+
+    return json;
+};
+
+
+module.exports = SmartBlurFilter;

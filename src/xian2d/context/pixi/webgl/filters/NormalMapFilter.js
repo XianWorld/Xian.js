@@ -1,7 +1,4 @@
-/**
- * @author Mat Groves http://matgroves.com/ @Doormat23
- */
-
+var AbstractFilter = require("./AbstractFilter");
 
 /**
  * The NormalMapFilter class uses the pixel values from the specified texture (called the displacement map) to perform a displacement of an object. 
@@ -13,12 +10,15 @@
  * @constructor
  * @param texture {Texture} The texture used for the displacement map * must be power of 2 texture at the moment
  */
-PIXI.NormalMapFilter = function(texture)
+function NormalMapFilter(opts)
 {
-	PIXI.AbstractFilter.call( this );
+	opts || (opts = {});
+
+	AbstractFilter.call( this,opts );
 	
-	this.passes = [this];
-	texture.baseTexture._powerOf2 = true;
+	//this.passes = [this];
+	//texture.baseTexture._powerOf2 = true;
+	var texture = opts.map;
 
 	// set the uniforms
 	this.uniforms = {
@@ -30,9 +30,11 @@ PIXI.NormalMapFilter = function(texture)
 	//	LightDir: {type: 'f3', value:[0, 1, 0]},
 		LightPos: {type: '3f', value:[0, 1, 0]}
 	};
-	
+	if(texture) this.map = texture;
+	if (opts.scale) this.scale = opts.scale;
+	if (opts.offset) this.offset = opts.offset;
 
-	if(texture.baseTexture.hasLoaded)
+	if(texture._loaded)
 	{
 		this.uniforms.mapDimensions.value.x = texture.width;
 		this.uniforms.mapDimensions.value.y = texture.height;
@@ -41,7 +43,7 @@ PIXI.NormalMapFilter = function(texture)
 	{
 		this.boundLoadedFunction = this.onTextureLoaded.bind(this);
 
-		texture.baseTexture.on("loaded", this.boundLoadedFunction);
+		texture.on("loaded", this.boundLoadedFunction);
 	}
 
 	this.fragmentSrc = [
@@ -134,20 +136,20 @@ PIXI.NormalMapFilter = function(texture)
 	
 }
 
-PIXI.NormalMapFilter.prototype = Object.create( PIXI.AbstractFilter.prototype );
-PIXI.NormalMapFilter.prototype.constructor = PIXI.NormalMapFilter;
+NormalMapFilter.prototype = Object.create( AbstractFilter.prototype );
+NormalMapFilter.prototype.constructor = NormalMapFilter;
 
 /**
  * Sets the map dimensions uniforms when the texture becomes available.
  *
  * @method onTextureLoaded
  */
-PIXI.NormalMapFilter.prototype.onTextureLoaded = function()
+NormalMapFilter.prototype.onTextureLoaded = function()
 {
 	this.uniforms.mapDimensions.value.x = this.uniforms.displacementMap.value.width;
 	this.uniforms.mapDimensions.value.y = this.uniforms.displacementMap.value.height;
 
-	this.uniforms.displacementMap.value.baseTexture.off("loaded", this.boundLoadedFunction)
+	this.uniforms.displacementMap.value.off("loaded", this.boundLoadedFunction)
 };
 
 /**
@@ -156,7 +158,7 @@ PIXI.NormalMapFilter.prototype.onTextureLoaded = function()
  * @property map
  * @type Texture
  */
-Object.defineProperty(PIXI.NormalMapFilter.prototype, 'map', {
+Object.defineProperty(NormalMapFilter.prototype, 'map', {
     get: function() {
         return this.uniforms.displacementMap.value;
     },
@@ -171,7 +173,7 @@ Object.defineProperty(PIXI.NormalMapFilter.prototype, 'map', {
  * @property scale
  * @type Point
  */
-Object.defineProperty(PIXI.NormalMapFilter.prototype, 'scale', {
+Object.defineProperty(NormalMapFilter.prototype, 'scale', {
     get: function() {
         return this.uniforms.scale.value;
     },
@@ -186,7 +188,7 @@ Object.defineProperty(PIXI.NormalMapFilter.prototype, 'scale', {
  * @property offset
  * @type Point
  */
-Object.defineProperty(PIXI.NormalMapFilter.prototype, 'offset', {
+Object.defineProperty(NormalMapFilter.prototype, 'offset', {
     get: function() {
         return this.uniforms.offset.value;
     },
@@ -194,3 +196,24 @@ Object.defineProperty(PIXI.NormalMapFilter.prototype, 'offset', {
     	this.uniforms.offset.value = value;
     }
 });
+NormalMapFilter.prototype.fromJSON = function (json) {
+
+	this.map = json.map ? Assets.get(json.map) : undefined;
+	this.scale = json.scale;
+	this.offset = json.offset;
+
+	return this;
+};
+
+NormalMapFilter.prototype.toJSON = function (json) {
+	json || (json = {});
+
+	json._className = "NormalMapFilter";
+	json.map = this.map ? this.map.name : undefined;
+	json.scale = this.scale;
+	json.offset = this.offset;
+
+	return json;
+};
+
+module.exports = NormalMapFilter;
