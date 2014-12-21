@@ -16,7 +16,7 @@ function Renderer2D(opts) {
     this.alpha = opts.alpha !== undefined ? opts.alpha : 1.0;
     this.worldAlpha = 1.0;
 
-    //this.mask = opts.mask !== undefined ? opts.mask : undefined;
+    this._mask = opts.mask !== undefined ? opts.mask : undefined;
 
     this.filterArea = undefined;
     this._filters = undefined;
@@ -30,6 +30,17 @@ function Renderer2D(opts) {
 
 Component.extend(Renderer2D);
 
+Object.defineProperty(Renderer2D.prototype, 'mask', {
+    get: function () {
+        return this._mask;
+    },
+    set: function (value) {
+
+        if (this._mask)this._mask.isMask = false;
+        this._mask = value;
+        if (this._mask)this._mask.isMask = true;
+    }
+});
 Object.defineProperty(Renderer2D.prototype, 'filters', {
 
     get: function () {
@@ -68,12 +79,11 @@ Renderer2D.prototype.clear = function () {
     return this;
 };
 
-function _getTransformBounds(transform, bounds, matrix)
-{
+function _getTransformBounds(transform, bounds, matrix) {
     var children = transform.children,
-        len = children.length,len1,
+        len = children.length, len1,
         gameObject, components, component,
-        i,j;
+        i, j;
 
     for (i = 0; i < len; i++) {
         var child = children[i];
@@ -139,9 +149,9 @@ Renderer2D.prototype.getBounds = function (matrix) {
 Renderer2D.prototype.getBoundsSelf = function (matrix) {
     var transform = this.transform,
         children = transform.children,
-        len = children.length,len1,
+        len = children.length, len1,
         gameObject, components, component,
-        i,j;
+        i, j;
 
     //var minX = Infinity;
     //var minY = Infinity;
@@ -210,6 +220,10 @@ Renderer2D.prototype.startRender = function (renderer) {
     if (this._filters) {
         renderer.pushFilter(this._filterBlock);
     }
+    if (this._mask) {
+        this._mask.update();
+        renderer.pushMask(this._mask);
+    }
 
     var children = transform.children,
         len = children.length,
@@ -230,12 +244,16 @@ Renderer2D.prototype.startRender = function (renderer) {
 
             component.worldAlpha = this.worldAlpha * component.alpha;
 
+            component.update();
             component._render(renderer);
         }
     }
 };
 
 Renderer2D.prototype.finishRender = function (renderer) {
+    if (this._mask) {
+        renderer.popMask(this._mask);
+    }
     if (this._filters) {
         renderer.popFilter();
     }

@@ -17,8 +17,8 @@ function TilingSprite2D(opts) {
     //this._originTexture = opts.texture !== undefined ? opts.texture : undefined;
     //this._texture = undefined;
 
-    this.destWidth = opts.destWidth || 100;
-    this.destHeight = opts.destHeight || 100;
+    //this.destWidth = opts.destWidth || 100;
+    //this.destHeight = opts.destHeight || 100;
 
     this.tileScale = opts.tileScale || new Vec2(1, 1);
     this.tilePosition = opts.tilePosition || new Vec2(0, 0);
@@ -29,46 +29,6 @@ function TilingSprite2D(opts) {
 };
 
 Sprite2D.extend(TilingSprite2D);
-
-//Object.defineProperty(TilingSprite2D.prototype, "texture", {
-//    get: function () {
-//        return this._texture;//this.destTexture ||
-//    },
-//    set: function (value) {
-//        if (this._texture === value) return;
-//        this._texture = value;
-//
-//        this._dirtyRenderSize = true;
-//        //this._updateRenderSize();
-//        this.refreshTexture = true;
-//    }
-//});
-//Object.defineProperty(Sprite2D.prototype, "textureClip", {
-//    get: function () {
-//        return this._textureClip;
-//    },
-//    set: function (value) {
-//        this._textureClip = value;
-//
-//        this._dirtyRenderSize = true;
-//        //this._updateRenderSize();
-//        this.refreshTexture = true;
-//    }
-//});
-
-//Sprite2D.prototype._updateRenderSize = function () {
-//    var textureClip = this._textureClip;
-//
-//    this.sourceX = 0;
-//    this.sourceY = 0;
-//    if (textureClip) {
-//        this.sourceWidth = textureClip.clipWidth;
-//        this.sourceHeight = textureClip.clipHeight;
-//        this.destX = -textureClip.offsetX;
-//        this.destY = -textureClip.offsetY;
-//    }
-//    return this;
-//};
 
 TilingSprite2D.prototype._generateTilingTexture = function (forcePowerOfTwo) {
     if (!this._texture._loaded) return;
@@ -148,8 +108,6 @@ TilingSprite2D.prototype._generateTilingTexture = function (forcePowerOfTwo) {
         this.destTexture = texture;
     }
 
-    this._dirtyRenderSize = false;
-
     //this.originalTexture = this.texture;
     //this._texture = this.destTexture;
     //
@@ -159,12 +117,23 @@ TilingSprite2D.prototype._generateTilingTexture = function (forcePowerOfTwo) {
     this.sourceY = 0;
     this.sourceWidth = this.destTexture.width;
     this.sourceHeight = this.destTexture.height;
+
     this.destX = -sourceX;
     this.destY = -sourceY;
+    this.destWidth = this._width;
+    this.destHeight = this._height;
+
+    var bounds = this._localBounds;
+    bounds.x =this.destX;
+    bounds.y =this.destY;
+    bounds.width =this.destWidth;
+    bounds.height =this.destHeight;
+    //this._dirtyRender = false;
+
 };
 
 TilingSprite2D.prototype._render = function (renderer) {
-    if (!this.destTexture || this._dirtyRenderSize) {
+    if (!this.destTexture || this._dirtyRender) {
         this._generateTilingTexture(RenderContext.isWebgl);
 
         if (this.destTexture && this.destTexture.needsUpdate) {
@@ -173,9 +142,11 @@ TilingSprite2D.prototype._render = function (renderer) {
             this.destTexture.needsUpdate = false;
             // this.destTexture._uvs = null;
         }
+
+        this._dirtyRender = false;
     }
 
-    this.worldMatrix = this.transform.modelView;
+    //this.worldMatrix = this.transform.modelView;
 
     renderer.renderTilingSprite2D(this);
 };

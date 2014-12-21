@@ -11,7 +11,7 @@ function Graphics(opts) {
 
     Renderable2D.call(this, opts);
 
-    this.renderable = true;
+    //this.renderable = true;
 
     this.fillAlpha = 1;
 
@@ -27,21 +27,16 @@ function Graphics(opts) {
 
     this._webGL = [];
 
-    this.isMask = opts.isMask !== undefined ? !!opts.isMask : false;
+    this.isMask = false;
 
-    ///**
-    // * The bounds' padding used for bounds calculation.
-    // *
-    // * @property boundsPadding
-    // * @type Number
-    // */
-    //this.boundsPadding = 0;
-    //
-    //this._localBounds = new RectangleShape(0,0,1,1);
+    this.boundsPadding = 0;
 
+    //this._localBounds = new Rect(0,0,1,1);
+
+    //use for WebGLGraphics to update gl data, will be set to false in WebGLGraphics renders
     this.dirty = true;
 
-    this.webGLDirty = false;
+    //this.webGLDirty = false;
 
     this.cachedSpriteDirty = false;
 
@@ -74,7 +69,7 @@ Renderable2D.extend(Graphics);
 //        else
 //        {
 //            this.destroyCachedSprite();
-//            this.dirty = true;
+//            this._dirtyRender = true;
 //        }
 //
 //    }
@@ -136,7 +131,7 @@ Graphics.prototype.moveTo = function (x, y) {
  */
 Graphics.prototype.lineTo = function (x, y) {
     this.currentPath.shape.points.push(x, y);
-    this.dirty = true;
+    this._dirtyRender = true;
 
     return this;
 };
@@ -182,7 +177,7 @@ Graphics.prototype.quadraticCurveTo = function (cpX, cpY, toX, toY) {
     }
 
 
-    this.dirty = true;
+    this._dirtyRender = true;
 
     return this;
 };
@@ -234,7 +229,7 @@ Graphics.prototype.bezierCurveTo = function (cpX, cpY, cpX2, cpY2, toX, toY) {
             dt3 * fromY + 3 * dt2 * j * cpY + 3 * dt * t2 * cpY2 + t3 * toY);
     }
 
-    this.dirty = true;
+    this._dirtyRender = true;
 
     return this;
 };
@@ -298,7 +293,7 @@ Graphics.prototype.arcTo = function (x1, y1, x2, y2, radius) {
         this.arc(cx + x1, cy + y1, radius, startAngle, endAngle, b1 * a2 > b2 * a1);
     }
 
-    this.dirty = true;
+    this._dirtyRender = true;
 
     return this;
 };
@@ -366,7 +361,7 @@ Graphics.prototype.arc = function (cx, cy, radius, startAngle, endAngle, anticlo
             ( (cTheta * -s) + (sTheta * c) ) * radius + cy);
     }
 
-    this.dirty = true;
+    this._dirtyRender = true;
 
     return this;
 };
@@ -458,7 +453,7 @@ Graphics.prototype.clear = function () {
     this.lineWidth = 0;
     this.filling = false;
 
-    this.dirty = true;
+    this._dirtyRender = true;
     this.clearDirty = true;
     this.graphicsData = [];
 
@@ -509,7 +504,7 @@ Graphics.prototype.clear = function () {
 //    if(this._cacheAsBitmap)
 //    {
 //
-//        if(this.dirty || this.cachedSpriteDirty)
+//        if(this._dirtyRender || this.cachedSpriteDirty)
 //        {
 //
 //            this._generateCachedSprite();
@@ -518,7 +513,7 @@ Graphics.prototype.clear = function () {
 //            this.updateCachedSpriteTexture();
 //
 //            this.cachedSpriteDirty = false;
-//            this.dirty = false;
+//            this._dirtyRender = false;
 //        }
 //
 //        this._cachedSprite.worldAlpha = this.worldAlpha;
@@ -545,7 +540,7 @@ Graphics.prototype.clear = function () {
 //        // check if the webgl graphic needs to be updated
 //        if(this.webGLDirty)
 //        {
-//            this.dirty = true;
+//            this._dirtyRender = true;
 //            this.webGLDirty = false;
 //        }
 //
@@ -588,7 +583,7 @@ Graphics.prototype.clear = function () {
 //
 //    if(this._cacheAsBitmap)
 //    {
-//        if(this.dirty || this.cachedSpriteDirty)
+//        if(this._dirtyRender || this.cachedSpriteDirty)
 //        {
 //            this._generateCachedSprite();
 //
@@ -596,7 +591,7 @@ Graphics.prototype.clear = function () {
 //            this.updateCachedSpriteTexture();
 //
 //            this.cachedSpriteDirty = false;
-//            this.dirty = false;
+//            this._dirtyRender = false;
 //        }
 //
 //        this._cachedSprite.alpha = this.alpha;
@@ -643,61 +638,60 @@ Graphics.prototype.clear = function () {
 //    }
 //};
 
-Graphics.prototype.startRender = function (renderer) {
-    if (!this.visible) {
-        return;
-    }
-    var transform = this.transform;
-    this.worldMatrix = transform.modelView;
-    if (this.isMask) {
-        renderer.pushMask(this);
-        //renderer.renderGraphicsMask(transform.modelView, this.graphicsData, this.worldAlpha, this.tint);
-    }
-    //else{
-    //    renderer.setAlpha(this.worldAlpha, this.blendMode);
-    //    renderer.renderGraphics(transform.modelView, this.graphicsData, this.worldAlpha, this.tint);
-    //}
-    //renderer.setTransform(transform.modelView);
-
-    this._render(renderer);
-};
+//Graphics.prototype.startRender = function (renderer) {
+//    if (!this.visible) {
+//        return;
+//    }
+//    var transform = this.transform;
+//    this.worldMatrix = transform.modelView;
+//    if (this.isMask) {
+//        renderer.pushMask(this);
+//        //renderer.renderGraphicsMask(transform.modelView, this.graphicsData, this.worldAlpha, this.tint);
+//    }
+//    //else{
+//    //    renderer.setAlpha(this.worldAlpha, this.blendMode);
+//    //    renderer.renderGraphics(transform.modelView, this.graphicsData, this.worldAlpha, this.tint);
+//    //}
+//    //renderer.setTransform(transform.modelView);
+//
+//    this._render(renderer);
+//};
 
 Graphics.prototype._render = function (renderer) {
+    //this.worldMatrix = this.transform.modelView;
     if (!this.isMask) {
-        var transform = this.transform;
+        if(this._dirtyRender){
+            this._updateLocalBounds();
+            this.dirty = true;
+            this._dirtyRender = false;
+        }
+        //var transform = this.transform;
         //renderer._setAlpha(this.worldAlpha, this.blendMode);
         //renderer.renderGraphics(transform.modelView, this.graphicsData, this.worldAlpha, this.tint);
         renderer.renderGraphics(this);
     }
 };
 
-Graphics.prototype.finishRender = function (renderer) {
-    if (this.isMask) {
-        var transform = this.transform;
-        renderer.popMask(this);
-    }
-};
-
-
-//
-///**
-// * Retrieves the bounds of the graphic shape as a RectangleShape object
-// *
-// * @method getBounds
-// * @return {RectangleShape} the rectangular bounding area
-// */
-//Graphics.prototype.getBounds = function( matrix )
-//{
-//    // return an empty object if the item is a mask!
-//    if(this.isMask)return PIXI.EmptyRectangleShape;
-//
-//    if(this.dirty)
-//    {
-//        this.updateLocalBounds();
-//        this.webGLDirty = true;
-//        this.cachedSpriteDirty = true;
-//        this.dirty = false;
+//Graphics.prototype.finishRender = function (renderer) {
+//    if (this.isMask) {
+//        var transform = this.transform;
+//        renderer.popMask(this);
 //    }
+//};
+
+
+//Graphics.prototype.getBounds = function (matrix) {
+//    // return an empty object if the item is a mask!
+//    if(this.isMask)return Rect.Empty;
+//
+//    this._updateLocalBounds();
+//    //if(this._dirtyRender)
+//    //{
+//    //    this._updateLocalBounds();
+//    //    this.webGLDirty = true;
+//    //    this.cachedSpriteDirty = true;
+//    //    this._dirtyRender = false;
+//    //}
 //
 //    var bounds = this._localBounds;
 //
@@ -707,157 +701,103 @@ Graphics.prototype.finishRender = function (renderer) {
 //    var h0 = bounds.y;
 //    var h1 = bounds.height + bounds.y;
 //
-//    var worldTransform = matrix || this.worldTransform;
-//
-//    var a = worldTransform.a;
-//    var b = worldTransform.b;
-//    var c = worldTransform.c;
-//    var d = worldTransform.d;
-//    var tx = worldTransform.tx;
-//    var ty = worldTransform.ty;
-//
-//    var x1 = a * w1 + c * h1 + tx;
-//    var y1 = d * h1 + b * w1 + ty;
-//
-//    var x2 = a * w0 + c * h1 + tx;
-//    var y2 = d * h1 + b * w0 + ty;
-//
-//    var x3 = a * w0 + c * h0 + tx;
-//    var y3 = d * h0 + b * w0 + ty;
-//
-//    var x4 =  a * w1 + c * h0 + tx;
-//    var y4 =  d * h0 + b * w1 + ty;
-//
-//    var maxX = x1;
-//    var maxY = y1;
-//
-//    var minX = x1;
-//    var minY = y1;
-//
-//    minX = x2 < minX ? x2 : minX;
-//    minX = x3 < minX ? x3 : minX;
-//    minX = x4 < minX ? x4 : minX;
-//
-//    minY = y2 < minY ? y2 : minY;
-//    minY = y3 < minY ? y3 : minY;
-//    minY = y4 < minY ? y4 : minY;
-//
-//    maxX = x2 > maxX ? x2 : maxX;
-//    maxX = x3 > maxX ? x3 : maxX;
-//    maxX = x4 > maxX ? x4 : maxX;
-//
-//    maxY = y2 > maxY ? y2 : maxY;
-//    maxY = y3 > maxY ? y3 : maxY;
-//    maxY = y4 > maxY ? y4 : maxY;
-//
-//    this._bounds.x = minX;
-//    this._bounds.width = maxX - minX;
-//
-//    this._bounds.y = minY;
-//    this._bounds.height = maxY - minY;
-//
-//    return  this._bounds;
+//    return this._getBounds(w1, h1, w0, h0, matrix);
 //};
 //
-///**
-// * Update the bounds of the object
-// *
-// * @method updateLocalBounds
-// */
-//Graphics.prototype.updateLocalBounds = function()
-//{
-//    var minX = Infinity;
-//    var maxX = -Infinity;
-//
-//    var minY = Infinity;
-//    var maxY = -Infinity;
-//
-//    if(this.graphicsData.length)
-//    {
-//        var shape, points, x, y, w, h;
-//
-//        for (var i = 0; i < this.graphicsData.length; i++) {
-//            var data = this.graphicsData[i];
-//            var type = data.type;
-//            var lineWidth = data.lineWidth;
-//            shape = data.shape;
-//
-//
-//            if(type === Graphics.RECT || type === Graphics.RREC)
-//            {
-//                x = shape.x - lineWidth/2;
-//                y = shape.y - lineWidth/2;
-//                w = shape.width + lineWidth;
-//                h = shape.height + lineWidth;
-//
-//                minX = x < minX ? x : minX;
-//                maxX = x + w > maxX ? x + w : maxX;
-//
-//                minY = y < minY ? y : minY;
-//                maxY = y + h > maxY ? y + h : maxY;
-//            }
-//            else if(type === Graphics.CIRC)
-//            {
-//                x = shape.x;
-//                y = shape.y;
-//                w = shape.radius + lineWidth/2;
-//                h = shape.radius + lineWidth/2;
-//
-//                minX = x - w < minX ? x - w : minX;
-//                maxX = x + w > maxX ? x + w : maxX;
-//
-//                minY = y - h < minY ? y - h : minY;
-//                maxY = y + h > maxY ? y + h : maxY;
-//            }
-//            else if(type === Graphics.ELIP)
-//            {
-//                x = shape.x;
-//                y = shape.y;
-//                w = shape.width + lineWidth/2;
-//                h = shape.height + lineWidth/2;
-//
-//                minX = x - w < minX ? x - w : minX;
-//                maxX = x + w > maxX ? x + w : maxX;
-//
-//                minY = y - h < minY ? y - h : minY;
-//                maxY = y + h > maxY ? y + h : maxY;
-//            }
-//            else
-//            {
-//                // POLY
-//                points = shape.points;
-//
-//                for (var j = 0; j < points.length; j+=2)
-//                {
-//
-//                    x = points[j];
-//                    y = points[j+1];
-//                    minX = x-lineWidth < minX ? x-lineWidth : minX;
-//                    maxX = x+lineWidth > maxX ? x+lineWidth : maxX;
-//
-//                    minY = y-lineWidth < minY ? y-lineWidth : minY;
-//                    maxY = y+lineWidth > maxY ? y+lineWidth : maxY;
-//                }
-//            }
-//        }
-//    }
-//    else
-//    {
-//        minX = 0;
-//        maxX = 0;
-//        minY = 0;
-//        maxY = 0;
-//    }
-//
-//    var padding = this.boundsPadding;
-//
-//    this._localBounds.x = minX - padding;
-//    this._localBounds.width = (maxX - minX) + padding * 2;
-//
-//    this._localBounds.y = minY - padding;
-//    this._localBounds.height = (maxY - minY) + padding * 2;
-//};
-//
+Graphics.prototype._updateLocalBounds = function()
+{
+    var minX = Infinity;
+    var maxX = -Infinity;
+
+    var minY = Infinity;
+    var maxY = -Infinity;
+
+    if(this.graphicsData.length)
+    {
+        var shape, points, x, y, w, h;
+
+        for (var i = 0; i < this.graphicsData.length; i++) {
+            var data = this.graphicsData[i];
+            var type = data.type;
+            var lineWidth = data.lineWidth;
+            shape = data.shape;
+
+
+            if(type === Enums2D.ShapeTypes.RECT || type === Enums2D.ShapeTypes.RREC)
+            {
+                x = shape.x - lineWidth/2;
+                y = shape.y - lineWidth/2;
+                w = shape.width + lineWidth;
+                h = shape.height + lineWidth;
+
+                minX = x < minX ? x : minX;
+                maxX = x + w > maxX ? x + w : maxX;
+
+                minY = y < minY ? y : minY;
+                maxY = y + h > maxY ? y + h : maxY;
+            }
+            else if(type === Enums2D.ShapeTypes.CIRC)
+            {
+                x = shape.x;
+                y = shape.y;
+                w = shape.radius + lineWidth/2;
+                h = shape.radius + lineWidth/2;
+
+                minX = x - w < minX ? x - w : minX;
+                maxX = x + w > maxX ? x + w : maxX;
+
+                minY = y - h < minY ? y - h : minY;
+                maxY = y + h > maxY ? y + h : maxY;
+            }
+            else if(type === Enums2D.ShapeTypes.ELIP)
+            {
+                x = shape.x;
+                y = shape.y;
+                w = shape.width + lineWidth/2;
+                h = shape.height + lineWidth/2;
+
+                minX = x - w < minX ? x - w : minX;
+                maxX = x + w > maxX ? x + w : maxX;
+
+                minY = y - h < minY ? y - h : minY;
+                maxY = y + h > maxY ? y + h : maxY;
+            }
+            else
+            {
+                // POLY
+                points = shape.points;
+
+                for (var j = 0; j < points.length; j+=2)
+                {
+
+                    x = points[j];
+                    y = points[j+1];
+                    minX = x-lineWidth < minX ? x-lineWidth : minX;
+                    maxX = x+lineWidth > maxX ? x+lineWidth : maxX;
+
+                    minY = y-lineWidth < minY ? y-lineWidth : minY;
+                    maxY = y+lineWidth > maxY ? y+lineWidth : maxY;
+                }
+            }
+        }
+    }
+    else
+    {
+        minX = 0;
+        maxX = 0;
+        minY = 0;
+        maxY = 0;
+    }
+
+    var padding = this.boundsPadding;
+
+    this._localBounds.x = minX - padding;
+    this._localBounds.width = (maxX - minX) + padding * 2;
+
+    this._localBounds.y = minY - padding;
+    this._localBounds.height = (maxY - minY) + padding * 2;
+};
+
 ///**
 // * Generates the cached sprite when the sprite has cacheAsBitmap = true
 // *
@@ -953,7 +893,7 @@ Graphics.prototype.drawShape = function (shape) {
         this.currentPath = data;
     }
 
-    this.dirty = true;
+    this._dirtyRender = true;
 
     return data;
 };

@@ -10,53 +10,55 @@ seajs.use(['index-debug.js'], function (Xian) {
 
     var game, scene, level0, level1, level2, system;
 
-    //function GraphicsBehaviour(){
-    //    Behaviour.call(this);
-    //}
-    //Behaviour.extend(GraphicsBehaviour);
-    //GraphicsBehaviour.prototype.onStart = function(){
-    //    var graphics = this.gameObject.graphics;
-    //    // set a fill and line style
-    //    graphics.beginFill(0xFF3300);
-    //    graphics.lineStyle(10, 0xffd900, 1);
-    //
-    //    // draw a shape
-    //    graphics.moveTo(50,50);
-    //    graphics.lineTo(250, 50);
-    //    graphics.lineTo(100, 100);
-    //    graphics.lineTo(250, 220);
-    //    graphics.lineTo(50, 220);
-    //    graphics.lineTo(50, 50);
-    //    graphics.endFill();
-    //
-    //    // set a fill and line style again
-    //    graphics.lineStyle(10, 0xFF0000, 0.8);
-    //    graphics.beginFill(0xFF700B, 1);
-    //
-    //    // draw a second shape
-    //    graphics.moveTo(210,300);
-    //    graphics.lineTo(450,320);
-    //    graphics.lineTo(570,350);
-    //    graphics.quadraticCurveTo(600, 0, 480,100);
-    //    graphics.lineTo(330,120);
-    //    graphics.lineTo(410,200);
-    //    graphics.lineTo(210,300);
-    //    graphics.endFill();
-    //
-    //    // draw a rectangle
-    //    graphics.lineStyle(2, 0x0000FF, 1);
-    //    graphics.drawRect(50, 250, 100, 100);
-    //
-    //    // draw a circle
-    //    graphics.lineStyle(0);
-    //    graphics.beginFill(0xFFFF0B, 0.5);
-    //    graphics.drawCircle(470, 200,100);
-    //    graphics.endFill();
-    //
-    //    graphics.lineStyle(20, 0x33FF00);
-    //    graphics.moveTo(30,30);
-    //    graphics.lineTo(600, 300);
-    //};
+    function GraphicsBehaviour(){
+        Behaviour.call(this);
+    }
+    Behaviour.extend(GraphicsBehaviour);
+    GraphicsBehaviour.prototype.onStart = function(){
+        var graphics = this.gameObject.graphics;
+        // set a fill and line style
+        graphics.beginFill(0xFF3300);
+        graphics.lineStyle(10, 0xffd900, 1);
+
+        // draw a shape
+        graphics.moveTo(50,50);
+        graphics.lineTo(250, 50);
+        graphics.lineTo(100, 100);
+        graphics.lineTo(250, 220);
+        graphics.lineTo(50, 220);
+        graphics.lineTo(50, 50);
+        graphics.endFill();
+
+        // set a fill and line style again
+        graphics.lineStyle(10, 0xFF0000, 0.8);
+        graphics.beginFill(0xFF700B, 1);
+
+        // draw a second shape
+        graphics.moveTo(210,300);
+        graphics.lineTo(450,320);
+        graphics.lineTo(570,350);
+        graphics.quadraticCurveTo(600, 0, 480,100);
+        graphics.lineTo(330,120);
+        graphics.lineTo(410,200);
+        graphics.lineTo(210,300);
+        graphics.endFill();
+
+        // draw a rectangle
+        graphics.lineStyle(2, 0x0000FF, 1);
+        graphics.drawRect(50, 250, 100, 100);
+
+        // draw a circle
+        graphics.lineStyle(0);
+        graphics.beginFill(0xFFFF0B, 0.5);
+        graphics.drawCircle(470, 200,100);
+        graphics.endFill();
+
+        graphics.lineStyle(20, 0x33FF00);
+        graphics.moveTo(30,30);
+        graphics.lineTo(600, 300);
+
+        //this.gameObject.renderer2d.mask = graphics;
+    };
 
     function Sprite2DBehaviour(opts) {
         Behaviour.call(this, opts);
@@ -160,13 +162,13 @@ seajs.use(['index-debug.js'], function (Xian) {
                 clearBeforeRender: true,
                 background: new Color(0.5, 0.5, 0.5)
             }),
-            new TilingSprite2D({
-                texture: Assets.get("img_player"),
-                destWidth: 500,
-                destHeight: 500,
-                alpha: 0.5,
-                tint: 0xff0000,
-            }),
+            //new TilingSprite2D({
+            //    texture: Assets.get("img_player"),
+            //    destWidth: 500,
+            //    destHeight: 500,
+            //    alpha: 0.5,
+            //    tint: 0xff0000,
+            //}),
             new Sprite2D({
                 //enabled: false,
                 name: "sprite2d_0",
@@ -175,12 +177,30 @@ seajs.use(['index-debug.js'], function (Xian) {
                 //mask: new Rect(10,10,20,20),
                 texture: Assets.get("img_player")
             }),
-            new Renderer2D,
-            //new Graphics({
-            //    //name: "graphics_0",
-            //    isMask: true
-            //}),
-            //new GraphicsBehaviour()
+            new Renderer2D({
+                filters: [
+                    new FilterLib._classes.BlurXFilter({
+                        blur: 30
+                    }),
+                    //new FilterLib._classes.AsciiFilter({
+                    //    size: 16
+                    //}),
+                    //new FilterLib._classes.ColorMatrixFilter({
+                    //    matrix: [
+                    //        1, 0, 0, 0,
+                    //        0, 1, 0, 0,
+                    //        0, 0, 0, 0,
+                    //        0, 0, 0, 1
+                    //    ]
+                    //})
+                    //new FilterLib._classes.ColorStepFilter(),
+                ],
+            }),
+            new Graphics({
+                //name: "graphics_0",
+                //isMask: true
+            }),
+            new GraphicsBehaviour()
             //new CacheAsBitmapBehaviour
         ]
     });
@@ -200,23 +220,23 @@ seajs.use(['index-debug.js'], function (Xian) {
                 texture: Assets.get("img_player")
             }),
             new Renderer2D({
-                filters: [
-                    //new FilterLib._classes.BlurXFilter({
-                    //    blur: 30
-                    //}),
-                    //new FilterLib._classes.AsciiFilter({
-                    //    size: 16
-                    //}),
-                    //new FilterLib._classes.ColorMatrixFilter({
-                    //    matrix: [
-                    //        1, 0, 0, 0,
-                    //        0, 1, 0, 0,
-                    //        0, 0, 0, 0,
-                    //        0, 0, 0, 1
-                    //    ]
-                    //})
-                    new FilterLib._classes.ColorStepFilter(),
-                ],
+                //filters: [
+                //    //new FilterLib._classes.BlurXFilter({
+                //    //    blur: 30
+                //    //}),
+                //    //new FilterLib._classes.AsciiFilter({
+                //    //    size: 16
+                //    //}),
+                //    //new FilterLib._classes.ColorMatrixFilter({
+                //    //    matrix: [
+                //    //        1, 0, 0, 0,
+                //    //        0, 1, 0, 0,
+                //    //        0, 0, 0, 0,
+                //    //        0, 0, 0, 1
+                //    //    ]
+                //    //})
+                //    new FilterLib._classes.ColorStepFilter(),
+                //],
             }),
             new Sprite2DBehaviour({
                 //enabled: false

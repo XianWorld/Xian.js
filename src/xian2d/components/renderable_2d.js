@@ -27,42 +27,18 @@ function Renderable2D(opts) {
     this.worldMatrix = undefined;
 
     this._bounds = new Rect(0, 0, 1, 1);
+    this._localBounds = new Rect(0, 0, 1, 1);
+    this._dirtyBounds = true;
+    //this._dirtyLocalBounds = true;
 
-    //this.mask = opts.mask !== undefined ? opts.mask : undefined;
-
-    //this._filters = undefined;
-    //this._filterBlock = undefined;
-    //if(opts.filters) this.filters = opts.filters;
+    this._dirtyRender = true;
 }
 
 Component.extend(Renderable2D);
 
-//Object.defineProperty(Renderable2D.prototype, 'filters', {
-//
+//Object.defineProperty(Renderable2D.prototype, 'worldMatrix', {
 //    get: function() {
-//        return this._filters;
-//    },
-//
-//    set: function(value) {
-//
-//        if(value)
-//        {
-//            // now put all the passes in one place..
-//            var passes = [];
-//            for (var i = 0; i < value.length; i++)
-//            {
-//                var filterPasses = value[i].passes;
-//                for (var j = 0; j < filterPasses.length; j++)
-//                {
-//                    passes.push(filterPasses[j]);
-//                }
-//            }
-//
-//            // TODO change this as it is legacy
-//            this._filterBlock = {target:this, filterPasses:passes};
-//        }
-//
-//        this._filters = value;
+//        return this.transform.modelView;
 //    }
 //});
 
@@ -87,46 +63,95 @@ Renderable2D.prototype.clear = function () {
     return this;
 };
 
-Renderable2D.prototype.getBounds = function(matrix)
+Renderable2D.prototype.getBounds = function()
 {
-    matrix = matrix;//just to get passed js hinting (and preserve inheritance)
-    return Rect.Empty;
+    if(this._dirtyBounds){
+        var worldTransform = this.transform.modelView;
+        this.getLocalBounds();
+        this._localBounds.getBounds(worldTransform, this._bounds);
+        this._dirtyBounds = false;
+    }
+
+    return this._bounds;
 };
+
 Renderable2D.prototype.getLocalBounds = function()
 {
-    return this.getBounds(Mat32.Identity);///PIXI.EmptyRectangle();
+    return this._localBounds;//this.getBounds(Mat32.Identity);///PIXI.EmptyRectangle();
 };
 
-//Renderable2D.prototype.startRender = function (renderer) {
-//    //if (!this.visible) {
-//    //    return;
-//    //}
-//    var transform = this.transform;
-//    //renderer.setAlpha(this.worldAlpha, this.blendMode);
-//    //renderer.setTransform(transform.modelView);
+
+//Renderable2D.prototype._getBounds = function (w1, h1, w0, h0, matrix) {
 //
-//    this.worldMatrix = transform.modelView;
+//    var worldTransform = matrix || this.transform.modelView;
+//    var m = worldTransform.elements;
+//    var a = m[0];
+//    var b = m[1];
+//    var c = m[2];
+//    var d = m[3];
+//    var tx = m[4];
+//    var ty = m[5];
 //
-//    if(this._filters)
-//    {
-//        renderer.pushFilter(this._filterBlock);
-//    }
+//    var x1 = a * w1 + c * h1 + tx;
+//    var y1 = d * h1 + b * w1 + ty;
 //
-//    this._render(renderer);
+//    var x2 = a * w0 + c * h1 + tx;
+//    var y2 = d * h1 + b * w0 + ty;
 //
+//    var x3 = a * w0 + c * h0 + tx;
+//    var y3 = d * h0 + b * w0 + ty;
+//
+//    var x4 = a * w1 + c * h0 + tx;
+//    var y4 = d * h0 + b * w1 + ty;
+//
+//    var maxX = -Infinity;
+//    var maxY = -Infinity;
+//
+//    var minX = Infinity;
+//    var minY = Infinity;
+//
+//    minX = x1 < minX ? x1 : minX;
+//    minX = x2 < minX ? x2 : minX;
+//    minX = x3 < minX ? x3 : minX;
+//    minX = x4 < minX ? x4 : minX;
+//
+//    minY = y1 < minY ? y1 : minY;
+//    minY = y2 < minY ? y2 : minY;
+//    minY = y3 < minY ? y3 : minY;
+//    minY = y4 < minY ? y4 : minY;
+//
+//    maxX = x1 > maxX ? x1 : maxX;
+//    maxX = x2 > maxX ? x2 : maxX;
+//    maxX = x3 > maxX ? x3 : maxX;
+//    maxX = x4 > maxX ? x4 : maxX;
+//
+//    maxY = y1 > maxY ? y1 : maxY;
+//    maxY = y2 > maxY ? y2 : maxY;
+//    maxY = y3 > maxY ? y3 : maxY;
+//    maxY = y4 > maxY ? y4 : maxY;
+//
+//    var bounds = this._bounds;
+//
+//    bounds.x = minX;
+//    bounds.width = maxX - minX;
+//
+//    bounds.y = minY;
+//    bounds.height = maxY - minY;
+//
+//    // store a reference so that if this function gets called again in the render cycle we do not have to recalculate
+//    //this._currentBounds = bounds;
+//
+//    return bounds;
 //};
+
+Renderable2D.prototype.update = function () {
+    this.worldMatrix = this.transform.modelView;
+    if(this.transform._matrix_changed)
+        this._dirtyBounds = true;
+};
 
 Renderable2D.prototype._render = function (renderer) {
-
 };
-
-//Renderable2D.prototype.finishRender = function (renderer) {
-//    if(this._filters)
-//    {
-//        renderer.popFilter();
-//    }
-//
-//};
 
 Renderable2D.prototype.toJSON = function (json) {
     json = Component.prototype.toJSON.call(this, json);
