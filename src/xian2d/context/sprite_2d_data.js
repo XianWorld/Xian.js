@@ -3,10 +3,8 @@
  */
 var ObjectPool = require("../../base/object_pool");
 
-function Renderable2DData() {
-    this._refCount = 0;
-
-    this.texture = undefined;
+function Sprite2DData() {
+    this.destTexture = undefined;
 
     this.sourceX = 0;
     this.sourceY = 0;
@@ -25,10 +23,8 @@ function Renderable2DData() {
     this.worldMatrix = undefined;
 }
 
-Renderable2DData.prototype.clear = function () {
-    this._refCount = 0;
-
-    this.texture = undefined;
+Sprite2DData.prototype.destroy = function () {
+    this.destTexture = undefined;
 
     this.sourceX = 0;
     this.sourceY = 0;
@@ -46,15 +42,14 @@ Renderable2DData.prototype.clear = function () {
 
     this.worldMatrix = undefined;
 
-    pool.removeObject(this);
 };
 
-var pool = ObjectPool.getPool(Renderable2DData);
-Renderable2DData.create = function() {
+var pool = ObjectPool.getPool(Sprite2DData);
+Sprite2DData.create = function() {
     var obj = pool.create();
-    if(!obj) obj = new Renderable2DData;
+    if(!obj) obj = new Sprite2DData;
 
     return obj;
 };
 
-module.exports = Renderable2DData;
+module.exports = Sprite2DData;

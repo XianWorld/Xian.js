@@ -5,6 +5,10 @@ var Renderable2D = require("./renderable_2d");
 var Enums2D = require("../common/enums_2d");
 var Rect = require("../../math/rect");
 var Vec2 = require("../../math/vec2");
+var CanvasBuffer = require("../../render/CanvasBuffer");
+var CanvasGraphics = require("../context/pixi/canvas/utils/canvas_graphics");
+var Texture = require("../../assets/texture");
+var Sprite2DData = require("../context/sprite_2d_data");
 
 function Graphics(opts) {
     opts || (opts = {});
@@ -21,7 +25,7 @@ function Graphics(opts) {
 
     this.graphicsData = [];
 
-    this.tint = 0xFFFFFF;
+    //this.tint = 0xFFFFFF;
 
     this.currentPath = null;
 
@@ -38,42 +42,33 @@ function Graphics(opts) {
 
     //this.webGLDirty = false;
 
-    this.cachedSpriteDirty = false;
+    //this.cachedSpriteDirty = false;
 
+    this._cachedSprite = undefined;
+    this._cacheAsBitmap = false;
 };
 
 Renderable2D.extend(Graphics);
-///**
-// * When cacheAsBitmap is set to true the graphics object will be rendered as if it was a sprite.
-// * This is useful if your graphics element does not change often, as it will speed up the rendering of the object in exchange for taking up texture memory.
-// * It is also useful if you need the graphics object to be anti-aliased, because it will be rendered using canvas.
-// * This is not recommended if you are constantly redrawing the graphics element.
-// *
-// * @property cacheAsBitmap
-// * @type Boolean
-// * @default false
-// * @private
-// */
-//Object.defineProperty(Graphics.prototype, "cacheAsBitmap", {
-//    get: function() {
-//        return  this._cacheAsBitmap;
-//    },
-//    set: function(value) {
-//        this._cacheAsBitmap = value;
-//
-//        if(this._cacheAsBitmap)
-//        {
-//
-//            this._generateCachedSprite();
-//        }
-//        else
-//        {
-//            this.destroyCachedSprite();
-//            this._dirtyRender = true;
-//        }
-//
-//    }
-//});
+
+Object.defineProperty(Graphics.prototype, "cacheAsBitmap", {
+    get: function () {
+        return this._cacheAsBitmap;
+    },
+    set: function (value) {
+        if(this._cacheAsBitmap === value) return;
+        this._cacheAsBitmap = value;
+
+        //this.cachedSpriteDirty = true;
+        //if (this._cacheAsBitmap) {
+        //    this._generateCachedSprite();
+        //}
+        //else {
+        //    this.destroyCachedSprite();
+        //    this._dirtyRender = true;
+        //}
+
+    }
+});
 
 /**
  * Specifies the line style used for subsequent calls to Graphics methods such as the lineTo() method or the drawCircleShape() method.
@@ -660,15 +655,30 @@ Graphics.prototype.clear = function () {
 Graphics.prototype._render = function (renderer) {
     //this.worldMatrix = this.transform.modelView;
     if (!this.isMask) {
-        if(this._dirtyRender){
+        if (this._dirtyRender) {
             this._updateLocalBounds();
             this.dirty = true;
             this._dirtyRender = false;
         }
+        if(this._cacheAsBitmap){
+            if(!this._cachedSprite){
+                this._generateCachedSprite();
+            }
+            this._cachedSprite.worldMatrix = this.worldMatrix;
+            this._cachedSprite.worldAlpha = this.worldAlpha;
+            renderer.renderSprite2D(this._cachedSprite);
+        }
+        else{
+            if(this._cachedSprite){
+                this._destroyCachedSprite();
+            }
+            renderer.renderGraphics(this);
+
+        }
         //var transform = this.transform;
         //renderer._setAlpha(this.worldAlpha, this.blendMode);
         //renderer.renderGraphics(transform.modelView, this.graphicsData, this.worldAlpha, this.tint);
-        renderer.renderGraphics(this);
+        //renderer.renderGraphics(this);
     }
 };
 
@@ -704,16 +714,14 @@ Graphics.prototype._render = function (renderer) {
 //    return this._getBounds(w1, h1, w0, h0, matrix);
 //};
 //
-Graphics.prototype._updateLocalBounds = function()
-{
+Graphics.prototype._updateLocalBounds = function () {
     var minX = Infinity;
     var maxX = -Infinity;
 
     var minY = Infinity;
     var maxY = -Infinity;
 
-    if(this.graphicsData.length)
-    {
+    if (this.graphicsData.length) {
         var shape, points, x, y, w, h;
 
         for (var i = 0; i < this.graphicsData.length; i++) {
@@ -723,10 +731,9 @@ Graphics.prototype._updateLocalBounds = function()
             shape = data.shape;
 
 
-            if(type === Enums2D.ShapeTypes.RECT || type === Enums2D.ShapeTypes.RREC)
-            {
-                x = shape.x - lineWidth/2;
-                y = shape.y - lineWidth/2;
+            if (type === Enums2D.ShapeTypes.RECT || type === Enums2D.ShapeTypes.RREC) {
+                x = shape.x - lineWidth / 2;
+                y = shape.y - lineWidth / 2;
                 w = shape.width + lineWidth;
                 h = shape.height + lineWidth;
 
@@ -736,12 +743,11 @@ Graphics.prototype._updateLocalBounds = function()
                 minY = y < minY ? y : minY;
                 maxY = y + h > maxY ? y + h : maxY;
             }
-            else if(type === Enums2D.ShapeTypes.CIRC)
-            {
+            else if (type === Enums2D.ShapeTypes.CIRC) {
                 x = shape.x;
                 y = shape.y;
-                w = shape.radius + lineWidth/2;
-                h = shape.radius + lineWidth/2;
+                w = shape.radius + lineWidth / 2;
+                h = shape.radius + lineWidth / 2;
 
                 minX = x - w < minX ? x - w : minX;
                 maxX = x + w > maxX ? x + w : maxX;
@@ -749,12 +755,11 @@ Graphics.prototype._updateLocalBounds = function()
                 minY = y - h < minY ? y - h : minY;
                 maxY = y + h > maxY ? y + h : maxY;
             }
-            else if(type === Enums2D.ShapeTypes.ELIP)
-            {
+            else if (type === Enums2D.ShapeTypes.ELIP) {
                 x = shape.x;
                 y = shape.y;
-                w = shape.width + lineWidth/2;
-                h = shape.height + lineWidth/2;
+                w = shape.width + lineWidth / 2;
+                h = shape.height + lineWidth / 2;
 
                 minX = x - w < minX ? x - w : minX;
                 maxX = x + w > maxX ? x + w : maxX;
@@ -762,27 +767,24 @@ Graphics.prototype._updateLocalBounds = function()
                 minY = y - h < minY ? y - h : minY;
                 maxY = y + h > maxY ? y + h : maxY;
             }
-            else
-            {
+            else {
                 // POLY
                 points = shape.points;
 
-                for (var j = 0; j < points.length; j+=2)
-                {
+                for (var j = 0; j < points.length; j += 2) {
 
                     x = points[j];
-                    y = points[j+1];
-                    minX = x-lineWidth < minX ? x-lineWidth : minX;
-                    maxX = x+lineWidth > maxX ? x+lineWidth : maxX;
+                    y = points[j + 1];
+                    minX = x - lineWidth < minX ? x - lineWidth : minX;
+                    maxX = x + lineWidth > maxX ? x + lineWidth : maxX;
 
-                    minY = y-lineWidth < minY ? y-lineWidth : minY;
-                    maxY = y+lineWidth > maxY ? y+lineWidth : maxY;
+                    minY = y - lineWidth < minY ? y - lineWidth : minY;
+                    maxY = y + lineWidth > maxY ? y + lineWidth : maxY;
                 }
             }
         }
     }
-    else
-    {
+    else {
         minX = 0;
         maxX = 0;
         minY = 0;
@@ -798,52 +800,47 @@ Graphics.prototype._updateLocalBounds = function()
     this._localBounds.height = (maxY - minY) + padding * 2;
 };
 
-///**
-// * Generates the cached sprite when the sprite has cacheAsBitmap = true
-// *
-// * @method _generateCachedSprite
-// * @private
-// */
-//Graphics.prototype._generateCachedSprite = function()
-//{
-//    var bounds = this.getLocalBounds();
-//
-//    if(!this._cachedSprite)
-//    {
-//        var canvasBuffer = new PIXI.CanvasBuffer(bounds.width, bounds.height);
-//        var texture = PIXI.Texture.fromCanvas(canvasBuffer.canvas);
-//
-//        this._cachedSprite = new PIXI.Sprite(texture);
-//        this._cachedSprite.buffer = canvasBuffer;
-//
-//        this._cachedSprite.worldTransform = this.worldTransform;
-//    }
-//    else
-//    {
-//        this._cachedSprite.buffer.resize(bounds.width, bounds.height);
-//    }
-//
-//    // leverage the anchor to account for the offset of the element
-//    this._cachedSprite.anchor.x = -( bounds.x / bounds.width );
-//    this._cachedSprite.anchor.y = -( bounds.y / bounds.height );
-//
-//    // this._cachedSprite.buffer.context.save();
-//    this._cachedSprite.buffer.context.translate(-bounds.x,-bounds.y);
-//
-//    // make sure we set the alpha of the graphics to 1 for the render..
-//    this.worldAlpha = 1;
-//
-//    // now render the graphic..
-//    PIXI.CanvasGraphics.renderGraphics(this, this._cachedSprite.buffer.context);
-//    this._cachedSprite.alpha = this.alpha;
-//};
-//
-///**
-// * Updates texture size based on canvas size
-// *
-// * @method updateCachedSpriteTexture
-// * @private
-// */
+Graphics.prototype._generateCachedSprite = function()
+{
+    var bounds = this.getLocalBounds();
+
+    if(!this._cachedSprite)
+    {
+        var canvasBuffer = new CanvasBuffer(bounds.width, bounds.height);
+        var texture = new Texture();//(canvasBuffer.canvas);
+        texture.parse(canvasBuffer.canvas);
+
+        this._cachedSprite = new Sprite2DData();
+        this._cachedSprite.buffer = canvasBuffer;
+        this._cachedSprite.destTexture = texture;
+    }
+    else
+    {
+        this._cachedSprite.buffer.resize(bounds.width, bounds.height);
+    }
+
+    this._cachedSprite.destTexture.width = bounds.width;
+    this._cachedSprite.destTexture.height = bounds.height;
+
+    this._cachedSprite.sourceWidth = bounds.width;
+    this._cachedSprite.sourceHeight = bounds.height;
+    this._cachedSprite.destX = -bounds.x;
+    this._cachedSprite.destX = -bounds.y;
+    this._cachedSprite.destWidth = bounds.width;
+    this._cachedSprite.destHeight = bounds.height;
+
+
+    // this._cachedSprite.buffer.context.save();
+    this._cachedSprite.buffer.context.translate(-bounds.x,-bounds.y);
+
+    // make sure we set the alpha of the graphics to 1 for the render..
+    this.worldAlpha = 1;
+
+    // now render the graphic..
+    CanvasGraphics.renderGraphicsToContext(this._cachedSprite.buffer.context, this);
+    this._cachedSprite.worldAlpha = this.alpha;
+};
+
 //Graphics.prototype.updateCachedSpriteTexture = function()
 //{
 //    var cachedSprite = this._cachedSprite;
@@ -861,20 +858,14 @@ Graphics.prototype._updateLocalBounds = function()
 //    // update the dirty base textures
 //    texture.baseTexture.dirty();
 //};
-//
-///**
-// * Destroys a previous cached sprite.
-// *
-// * @method destroyCachedSprite
-// */
-//Graphics.prototype.destroyCachedSprite = function()
-//{
-//    this._cachedSprite.texture.destroy(true);
-//
-//    // let the gc collect the unused sprite
-//    // TODO could be object pooled!
-//    this._cachedSprite = null;
-//};
+Graphics.prototype._destroyCachedSprite = function()
+{
+    this._cachedSprite.destroy();
+
+    // let the gc collect the unused sprite
+    // TODO could be object pooled!
+    this._cachedSprite = null;
+};
 
 Graphics.prototype.drawShape = function (shape) {
     if (this.currentPath) {
@@ -902,7 +893,7 @@ Graphics.prototype.toJSON = function (json) {
     json = Renderable2D.prototype.toJSON.call(this, json);
 
     //json.texture = this.texture ? this.texture.name : undefined;
-    json.isMask = this.isMask;
+    //json.cacheAsBitmap = this._cacheAsBitmap;
 
     return json;
 };
@@ -912,7 +903,7 @@ Graphics.prototype.fromJSON = function (json) {
     Renderable2D.prototype.fromJSON.call(this, json);
 
     //this.texture = json.texture ? Assets.get(json.texture) : undefined;
-    this.isMask = json.isMask;
+    //this.isMask = json.isMask;
     return this;
 };
 

@@ -58,6 +58,7 @@ seajs.use(['index-debug.js'], function (Xian) {
         graphics.lineTo(600, 300);
 
         //this.gameObject.renderer2d.mask = graphics;
+        graphics.cacheAsBitmap = true;
     };
 
     function Sprite2DBehaviour(opts) {

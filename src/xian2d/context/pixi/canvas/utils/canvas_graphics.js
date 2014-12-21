@@ -4,21 +4,22 @@ function CanvasGraphics()
 {
 };
 
-/*
- * Renders a Graphics object to a canvas.
- *
- * @method renderGraphics
- * @static
- * @param graphics {Graphics} the actual graphics object to render
- * @param context {CanvasRenderingContext2D} the 2d drawing method of the canvas
- */
 CanvasGraphics.renderGraphics = function(renderer, graphics)//, worldTransform, graphicsData, worldAlpha, tint
 {
-    var worldAlpha = graphics.worldAlpha;
     var context = renderer.canvasContext;
-    var color = '';
 
     renderer._setTransform(graphics.worldTransform);
+
+    CanvasGraphics.renderGraphicsToContext(context, graphics);
+};
+
+CanvasGraphics.renderGraphicsToContext = function(context, graphics)//, worldTransform, graphicsData, worldAlpha, tint
+{
+    var worldAlpha = graphics.worldAlpha;
+    //var context = renderer.canvasContext;
+    var color = '';
+
+    //renderer._setTransform(graphics.worldTransform);
 
     for (var i = 0; i < graphics.graphicsData.length; i++)
     {
