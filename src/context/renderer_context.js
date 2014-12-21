@@ -15,6 +15,8 @@ function RendererContext() {
 
     this.rendererClass = undefined;
     this.renderer = undefined;
+
+    this.isWebgl = false;
 }
 
 RendererContext.prototype.init = function (opts) {
@@ -58,6 +60,7 @@ RendererContext.prototype.init = function (opts) {
         Log.error("can not init the renderer required!");
     }
     else {
+        this.isWebgl = this.rendererClass == this.webglRendererClass;
         this.renderer = new this.rendererClass(canvas, opts);
     }
 

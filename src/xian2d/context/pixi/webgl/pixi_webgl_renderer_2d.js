@@ -4,6 +4,7 @@ var Dom = require("../../../../context/dom");
 var util = require("../../../../base/util");
 var Color = require("../../../../math/color");
 var Mat32 = require("../../../../math/mat32");
+var Vec2 = require("../../../../math/vec2");
 var WebGLShaderManager = require("./utils/WebGLShaderManager");
 var WebGLSpriteBatch = require("./utils/WebGLSpriteBatch");
 var WebGLMaskManager = require("./utils/WebGLMaskManager");
@@ -33,8 +34,8 @@ function PIXIWebGLRenderer2D(canvas, opts) {
     this.canvas.addEventListener("webglcontextrestored", this._handleContextRestored.bind(this), false);
 
     //TODO should a total solution for autosize
-    //this.width = this.canvas.width;
-    //this.height = this.canvas.height;
+    this.width = this.canvas.width;
+    this.height = this.canvas.height;
 
     this.projection = new Vec2;
     this.offset = new Vec2;
@@ -195,7 +196,11 @@ PIXIWebGLRenderer2D.prototype.clearScreen = function (transparent, background) {
 //};
 
 PIXIWebGLRenderer2D.prototype.renderSprite2D = function (sprite2D) {
-    this.spriteBatch.render(sprite2D)
+    this.spriteBatch.render(sprite2D);
+};
+
+PIXIWebGLRenderer2D.prototype.renderTilingSprite2D = function (tilingSprite) {
+    this.spriteBatch.renderTilingSprite(tilingSprite);
 };
 
 PIXIWebGLRenderer2D.prototype.renderGraphics = function (graphics) {

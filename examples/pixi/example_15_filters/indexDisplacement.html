@@ -47,12 +47,17 @@
             this.displacementFilter.scale.y = 50;
             gameObject.renderer2d.filters = [this.displacementFilter];
 
+            this.water = gameObject.tilingSprite2d;
 //            this.fish = this.gameObject.scene.findByTagFirst("fish");
         };
         PondBehaviour.prototype.onUpdate = function () {
             this.count += 0.1;
             this.displacementFilter.offset.x = this.count * 10;//blurAmount * 40;
             this.displacementFilter.offset.y = this.count * 10;
+
+            this.water.tilePosition.x = this.count * -10//blurAmount * 40;
+            this.water.tilePosition.y = this.count * -10
+
         };
 
         function FishBehaviour(opts) {
@@ -115,7 +120,12 @@
                 new Texture({
                     name: "map",
                     src: "./displacement_map.jpg"
+                }),
+                new Texture({
+                    name: "water",
+                    src: "./zeldaWaves.png"//
                 })
+
         );
 
         game = new Game({
@@ -153,22 +163,32 @@
                     transparent: true,
                     clearBeforeRender: true,
                 }),
+                new Sprite2D({
+                    texture: Assets.get("bg")
+                }),
+                new TilingSprite2D({
+                    texture: Assets.get("water"),
+                    destWidth: bg_width,
+                    destHeight: bg_height,
+                    alpha: 0.2,
+//                    tint: 0xff0000,
+                }),
                 new Renderer2D,
                 new PondBehaviour()
             ]
         });
-        var bg = new GameObject({
-            name: "bg",
-            components: [
-                new Transform2D({
-                    //identity: true
-                }),
-                new Sprite2D({
-                    texture: Assets.get("bg")
-                }),
-                new Renderer2D,
-            ]
-        });
+//        var bg = new GameObject({
+//            name: "bg",
+//            components: [
+//                new Transform2D({
+//                    //identity: true
+//                }),
+//                new Sprite2D({
+//                    texture: Assets.get("bg")
+//                }),
+//                new Renderer2D,
+//            ]
+//        });
         var fish = new GameObject({
             name: "fish",
             tag: "fish",
@@ -184,7 +204,7 @@
             ]
         });
 
-        pond.transform.addChild(bg.transform);
+//        pond.transform.addChild(bg.transform);
         pond.transform.addChild(fish.transform);
         scene.addGameObject(pond);
 

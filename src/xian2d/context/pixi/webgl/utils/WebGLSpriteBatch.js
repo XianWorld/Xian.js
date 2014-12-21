@@ -95,7 +95,7 @@ WebGLSpriteBatch.prototype.end = function () {
 };
 
 WebGLSpriteBatch.prototype.render = function (sprite) {
-    var texture = sprite.texture;
+    var texture = sprite.destTexture;
 
     //TODO set blend modes..
     // check texture..
@@ -113,9 +113,6 @@ WebGLSpriteBatch.prototype.render = function (sprite) {
     var alpha = sprite.worldAlpha;
     var tint = sprite.tint;
 
-    var vertices = this.vertices;
-    var index = this.currentBatchSize * 4 * this.vertSize;
-
     var sourceX = sprite.sourceX,
         sourceY = sprite.sourceY,
         sourceWidth = sprite.sourceWidth,
@@ -127,11 +124,12 @@ WebGLSpriteBatch.prototype.render = function (sprite) {
     //blendMode = sprite.blendMode,
         worldMatrix = sprite.worldMatrix;
 
-    //var texture_scale_factor = this.texture_scale_factor;
-    //sourceX = sourceX / texture_scale_factor;
-    //sourceY = sourceY / texture_scale_factor;
-    //sourceWidth = sourceWidth / texture_scale_factor;
-    //sourceHeight = sourceHeight / texture_scale_factor;
+    if(destWidth <= 0) destWidth = sourceWidth;
+    if(destHeight <= 0) destHeight = sourceHeight;
+
+    var vertices = this.vertices;
+    var index = this.currentBatchSize * 4 * this.vertSize;
+
     var m = worldMatrix.elements;
     var a = m[0];
     var b = m[1];
@@ -141,16 +139,10 @@ WebGLSpriteBatch.prototype.render = function (sprite) {
     var ty = m[5];
 
     if (this.renderSession.renderTexture) {
-
+        //render to texture is upside down
         ty = this.renderSession.renderTexture.height - ty;
-
         b = -b;
         d = -d;
-        //tx = -c * this.renderTexture.height + tx;
-        //ty = -d * this.renderTexture.height + ty;
-        //
-        //c = -c;
-        //d = -d;
     }
 
     if (destX != 0 || destY != 0) {
@@ -213,46 +205,253 @@ WebGLSpriteBatch.prototype.render = function (sprite) {
     vertices[index++] = alpha;
     vertices[index++] = tint;
 
+    //this._render(worldMatrix, texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, alpha, tint);
+    // increment the batchsize
+    this.sprites[this.currentBatchSize++] = sprite;
+};
+
+//WebGLSpriteBatch.prototype._render = function (worldMatrix, texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, alpha, tint) {
+//    var vertices = this.vertices;
+//    var index = this.currentBatchSize * 4 * this.vertSize;
+//
+//    var m = worldMatrix.elements;
+//    var a = m[0];
+//    var b = m[1];
+//    var c = m[2];
+//    var d = m[3];
+//    var tx = m[4];
+//    var ty = m[5];
+//
+//    if (this.renderSession.renderTexture) {
+//        //render to texture is upside down
+//        ty = this.renderSession.renderTexture.height - ty;
+//        b = -b;
+//        d = -d;
+//    }
+//
+//    if (destX != 0 || destY != 0) {
+//        tx = a * destX + c * destY + tx;
+//        ty = b * destX + d * destY + ty;
+//    }
+//    var sx = destWidth / sourceWidth,
+//        sy = destHeight / sourceHeight;
+//    if (sx != 1 || sy != 1) {
+//        a *= sx;
+//        b *= sx;
+//
+//        c *= sy;
+//        d *= sy;
+//    }
+//
+//    var width = texture.width;
+//    var height = texture.height;
+//    var w = sourceWidth;
+//    var h = sourceHeight;
+//    sourceX = sourceX / width;
+//    sourceY = sourceY / height;
+//    sourceWidth = sourceWidth / width;
+//    sourceHeight = sourceHeight / height;
+//
+//    // xy
+//    vertices[index++] = tx;
+//    vertices[index++] = ty;
+//    // uv
+//    vertices[index++] = sourceX;
+//    vertices[index++] = sourceY;
+//    // alpha
+//    vertices[index++] = alpha;
+//    vertices[index++] = tint;
+//    // xy
+//    vertices[index++] = a * w + tx;
+//    vertices[index++] = b * w + ty;
+//    // uv
+//    vertices[index++] = sourceWidth + sourceX;
+//    vertices[index++] = sourceY;
+//    // alpha
+//    vertices[index++] = alpha;
+//    vertices[index++] = tint;
+//    // xy
+//    vertices[index++] = a * w + c * h + tx;
+//    vertices[index++] = d * h + b * w + ty;
+//    // uv
+//    vertices[index++] = sourceWidth + sourceX;
+//    vertices[index++] = sourceHeight + sourceY;
+//    // alpha
+//    vertices[index++] = alpha;
+//    vertices[index++] = tint;
+//    // xy
+//    vertices[index++] = c * h + tx;
+//    vertices[index++] = d * h + ty;
+//    // uv
+//    vertices[index++] = sourceX;
+//    vertices[index++] = sourceHeight + sourceY;
+//    // alpha
+//    vertices[index++] = alpha;
+//    vertices[index++] = tint;
+//
+//};
+
+WebGLSpriteBatch.prototype.renderTilingSprite = function (tilingSprite) {
+    var texture = tilingSprite.destTexture;
+
+    // check texture..
+    if (this.currentBatchSize >= this.size) {
+        this.flush();
+        this.currentBaseTexture = texture;
+    }
+
+    //// set the textures uvs temporarily
+    //// TODO create a separate texture so that we can tile part of a texture
+    //
+    //if (!tilingSprite._uvs)tilingSprite._uvs = new TextureUvs();
+    //
+    //var uvs = tilingSprite._uvs;
+
+    var sourceX = tilingSprite.sourceX,
+        sourceY = tilingSprite.sourceY,
+        sourceWidth = tilingSprite.sourceWidth,
+        sourceHeight = tilingSprite.sourceHeight,
+        destX = tilingSprite.destX,
+        destY = tilingSprite.destY,
+        destWidth = tilingSprite.destWidth,
+        destHeight = tilingSprite.destHeight,
+    //blendMode = sprite.blendMode,
+        worldMatrix = tilingSprite.worldMatrix;
+
+    tilingSprite.tilePosition.x %= texture.width * tilingSprite.tileScaleOffset.x;
+    tilingSprite.tilePosition.y %= texture.height * tilingSprite.tileScaleOffset.y;
+
+    var offsetX = tilingSprite.tilePosition.x / (texture.width * tilingSprite.tileScaleOffset.x);
+    var offsetY = tilingSprite.tilePosition.y / (texture.height * tilingSprite.tileScaleOffset.y);
+
+    var scaleX = (destWidth / texture.width) / (tilingSprite.tileScale.x * tilingSprite.tileScaleOffset.x);
+    var scaleY = (destHeight / texture.height) / (tilingSprite.tileScale.y * tilingSprite.tileScaleOffset.y);
+
+    var uvs_x0 = 0 - offsetX;
+    var uvs_y0 = 0 - offsetY;
+
+    var uvs_x1 = (1 * scaleX) - offsetX;
+    var uvs_y1 = 0 - offsetY;
+
+    var uvs_x2 = (1 * scaleX) - offsetX;
+    var uvs_y2 = (1 * scaleY) - offsetY;
+
+    var uvs_x3 = 0 - offsetX;
+    var uvs_y3 = (1 * scaleY) - offsetY;
+
+    // get the tilingSprites current alpha
+    var alpha = tilingSprite.worldAlpha;
+    var tint = tilingSprite.tint;
+
+    var vertices = this.vertices;
+    var index = this.currentBatchSize * 4 * this.vertSize;
+
+    var m = worldMatrix.elements;
+    var a = m[0];
+    var b = m[1];
+    var c = m[2];
+    var d = m[3];
+    var tx = m[4];
+    var ty = m[5];
+
+    if (this.renderSession.renderTexture) {
+        //render to texture is upside down
+        ty = this.renderSession.renderTexture.height - ty;
+        b = -b;
+        d = -d;
+    }
+
+    //if (destX != 0 || destY != 0) {
+    //    tx = a * destX + c * destY + tx;
+    //    ty = b * destX + d * destY + ty;
+    //}
+    //var sx = destWidth / sourceWidth,
+    //    sy = destHeight / sourceHeight;
+    //if (sx != 1 || sy != 1) {
+    //    a *= sx;
+    //    b *= sx;
+    //
+    //    c *= sy;
+    //    d *= sy;
+    //}
+    var w0 = destX + destWidth;
+    var w1 = destX;
+
+    var h0 = destY + destHeight;
+    var h1 = destY;
+
+    var width = texture.width;
+    var height = texture.height;
+    var w = sourceWidth;
+    var h = sourceHeight;
+    //sourceX = sourceX / width;
+    //sourceY = sourceY / height;
+    //sourceWidth = sourceWidth / width;
+    //sourceHeight = sourceHeight / height;
+
+    // xy
+    vertices[index++] = a * w1 + c * h1 + tx;
+    vertices[index++] = d * h1 + b * w1 + ty;
+    // uv
+    vertices[index++] = uvs_x0;//sourceX;
+    vertices[index++] = uvs_y0;//sourceY;
+    // alpha
+    vertices[index++] = alpha;
+    vertices[index++] = tint;
+    // xy
+    vertices[index++] = a * w0 + c * h1 + tx;
+    vertices[index++] = d * h1 + b * w0 + ty;
+    // uv
+    vertices[index++] = uvs_x1;//sourceWidth + sourceX;
+    vertices[index++] = uvs_y1;//sourceY;
+    // alpha
+    vertices[index++] = alpha;
+    vertices[index++] = tint;
+    // xy
+    vertices[index++] = a * w0 + c * h0 + tx;
+    vertices[index++] = d * h0 + b * w0 + ty;
+    // uv
+    vertices[index++] = uvs_x2;//sourceWidth + sourceX;
+    vertices[index++] = uvs_y2;//sourceHeight + sourceY;
+    // alpha
+    vertices[index++] = alpha;
+    vertices[index++] = tint;
+    // xy
+    vertices[index++] = a * w1 + c * h0 + tx;
+    vertices[index++] = d * h0 + b * w1 + ty;
+    // uv
+    vertices[index++] = uvs_x3;//sourceX;
+    vertices[index++] = uvs_y3;//sourceHeight + sourceY;
+    // alpha
+    vertices[index++] = alpha;
+    vertices[index++] = tint;
+
+    //var verticies = this.vertices;
+    //
+    //var width = tilingSprite.width;
+    //var height = tilingSprite.height;
+    //
     //// TODO trim??
-    //var aX = sprite.anchor.x;
-    //var aY = sprite.anchor.y;
+    //var aX = tilingSprite.anchor.x;
+    //var aY = tilingSprite.anchor.y;
+    //var w0 = width * (1 - aX);
+    //var w1 = width * -aX;
     //
-    //var w0, w1, h0, h1;
-    //
-    //if (texture.trim)
-    //{
-    //    // if the sprite is trimmed then we need to add the extra space before transforming the sprite coords..
-    //    var trim = texture.trim;
-    //
-    //    w1 = trim.x - aX * trim.width;
-    //    w0 = w1 + texture.crop.width;
-    //
-    //    h1 = trim.y - aY * trim.height;
-    //    h0 = h1 + texture.crop.height;
-    //
-    //}
-    //else
-    //{
-    //    w0 = (texture.frame.width ) * (1-aX);
-    //    w1 = (texture.frame.width ) * -aX;
-    //
-    //    h0 = texture.frame.height * (1-aY);
-    //    h1 = texture.frame.height * -aY;
-    //}
+    //var h0 = height * (1 - aY);
+    //var h1 = height * -aY;
     //
     //var index = this.currentBatchSize * 4 * this.vertSize;
     //
     //var resolution = texture.baseTexture.resolution;
     //
-    //var worldTransform = sprite.worldTransform;
+    //var worldTransform = tilingSprite.worldTransform;
     //
-    //var a = worldTransform.a / resolution;
-    //var b = worldTransform.b / resolution;
-    //var c = worldTransform.c / resolution;
-    //var d = worldTransform.d / resolution;
-    //var tx = worldTransform.tx;
-    //var ty = worldTransform.ty;
-    //
+    //var a = worldTransform.a / resolution;//[0];
+    //var b = worldTransform.b / resolution;//[3];
+    //var c = worldTransform.c / resolution;//[1];
+    //var d = worldTransform.d / resolution;//[4];
+    //var tx = worldTransform.tx;//[2];
+    //var ty = worldTransform.ty;///[5];
     //
     //// xy
     //verticies[index++] = a * w1 + c * h1 + tx;
@@ -265,7 +464,7 @@ WebGLSpriteBatch.prototype.render = function (sprite) {
     //verticies[index++] = tint;
     //
     //// xy
-    //verticies[index++] = a * w0 + c * h1 + tx;
+    //verticies[index++] = (a * w0 + c * h1 + tx);
     //verticies[index++] = d * h1 + b * w0 + ty;
     //// uv
     //verticies[index++] = uvs.x1;
@@ -295,123 +494,131 @@ WebGLSpriteBatch.prototype.render = function (sprite) {
     //verticies[index++] = tint;
 
     // increment the batchsize
-    this.sprites[this.currentBatchSize++] = sprite;
-
+    this.sprites[this.currentBatchSize++] = tilingSprite;
 };
 
-//WebGLSpriteBatch.prototype.renderTilingSprite = function(tilingSprite)
-//{
-//    var texture = tilingSprite.tilingTexture;
+//WebGLSpriteBatch.prototype.render = function (sprite) {
+//    var texture = sprite.texture;
 //
+//    //TODO set blend modes..
 //    // check texture..
-//    if(this.currentBatchSize >= this.size)
-//    {
-//        //return;
+//    if (this.currentBatchSize >= this.size) {
 //        this.flush();
-//        this.currentBaseTexture = texture.baseTexture;
+//        this.currentBaseTexture = texture;
 //    }
 //
-//     // set the textures uvs temporarily
-//    // TODO create a separate texture so that we can tile part of a texture
+//    //// get the uvs for the texture
+//    //var uvs = texture._uvs;
+//    //// if the uvs have not updated then no point rendering just yet!
+//    //if(!uvs)return;
 //
-//    if(!tilingSprite._uvs)tilingSprite._uvs = new TextureUvs();
+//    // get the sprites current alpha
+//    var alpha = sprite.worldAlpha;
+//    var tint = sprite.tint;
 //
-//    var uvs = tilingSprite._uvs;
-//
-//    tilingSprite.tilePosition.x %= texture.baseTexture.width * tilingSprite.tileScaleOffset.x;
-//    tilingSprite.tilePosition.y %= texture.baseTexture.height * tilingSprite.tileScaleOffset.y;
-//
-//    var offsetX =  tilingSprite.tilePosition.x/(texture.baseTexture.width*tilingSprite.tileScaleOffset.x);
-//    var offsetY =  tilingSprite.tilePosition.y/(texture.baseTexture.height*tilingSprite.tileScaleOffset.y);
-//
-//    var scaleX =  (tilingSprite.width / texture.baseTexture.width)  / (tilingSprite.tileScale.x * tilingSprite.tileScaleOffset.x);
-//    var scaleY =  (tilingSprite.height / texture.baseTexture.height) / (tilingSprite.tileScale.y * tilingSprite.tileScaleOffset.y);
-//
-//    uvs.x0 = 0 - offsetX;
-//    uvs.y0 = 0 - offsetY;
-//
-//    uvs.x1 = (1 * scaleX) - offsetX;
-//    uvs.y1 = 0 - offsetY;
-//
-//    uvs.x2 = (1 * scaleX) - offsetX;
-//    uvs.y2 = (1 * scaleY) - offsetY;
-//
-//    uvs.x3 = 0 - offsetX;
-//    uvs.y3 = (1 *scaleY) - offsetY;
-//
-//    // get the tilingSprites current alpha
-//    var alpha = tilingSprite.worldAlpha;
-//    var tint = tilingSprite.tint;
-//
-//    var  verticies = this.vertices;
-//
-//    var width = tilingSprite.width;
-//    var height = tilingSprite.height;
-//
-//    // TODO trim??
-//    var aX = tilingSprite.anchor.x;
-//    var aY = tilingSprite.anchor.y;
-//    var w0 = width * (1-aX);
-//    var w1 = width * -aX;
-//
-//    var h0 = height * (1-aY);
-//    var h1 = height * -aY;
-//
+//    var vertices = this.vertices;
 //    var index = this.currentBatchSize * 4 * this.vertSize;
 //
-//    var resolution = texture.baseTexture.resolution;
+//    var sourceX = sprite.sourceX,
+//        sourceY = sprite.sourceY,
+//        sourceWidth = sprite.sourceWidth,
+//        sourceHeight = sprite.sourceHeight,
+//        destX = sprite.destX,
+//        destY = sprite.destY,
+//        destWidth = sprite.destWidth,
+//        destHeight = sprite.destHeight,
+//    //blendMode = sprite.blendMode,
+//        worldMatrix = sprite.worldMatrix;
 //
-//    var worldTransform = tilingSprite.worldTransform;
+//    //var texture_scale_factor = this.texture_scale_factor;
+//    //sourceX = sourceX / texture_scale_factor;
+//    //sourceY = sourceY / texture_scale_factor;
+//    //sourceWidth = sourceWidth / texture_scale_factor;
+//    //sourceHeight = sourceHeight / texture_scale_factor;
+//    var m = worldMatrix.elements;
+//    var a = m[0];
+//    var b = m[1];
+//    var c = m[2];
+//    var d = m[3];
+//    var tx = m[4];
+//    var ty = m[5];
 //
-//    var a = worldTransform.a / resolution;//[0];
-//    var b = worldTransform.b / resolution;//[3];
-//    var c = worldTransform.c / resolution;//[1];
-//    var d = worldTransform.d / resolution;//[4];
-//    var tx = worldTransform.tx;//[2];
-//    var ty = worldTransform.ty;///[5];
+//    if (this.renderSession.renderTexture) {
+//        //render to texture is upside down
+//        ty = this.renderSession.renderTexture.height - ty;
+//
+//        b = -b;
+//        d = -d;
+//        //tx = -c * this.renderTexture.height + tx;
+//        //ty = -d * this.renderTexture.height + ty;
+//        //
+//        //c = -c;
+//        //d = -d;
+//    }
+//
+//    if (destX != 0 || destY != 0) {
+//        tx = a * destX + c * destY + tx;
+//        ty = b * destX + d * destY + ty;
+//    }
+//    var sx = destWidth / sourceWidth,
+//        sy = destHeight / sourceHeight;
+//    if (sx != 1 || sy != 1) {
+//        a *= sx;
+//        b *= sx;
+//
+//        c *= sy;
+//        d *= sy;
+//    }
+//
+//    var width = texture.width;
+//    var height = texture.height;
+//    var w = sourceWidth;
+//    var h = sourceHeight;
+//    sourceX = sourceX / width;
+//    sourceY = sourceY / height;
+//    sourceWidth = sourceWidth / width;
+//    sourceHeight = sourceHeight / height;
 //
 //    // xy
-//    verticies[index++] = a * w1 + c * h1 + tx;
-//    verticies[index++] = d * h1 + b * w1 + ty;
+//    vertices[index++] = tx;
+//    vertices[index++] = ty;
 //    // uv
-//    verticies[index++] = uvs.x0;
-//    verticies[index++] = uvs.y0;
-//    // color
-//    verticies[index++] = alpha;
-//    verticies[index++] = tint;
-//
+//    vertices[index++] = sourceX;
+//    vertices[index++] = sourceY;
+//    // alpha
+//    vertices[index++] = alpha;
+//    vertices[index++] = tint;
 //    // xy
-//    verticies[index++] = (a * w0 + c * h1 + tx);
-//    verticies[index++] = d * h1 + b * w0 + ty;
+//    vertices[index++] = a * w + tx;
+//    vertices[index++] = b * w + ty;
 //    // uv
-//    verticies[index++] = uvs.x1;
-//    verticies[index++] = uvs.y1;
-//    // color
-//    verticies[index++] = alpha;
-//    verticies[index++] = tint;
-//
+//    vertices[index++] = sourceWidth + sourceX;
+//    vertices[index++] = sourceY;
+//    // alpha
+//    vertices[index++] = alpha;
+//    vertices[index++] = tint;
 //    // xy
-//    verticies[index++] = a * w0 + c * h0 + tx;
-//    verticies[index++] = d * h0 + b * w0 + ty;
+//    vertices[index++] = a * w + c * h + tx;
+//    vertices[index++] = d * h + b * w + ty;
 //    // uv
-//    verticies[index++] = uvs.x2;
-//    verticies[index++] = uvs.y2;
-//    // color
-//    verticies[index++] = alpha;
-//    verticies[index++] = tint;
-//
+//    vertices[index++] = sourceWidth + sourceX;
+//    vertices[index++] = sourceHeight + sourceY;
+//    // alpha
+//    vertices[index++] = alpha;
+//    vertices[index++] = tint;
 //    // xy
-//    verticies[index++] = a * w1 + c * h0 + tx;
-//    verticies[index++] = d * h0 + b * w1 + ty;
+//    vertices[index++] = c * h + tx;
+//    vertices[index++] = d * h + ty;
 //    // uv
-//    verticies[index++] = uvs.x3;
-//    verticies[index++] = uvs.y3;
-//    // color
-//    verticies[index++] = alpha;
-//    verticies[index++] = tint;
+//    vertices[index++] = sourceX;
+//    vertices[index++] = sourceHeight + sourceY;
+//    // alpha
+//    vertices[index++] = alpha;
+//    vertices[index++] = tint;
 //
 //    // increment the batchsize
-//    this.sprites[this.currentBatchSize++] = tilingSprite;
+//    this.sprites[this.currentBatchSize++] = sprite;
+//
 //};
 
 WebGLSpriteBatch.prototype.flush = function () {
@@ -464,7 +671,7 @@ WebGLSpriteBatch.prototype.flush = function () {
 
         sprite = this.sprites[i];
 
-        nextTexture = sprite.texture;//.baseTexture;
+        nextTexture = sprite.destTexture;//.baseTexture;
         nextBlendMode = sprite.blendMode;
         nextShader = sprite.shader || this.defaultShader;
 

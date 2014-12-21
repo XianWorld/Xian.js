@@ -38,6 +38,10 @@ AbstractRenderer2D.prototype.renderSprite2D = function (sprite2D) {
 
 };
 
+AbstractRenderer2D.prototype.renderTilingSprite2D = function (tilingSprite) {
+
+};
+
 AbstractRenderer2D.prototype.pushMask = function (mask) {
 };
 

@@ -18,21 +18,6 @@ AlphaMaskFilter = function(opts)
     };
 
     if(texture) this.map = texture;
-    //texture._powerOf2 = true;
-    //this.uniforms.mapDimensions.value.x = this.uniforms.mask.value.width;
-    //this.uniforms.mapDimensions.value.y = this.uniforms.mask.value.height;
-
-    if(texture._loaded)
-    {
-        this.uniforms.mapDimensions.value.x = texture.width;
-        this.uniforms.mapDimensions.value.y = texture.height;
-    }
-    else
-    {
-        this.boundLoadedFunction = this.onTextureLoaded.bind(this);
-
-        texture.on('load', this.boundLoadedFunction);
-    }
 
     this.fragmentSrc = [
         'precision mediump float;',
@@ -75,7 +60,7 @@ AlphaMaskFilter.prototype.onTextureLoaded = function()
     this.uniforms.mapDimensions.value.x = this.uniforms.mask.value.width;
     this.uniforms.mapDimensions.value.y = this.uniforms.mask.value.height;
 
-    this.uniforms.mask.value.off('loaded', this.boundLoadedFunction);
+    this.uniforms.mask.value.off('load', this.boundLoadedFunction);
 };
 
 /**
@@ -89,12 +74,21 @@ Object.defineProperty(AlphaMaskFilter.prototype, 'map', {
         return this.uniforms.mask.value;
     },
     set: function(value) {
+        if(this.uniforms.mask.value === value) return;
         this.uniforms.mask.value = value;
+        if(value){
+            value._powerOf2 = true;
 
-        value._powerOf2 = true;
+            if (value._loaded) {
+                this.uniforms.mapDimensions.value.x = value.width;
+                this.uniforms.mapDimensions.value.y = value.height;
+            }
+            else {
+                this.boundLoadedFunction = this.onTextureLoaded.bind(this);
 
-        this.uniforms.mapDimensions.value.x = value.width;
-        this.uniforms.mapDimensions.value.y = value.height;
+                value.on('load', this.boundLoadedFunction);
+            }
+        }
     }
 });
 

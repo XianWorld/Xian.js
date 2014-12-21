@@ -1,4 +1,3 @@
-
 // Set configuration
 seajs.config({
     base: "../../dist/"
@@ -11,61 +10,62 @@ seajs.use(['index-debug.js'], function (Xian) {
 
     var game, scene, level0, level1, level2, system;
 
-    function GraphicsBehaviour(){
-        Behaviour.call(this);
+    //function GraphicsBehaviour(){
+    //    Behaviour.call(this);
+    //}
+    //Behaviour.extend(GraphicsBehaviour);
+    //GraphicsBehaviour.prototype.onStart = function(){
+    //    var graphics = this.gameObject.graphics;
+    //    // set a fill and line style
+    //    graphics.beginFill(0xFF3300);
+    //    graphics.lineStyle(10, 0xffd900, 1);
+    //
+    //    // draw a shape
+    //    graphics.moveTo(50,50);
+    //    graphics.lineTo(250, 50);
+    //    graphics.lineTo(100, 100);
+    //    graphics.lineTo(250, 220);
+    //    graphics.lineTo(50, 220);
+    //    graphics.lineTo(50, 50);
+    //    graphics.endFill();
+    //
+    //    // set a fill and line style again
+    //    graphics.lineStyle(10, 0xFF0000, 0.8);
+    //    graphics.beginFill(0xFF700B, 1);
+    //
+    //    // draw a second shape
+    //    graphics.moveTo(210,300);
+    //    graphics.lineTo(450,320);
+    //    graphics.lineTo(570,350);
+    //    graphics.quadraticCurveTo(600, 0, 480,100);
+    //    graphics.lineTo(330,120);
+    //    graphics.lineTo(410,200);
+    //    graphics.lineTo(210,300);
+    //    graphics.endFill();
+    //
+    //    // draw a rectangle
+    //    graphics.lineStyle(2, 0x0000FF, 1);
+    //    graphics.drawRect(50, 250, 100, 100);
+    //
+    //    // draw a circle
+    //    graphics.lineStyle(0);
+    //    graphics.beginFill(0xFFFF0B, 0.5);
+    //    graphics.drawCircle(470, 200,100);
+    //    graphics.endFill();
+    //
+    //    graphics.lineStyle(20, 0x33FF00);
+    //    graphics.moveTo(30,30);
+    //    graphics.lineTo(600, 300);
+    //};
+
+    function Sprite2DBehaviour(opts) {
+        Behaviour.call(this, opts);
     }
-    Behaviour.extend(GraphicsBehaviour);
-    GraphicsBehaviour.prototype.onStart = function(){
-        var graphics = this.gameObject.graphics;
-        // set a fill and line style
-        graphics.beginFill(0xFF3300);
-        graphics.lineStyle(10, 0xffd900, 1);
 
-        // draw a shape
-        graphics.moveTo(50,50);
-        graphics.lineTo(250, 50);
-        graphics.lineTo(100, 100);
-        graphics.lineTo(250, 220);
-        graphics.lineTo(50, 220);
-        graphics.lineTo(50, 50);
-        graphics.endFill();
-
-        // set a fill and line style again
-        graphics.lineStyle(10, 0xFF0000, 0.8);
-        graphics.beginFill(0xFF700B, 1);
-
-        // draw a second shape
-        graphics.moveTo(210,300);
-        graphics.lineTo(450,320);
-        graphics.lineTo(570,350);
-        graphics.quadraticCurveTo(600, 0, 480,100);
-        graphics.lineTo(330,120);
-        graphics.lineTo(410,200);
-        graphics.lineTo(210,300);
-        graphics.endFill();
-
-        // draw a rectangle
-        graphics.lineStyle(2, 0x0000FF, 1);
-        graphics.drawRect(50, 250, 100, 100);
-
-        // draw a circle
-        graphics.lineStyle(0);
-        graphics.beginFill(0xFFFF0B, 0.5);
-        graphics.drawCircle(470, 200,100);
-        graphics.endFill();
-
-        graphics.lineStyle(20, 0x33FF00);
-        graphics.moveTo(30,30);
-        graphics.lineTo(600, 300);
-    };
-
-    function Sprite2DBehaviour(opts){
-        Behaviour.call(this,opts);
-    }
     Behaviour.extend(Sprite2DBehaviour);
-    Sprite2DBehaviour.prototype.onStart = function(){
+    Sprite2DBehaviour.prototype.onStart = function () {
     };
-    Sprite2DBehaviour.prototype.onUpdate = function(){
+    Sprite2DBehaviour.prototype.onUpdate = function () {
         var transform = this.transform;
         //transform.position.x += 1;
         //transform.position.y += 1;
@@ -78,37 +78,37 @@ seajs.use(['index-debug.js'], function (Xian) {
         //}
     };
 
-    function CacheAsBitmapBehaviour(opts){
-        Behaviour.call(this,opts);
-
-        this.cached = false;
-    }
-    Behaviour.extend(CacheAsBitmapBehaviour);
-    CacheAsBitmapBehaviour.prototype.onStart = function(){
-
-    };
-    CacheAsBitmapBehaviour.prototype.onUpdate = function(){
-        if(this.cached) return;
-
-        var gameObject = this.gameObject;
-        var sprite2d = gameObject.addComponent(new Sprite2D());
-        var camera2d = gameObject.addComponent(new Camera2D({name: "camera_temp"}));
-
-        var children = gameObject.transform.children;
-        camera2d.update();
-        camera2d.renderTexture = new RenderTexture({width: 300, height: 300});
-        camera2d.render(children);
-        camera2d.enabled = false;
-        //sprite2d.enabled = false;
-
-        sprite2d.texture = camera2d.renderTexture;
-
-        //var i = children.length;
-        //while(i--)
-        //    children[i].gameObject.setActive(false);
-
-        this.cached = true;
-    };
+    //function CacheAsBitmapBehaviour(opts){
+    //    Behaviour.call(this,opts);
+    //
+    //    this.cached = false;
+    //}
+    //Behaviour.extend(CacheAsBitmapBehaviour);
+    //CacheAsBitmapBehaviour.prototype.onStart = function(){
+    //
+    //};
+    //CacheAsBitmapBehaviour.prototype.onUpdate = function(){
+    //    if(this.cached) return;
+    //
+    //    var gameObject = this.gameObject;
+    //    var sprite2d = gameObject.addComponent(new Sprite2D());
+    //    var camera2d = gameObject.addComponent(new Camera2D({name: "camera_temp"}));
+    //
+    //    var children = gameObject.transform.children;
+    //    camera2d.update();
+    //    camera2d.renderTexture = new RenderTexture({width: 300, height: 300});
+    //    camera2d.render(children);
+    //    camera2d.enabled = false;
+    //    //sprite2d.enabled = false;
+    //
+    //    sprite2d.texture = camera2d.renderTexture;
+    //
+    //    //var i = children.length;
+    //    //while(i--)
+    //    //    children[i].gameObject.setActive(false);
+    //
+    //    this.cached = true;
+    //};
 
     Assets.addAssets(
         new Texture({
@@ -160,14 +160,22 @@ seajs.use(['index-debug.js'], function (Xian) {
                 clearBeforeRender: true,
                 background: new Color(0.5, 0.5, 0.5)
             }),
-            //new Sprite2D({
-            //    //enabled: false,
-            //    name: "sprite2d_0",
-            //    alpha: 1,
-            //    tint: 0xff0000,
-            //    //mask: new Rect(10,10,20,20),
-            //    texture: Assets.get("img_player")
-            //}),
+            new TilingSprite2D({
+                texture: Assets.get("img_player"),
+                destWidth: 500,
+                destHeight: 500,
+                alpha: 0.5,
+                tint: 0xff0000,
+            }),
+            new Sprite2D({
+                //enabled: false,
+                name: "sprite2d_0",
+                alpha: 1,
+                tint: 0xff0000,
+                //mask: new Rect(10,10,20,20),
+                texture: Assets.get("img_player")
+            }),
+            new Renderer2D,
             //new Graphics({
             //    //name: "graphics_0",
             //    isMask: true
@@ -178,11 +186,11 @@ seajs.use(['index-debug.js'], function (Xian) {
     });
     level1 = new GameObject({
         name: "level1",
-        //active: false,
+        active: false,
         components: [
             new Transform2D({
                 //identity: true
-                position: new Vec2(100,100)
+                position: new Vec2(100, 100)
             }),
             new Sprite2D({
                 name: "sprite2d_1",
@@ -217,11 +225,11 @@ seajs.use(['index-debug.js'], function (Xian) {
     });
     level2 = new GameObject({
         name: "level2",
-        //active: false,
+        active: false,
         components: [
             new Transform2D({
                 //identity: true
-                position: new Vec2(-50,-50),
+                position: new Vec2(-50, -50),
                 rotation: 0.5
             }),
             new Sprite2D({
@@ -268,8 +276,6 @@ seajs.use(['index-debug.js'], function (Xian) {
     }).load();
 
 });
-
-
 
 
 //

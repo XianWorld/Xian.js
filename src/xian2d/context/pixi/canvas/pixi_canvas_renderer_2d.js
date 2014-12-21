@@ -100,7 +100,7 @@ PIXICanvasRenderer2D.prototype.clearScreen = function (transparent, background) 
 
 PIXICanvasRenderer2D.prototype.renderSprite2D = function (sprite2D) {
 
-    var texture = sprite2D.texture,
+    var texture = sprite2D.destTexture,
         sourceX = sprite2D.sourceX,
         sourceY = sprite2D.sourceY,
         sourceWidth = sprite2D.sourceWidth,
@@ -114,9 +114,71 @@ PIXICanvasRenderer2D.prototype.renderSprite2D = function (sprite2D) {
         blendMode = sprite2D.blendMode,
         worldMatrix = sprite2D.worldMatrix;
 
+    if(destWidth <= 0) destWidth = sourceWidth;
+    if(destHeight <= 0) destHeight = sourceHeight;
     this._setAlpha(alpha, blendMode);
     this._setTransform(worldMatrix);
     this._drawImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint);
+};
+
+PIXICanvasRenderer2D.prototype.renderTilingSprite2D = function (tilingSprite) {
+    var tilingTexture = tilingSprite.destTexture,
+    sourceX = tilingSprite.sourceX,
+    sourceY = tilingSprite.sourceY,
+    sourceWidth = tilingSprite.sourceWidth,
+    sourceHeight = tilingSprite.sourceHeight,
+        destX = tilingSprite.destX,
+        destY = tilingSprite.destY,
+        destWidth = tilingSprite.destWidth,
+        destHeight = tilingSprite.destHeight,
+        tint = tilingSprite.tint,
+        alpha = tilingSprite.worldAlpha,
+        blendMode = tilingSprite.blendMode,
+        worldMatrix = tilingSprite.worldMatrix;
+
+    var tilePosition = tilingSprite.tilePosition;
+    var tileScale = tilingSprite.tileScale;
+
+    this._setAlpha(alpha, blendMode);
+    this._setTransform(worldMatrix);
+
+    if (tilingTexture['pattern'] === undefined) {
+        var image = tilingTexture.raw;
+        var tempImage = image;
+        //if (image.width != sourceWidth || image.height != sourceHeight) {
+        //    var tempCanvas = document.createElement("canvas");
+        //    tempCanvas.width = sourceWidth;
+        //    tempCanvas.height = sourceHeight;
+        //    tempCanvas.getContext("2d").drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, sourceWidth, sourceHeight);
+        //    tempImage = tempCanvas;
+        //}
+        //TODO in this canvas renderer, only first set tint will work
+        if (tint !== 0xFFFFFF) {
+            tempImage = CanvasTinter.getTintedTexture(tilingTexture, sourceX, sourceY, sourceWidth, sourceHeight, tint);
+            //sourceX = 0;
+            //sourceY = 0;
+        }
+        var pat = this.canvasContext.createPattern(tempImage, 'repeat');
+        tilingTexture['pattern'] = pat;
+    }
+    var pattern = tilingTexture['pattern'];
+
+    tilePosition.x %= tilingTexture.width;
+    tilePosition.y %= tilingTexture.height;
+
+    // offset - make sure to account for the anchor point..
+    this.canvasContext.scale(tileScale.x,tileScale.y);
+    this.canvasContext.translate(tilePosition.x + (destX), tilePosition.y + (destY));
+
+    this.canvasContext.fillStyle = pattern;
+
+    this.canvasContext.fillRect(-tilePosition.x,
+        -tilePosition.y,
+        destWidth / tileScale.x,
+        destHeight / tileScale.y);
+
+    this.canvasContext.scale(1 / tileScale.x, 1 / tileScale.y);
+    this.canvasContext.translate(-tilePosition.x - (destX), -tilePosition.y - (destY));
 };
 
 PIXICanvasRenderer2D.prototype.renderGraphics = function (graphics) {
@@ -192,31 +254,31 @@ PIXICanvasRenderer2D.prototype._drawImage = function (texture, sourceX, sourceY,
         this.canvasContext.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
     }
     else {
-        this._drawRepeatImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat);
+        //this._drawRepeatImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat);
     }
     //this.renderCost += egret.getTimer() - beforeDraw;
 };
 
-PIXICanvasRenderer2D.prototype._drawRepeatImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
-    if (texture['pattern'] === undefined) {
-        var image = texture.raw;
-        var tempImage = image;
-        if (image.width != sourceWidth || image.height != sourceHeight) {
-            var tempCanvas = document.createElement("canvas");
-            tempCanvas.width = sourceWidth;
-            tempCanvas.height = sourceHeight;
-            tempCanvas.getContext("2d").drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, sourceWidth, sourceHeight);
-            tempImage = tempCanvas;
-        }
-        var pat = this.canvasContext.createPattern(tempImage, repeat);
-        texture['pattern'] = pat;
-    }
-    var pattern = texture['pattern'];
-    this.canvasContext.fillStyle = pattern;
-    this.canvasContext.translate(destX, destY);
-    this.canvasContext.fillRect(0, 0, destWidth, destHeight);
-    this.canvasContext.translate(-destX, -destY);
-};
+//PIXICanvasRenderer2D.prototype._drawRepeatImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
+//    if (texture['pattern'] === undefined) {
+//        var image = texture.raw;
+//        var tempImage = image;
+//        if (image.width != sourceWidth || image.height != sourceHeight) {
+//            var tempCanvas = document.createElement("canvas");
+//            tempCanvas.width = sourceWidth;
+//            tempCanvas.height = sourceHeight;
+//            tempCanvas.getContext("2d").drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, sourceWidth, sourceHeight);
+//            tempImage = tempCanvas;
+//        }
+//        var pat = this.canvasContext.createPattern(tempImage, repeat);
+//        texture['pattern'] = pat;
+//    }
+//    var pattern = texture['pattern'];
+//    this.canvasContext.fillStyle = pattern;
+//    this.canvasContext.translate(destX, destY);
+//    this.canvasContext.fillRect(0, 0, destWidth, destHeight);
+//    this.canvasContext.translate(-destX, -destY);
+//};
 
 PIXICanvasRenderer2D.prototype._setTransform = function (matrix) {
     if(!matrix){

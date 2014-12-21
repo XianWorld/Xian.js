@@ -94,7 +94,7 @@ CanvasRenderer2D.prototype.clearScreen = function (transparent, background) {
 
 CanvasRenderer2D.prototype.renderSprite2D = function (sprite2D) {
 
-    var texture = sprite2D.texture,
+    var texture = sprite2D.destTexture,
         sourceX = sprite2D.sourceX,
         sourceY = sprite2D.sourceY,
         sourceWidth = sprite2D.sourceWidth,
@@ -108,9 +108,71 @@ CanvasRenderer2D.prototype.renderSprite2D = function (sprite2D) {
         blendMode = sprite2D.blendMode,
         worldMatrix = sprite2D.worldMatrix;
 
+    if(destWidth <= 0) destWidth = sourceWidth;
+    if(destHeight <= 0) destHeight = sourceHeight;
     this._setAlpha(alpha, blendMode);
     this._setTransform(worldMatrix);
     this._drawImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint);
+};
+
+CanvasRenderer2D.prototype.renderTilingSprite2D = function (tilingSprite) {
+    var tilingTexture = tilingSprite.destTexture,
+        //sourceX = sprite2D.sourceX,
+        //sourceY = sprite2D.sourceY,
+        //sourceWidth = sprite2D.sourceWidth,
+        //sourceHeight = sprite2D.sourceHeight,
+        destX = tilingSprite.destX,
+        destY = tilingSprite.destY,
+        destWidth = tilingSprite.destWidth,
+        destHeight = tilingSprite.destHeight,
+        //tint = tilingSprite.tint,
+        alpha = tilingSprite.worldAlpha,
+        blendMode = tilingSprite.blendMode,
+        worldMatrix = tilingSprite.worldMatrix;
+
+    var tilePosition = tilingSprite.tilePosition;
+    var tileScale = tilingSprite.tileScale;
+
+    this._setAlpha(alpha, blendMode);
+    this._setTransform(worldMatrix);
+
+    if (tilingTexture['pattern'] === undefined) {
+        var image = tilingTexture.raw;
+        var tempImage = image;
+        //if (image.width != sourceWidth || image.height != sourceHeight) {
+        //    var tempCanvas = document.createElement("canvas");
+        //    tempCanvas.width = sourceWidth;
+        //    tempCanvas.height = sourceHeight;
+        //    tempCanvas.getContext("2d").drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, sourceWidth, sourceHeight);
+        //    tempImage = tempCanvas;
+        //}
+        var pat = this.canvasContext.createPattern(tempImage, 'repeat');
+        tilingTexture['pattern'] = pat;
+    }
+    var pattern = tilingTexture['pattern'];
+
+    tilePosition.x %= tilingTexture.width;
+    tilePosition.y %= tilingTexture.height;
+
+    // offset - make sure to account for the anchor point..
+    this.canvasContext.scale(tileScale.x,tileScale.y);
+    this.canvasContext.translate(tilePosition.x + (destX), tilePosition.y + (destY));
+
+    this.canvasContext.fillStyle = pattern;
+
+    this.canvasContext.fillRect(-tilePosition.x,
+        -tilePosition.y,
+        destWidth / tileScale.x,
+        destHeight / tileScale.y);
+
+    this.canvasContext.scale(1 / tileScale.x, 1 / tileScale.y);
+    this.canvasContext.translate(-tilePosition.x - (destX), -tilePosition.y - (destY));
+
+    //this.canvasContext.fillStyle = pattern;
+    //this.canvasContext.translate(destX, destY);
+    //this.canvasContext.fillRect(0, 0, destWidth, destHeight);
+    //this.canvasContext.translate(-destX, -destY);
+
 };
 
 //CanvasRenderer2D.prototype.pushMask = function (mask) {
@@ -127,26 +189,26 @@ CanvasRenderer2D.prototype.renderSprite2D = function (sprite2D) {
 //};
 //
 
-//CanvasRenderer2D.prototype.drawRepeatImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
-//    if (texture['pattern'] === undefined) {
-//        var image = texture.raw;
-//        var tempImage = image;
-//        if (image.width != sourceWidth || image.height != sourceHeight) {
-//            var tempCanvas = document.createElement("canvas");
-//            tempCanvas.width = sourceWidth;
-//            tempCanvas.height = sourceHeight;
-//            tempCanvas.getContext("2d").drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, sourceWidth, sourceHeight);
-//            tempImage = tempCanvas;
-//        }
-//        var pat = this.canvasContext.createPattern(tempImage, repeat);
-//        texture['pattern'] = pat;
-//    }
-//    var pattern = texture['pattern'];
-//    this.canvasContext.fillStyle = pattern;
-//    this.canvasContext.translate(destX, destY);
-//    this.canvasContext.fillRect(0, 0, destWidth, destHeight);
-//    this.canvasContext.translate(-destX, -destY);
-//};
+CanvasRenderer2D.prototype.drawRepeatImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
+    if (texture['pattern'] === undefined) {
+        var image = texture.raw;
+        var tempImage = image;
+        if (image.width != sourceWidth || image.height != sourceHeight) {
+            var tempCanvas = document.createElement("canvas");
+            tempCanvas.width = sourceWidth;
+            tempCanvas.height = sourceHeight;
+            tempCanvas.getContext("2d").drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, sourceWidth, sourceHeight);
+            tempImage = tempCanvas;
+        }
+        var pat = this.canvasContext.createPattern(tempImage, repeat);
+        texture['pattern'] = pat;
+    }
+    var pattern = texture['pattern'];
+    this.canvasContext.fillStyle = pattern;
+    this.canvasContext.translate(destX, destY);
+    this.canvasContext.fillRect(0, 0, destWidth, destHeight);
+    this.canvasContext.translate(-destX, -destY);
+};
 
 CanvasRenderer2D.prototype._drawImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
     if (repeat === void 0) {

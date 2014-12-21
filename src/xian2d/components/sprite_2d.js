@@ -22,8 +22,10 @@ function Sprite2D(opts) {
     this.destY = 0;
     this.destWidth = 0;
     this.destHeight = 0;
+    this.destTexture = undefined;
 
-    //this._updateRenderSize();
+    //if (this._texture)
+    //    this._updateRenderSize();
     this._dirtyRenderSize = true;
 }
 
@@ -33,20 +35,24 @@ Object.defineProperty(Sprite2D.prototype, "texture", {
     get: function () {
         return this._texture;
     },
-    set: function (value){
+    set: function (value) {
+        if (this._texture === value) return;
         this._texture = value;
+        this.destTexture = value;
 
         this._dirtyRenderSize = true;
+        //this._updateRenderSize();
     }
 });
 Object.defineProperty(Sprite2D.prototype, "textureClip", {
     get: function () {
         return this._textureClip;
     },
-    set: function (value){
+    set: function (value) {
         this._textureClip = value;
 
         this._dirtyRenderSize = true;
+        //this._updateRenderSize();
     }
 });
 
@@ -64,7 +70,8 @@ Sprite2D.prototype._updateRenderSize = function () {
         this.destY = -textureClip.offsetY;
         this.destWidth = textureClip.clipWidth;
         this.destHeight = textureClip.clipHeight;
-    }else{
+    }
+    else if (texture) {
         this.sourceX = 0;
         this.sourceY = 0;
         this.sourceWidth = texture.width;
@@ -75,6 +82,8 @@ Sprite2D.prototype._updateRenderSize = function () {
         this.destWidth = texture.width;
         this.destHeight = texture.height;
     }
+    this._dirtyRenderSize = false;
+
     return this;
 };
 
@@ -90,12 +99,20 @@ Sprite2D.prototype.clear = function () {
     return this;
 };
 
-Sprite2D.prototype.getBounds = function(matrix)
-{
-    if(this._dirtyRenderSize){
-        this._updateRenderSize();
-        this._dirtyRenderSize = false;
-    }
+Sprite2D.prototype.getBounds = function (matrix) {
+//    var w0 = this.destX + this.destWidth;
+//    var w1 = this.destX;
+//    var h0 = this.destY + this.destHeight;
+//    var h1 = this.destY;
+//
+//    return this._getBounds(w1, h1, w0, h0, matrix);
+//};
+//
+//Sprite2D.prototype._getBounds = function (w1, h1, w0, h0, matrix) {
+//    if(this._dirtyRenderSize){
+//        this._updateRenderSize();
+//        this._dirtyRenderSize = false;
+//    }
 
     //var width = this.texture.frame.width;
     //var height = this.texture.frame.height;
@@ -105,6 +122,7 @@ Sprite2D.prototype.getBounds = function(matrix)
     //
     //var h0 = height * (1-this.anchor.y);
     //var h1 = height * -this.anchor.y;
+
     var w0 = this.destX + this.destWidth;
     var w1 = this.destX;
 
@@ -129,8 +147,8 @@ Sprite2D.prototype.getBounds = function(matrix)
     var x3 = a * w0 + c * h0 + tx;
     var y3 = d * h0 + b * w0 + ty;
 
-    var x4 =  a * w1 + c * h0 + tx;
-    var y4 =  d * h0 + b * w1 + ty;
+    var x4 = a * w1 + c * h0 + tx;
+    var y4 = d * h0 + b * w1 + ty;
 
     var maxX = -Infinity;
     var maxY = -Infinity;
@@ -177,8 +195,8 @@ Sprite2D.prototype._render = function (renderer) {
 
     if(this._dirtyRenderSize){
         this._updateRenderSize();
-        this._dirtyRenderSize = false;
     }
+
     //renderer.drawImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, this.tint);
     renderer.renderSprite2D(this);
 };

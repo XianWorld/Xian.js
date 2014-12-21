@@ -105,7 +105,7 @@ WebGLRenderer2D.prototype.clearScreen = function (transparent, background) {
 
 WebGLRenderer2D.prototype.renderSprite2D = function (sprite2D) {
 
-    var texture = sprite2D.texture,
+    var texture = sprite2D.destTexture,
         sourceX = sprite2D.sourceX,
         sourceY = sprite2D.sourceY,
         sourceWidth = sprite2D.sourceWidth,

@@ -33,16 +33,6 @@ function DisplacementFilter(opts) {
     if (opts.scale) this.scale = opts.scale;
     if (opts.offset) this.offset = opts.offset;
 
-    if (texture._loaded) {
-        this.uniforms.mapDimensions.value.x = texture.width;
-        this.uniforms.mapDimensions.value.y = texture.height;
-    }
-    else {
-        this.boundLoadedFunction = this.onTextureLoaded.bind(this);
-
-        texture.on('load', this.boundLoadedFunction);
-    }
-
     this.fragmentSrc = [
         'precision mediump float;',
         'varying vec2 vTextureCoord;',
@@ -96,11 +86,21 @@ Object.defineProperty(DisplacementFilter.prototype, 'map', {
         return this.uniforms.displacementMap.value;
     },
     set: function (value) {
+        if(this.uniforms.displacementMap.value === value) return;
         this.uniforms.displacementMap.value = value;
-        value._powerOf2 = true;
+        if(value){
+            value._powerOf2 = true;
 
-        //this.uniforms.mapDimensions.value.x = value.width;
-        //this.uniforms.mapDimensions.value.y = value.height;
+            if (value._loaded) {
+                this.uniforms.mapDimensions.value.x = value.width;
+                this.uniforms.mapDimensions.value.y = value.height;
+            }
+            else {
+                this.boundLoadedFunction = this.onTextureLoaded.bind(this);
+
+                value.on('load', this.boundLoadedFunction);
+            }
+        }
     }
 });
 
