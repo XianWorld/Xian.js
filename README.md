@@ -20,7 +20,7 @@ MMO Game World Framework based on Node.js, support multiplatforms including Web/
 ## Install
 
 ```
-$ spm install xian --save
+$ npm install xian --save
 ```
 
 ## Usage
