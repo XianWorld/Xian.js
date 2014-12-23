@@ -5,8 +5,8 @@ var Mat32 = require("../../math/mat32");
 var Mat4 = require("../../math/mat4");
 var Camera = require("./../../components/camera");
 var Transform = require("./../../components/transform");
-var Renderable2D = require("./renderable_2d");
-var MainContext  = require("../../context/main_context");
+//var Renderer2D = require("./renderer_2d");
+var MainContext = require("../../context/main_context");
 "use strict";
 
 
@@ -132,6 +132,7 @@ Camera2D.prototype.render = function (target) {
         var transforms = target;
         for (j = 0; j < transforms.length; j++) {
             transform = transforms[j];
+            _updateTransform(transform, _projectionView);
             //if(transform.gameObject.activeInHierarchy)
             this._renderTransform(renderer, _projectionView, transform, 1.0);
         }
@@ -139,36 +140,68 @@ Camera2D.prototype.render = function (target) {
     else if (target instanceof Transform) {
         transform = target;
         //if(transform.gameObject.activeInHierarchy)
+        _updateTransform(transform, _projectionView);
         this._renderTransform(renderer, _projectionView, transform, 1.0);
     }
-    else if (target instanceof Renderer2D) {
-        var component = target;
-        if(component.enabled){
-            component.worldAlpha = component.alpha;
-
-            component.startRender(renderer);
-            component.finishRender(renderer);
-        }
-    }
+    //else if (target instanceof Renderer2D) {
+    //    var component = target;
+    //    if(component.enabled){
+    //        component.worldAlpha = component.alpha;
+    //
+    //        component.startRender(renderer);
+    //        component.finishRender(renderer);
+    //    }
+    //}
 
     renderer.finishRender(this.renderTexture);
 
 };
 
+Camera2D.prototype.updateMVP = function (target) {
+    var j, transform,
+        _projectionView = this._projectionView;
+
+    if (!target) {
+    }
+    else if (target instanceof Array) {
+        var transforms = target;
+        for (j = 0; j < transforms.length; j++) {
+            transform = transforms[j];
+            _updateTransform(transform, _projectionView);
+        }
+    }
+    else if (target instanceof Transform) {
+        transform = target;
+        _updateTransform(transform, _projectionView);
+    }
+};
+
+function _updateTransform(transform, _projectionView) {
+    if (!transform.gameObject.activeInHierarchy) return;
+
+    var children = transform.children,
+        len = children.length, i;
+    transform.updateMatrices(_projectionView);
+
+    for (i = 0; i < len; i++) {
+        _updateTransform(children[i], _projectionView);
+    }
+};
+
 Camera2D.prototype._renderTransform = function (renderer, viewMatrix, transform, alpha) {
-    if(!transform.gameObject.activeInHierarchy) return;
+    if (!transform.gameObject.activeInHierarchy) return;
 
     var children = transform.children,
         len = children.length,
         gameObject, components, component,
-        i, mask, colorTransform;
+        i;
 
 
     gameObject = transform.gameObject;
 
     component = gameObject.getComponent("Renderer2D", true);
-    if(component && component.enabled){
-        transform.updateMatrices(viewMatrix);
+    if (component && component.enabled) {
+        //transform.updateMatrices(viewMatrix);
 
         alpha = component.worldAlpha = alpha * component.alpha;
         component.startRender(renderer);
@@ -179,7 +212,7 @@ Camera2D.prototype._renderTransform = function (renderer, viewMatrix, transform,
         this._renderTransform(renderer, viewMatrix, children[i], alpha);
     }
 
-    if(component && component.enabled) {
+    if (component && component.enabled) {
         component.finishRender(renderer);
     }
     //components = gameObject.getComponents("Renderable2D", true);

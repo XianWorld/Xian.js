@@ -6,14 +6,14 @@ var PrimitiveShader = require("./shaders/primitive_shader");
 var XianShader = require("./shaders/xian_shader");
 var ColorTransformShader = require("./shaders/colortransform_shader");
 
-function WebGLShaderManager(gl) {
+function WebGLShaderManager() {
     this.maxAttibs = 10;
     this.attribState = [];
     this.tempAttribState = [];
     for (var i = 0; i < this.maxAttibs; i++) {
         this.attribState[i] = false;
     }
-    this.setContext(gl);
+    //this.setContext(gl);
 }
 WebGLShaderManager.prototype.setContext = function (gl) {
     this.gl = gl;
@@ -22,6 +22,7 @@ WebGLShaderManager.prototype.setContext = function (gl) {
     this.colorTransformShader = new ColorTransformShader(gl);
     this.activateShader(this.defaultShader);
 };
+
 WebGLShaderManager.prototype.activateShader = function (shader) {
     if (this.currentShader != shader) {
         this.gl.useProgram(shader.program);

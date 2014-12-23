@@ -81,50 +81,54 @@ seajs.use(['index-debug.js'], function (Xian) {
         //}
     };
 
-    //function CacheAsBitmapBehaviour(opts){
-    //    Behaviour.call(this,opts);
-    //
-    //    this.cached = false;
-    //}
-    //Behaviour.extend(CacheAsBitmapBehaviour);
-    //CacheAsBitmapBehaviour.prototype.onStart = function(){
-    //
-    //};
-    //CacheAsBitmapBehaviour.prototype.onUpdate = function(){
-    //    if(this.cached) return;
-    //
-    //    var gameObject = this.gameObject;
-    //    var sprite2d = gameObject.addComponent(new Sprite2D());
-    //    var camera2d = gameObject.addComponent(new Camera2D({name: "camera_temp"}));
-    //
-    //    var children = gameObject.transform.children;
-    //    camera2d.update();
-    //    camera2d.renderTexture = new RenderTexture({width: 300, height: 300});
-    //    camera2d.render(children);
-    //    camera2d.enabled = false;
-    //    //sprite2d.enabled = false;
-    //
-    //    sprite2d.texture = camera2d.renderTexture;
-    //
-    //    //var i = children.length;
-    //    //while(i--)
-    //    //    children[i].gameObject.setActive(false);
-    //
-    //    this.cached = true;
-    //};
+    function CacheAsBitmapBehaviour(opts){
+        Behaviour.call(this,opts);
+
+        this.cached = false;
+    }
+    Behaviour.extend(CacheAsBitmapBehaviour);
+    CacheAsBitmapBehaviour.prototype.onStart = function(){
+        //this.gameObject.renderer2d.cacheAsBitmap = true;
+    };
+    CacheAsBitmapBehaviour.prototype.onUpdate = function(){
+        if(this.cached) return;
+        this.gameObject.renderer2d.cacheAsBitmap = true;
+
+
+        //var gameObject = this.gameObject;
+        //var sprite2d = gameObject.addComponent(new Sprite2D());
+        //var camera2d = gameObject.addComponent(new Camera2D({name: "camera_temp",transparent: true}));
+        //
+        //var children = gameObject.transform.children;
+        //camera2d.update();
+        //camera2d.renderTexture = new RenderTexture({width: 300, height: 300});
+        //camera2d.render(children);
+        //camera2d.enabled = false;
+        ////sprite2d.enabled = false;
+        ////sprite2d.alpha = 0.5;
+        //sprite2d.texture = camera2d.renderTexture;
+        //
+        //var i = children.length;
+        //while(i--)
+        //    children[i].gameObject.setActive(false);
+
+        this.cached = true;
+    };
 
     Assets.addAssets(
         new Texture({
             name: "img_player",
             flipY: true,
             //filter: Enums.FilterMode.None,
-            src: "../content/images/player.png"
+            src: "./eggHead.png"
+            //src: "../content/images/player.png"
         }),
         new Texture({
             name: "img_hospital",
             flipY: true,
             //filter: Enums.FilterMode.None,
-            src: "../content/images/hospital.png"
+            src: "./flowerTop.png"
+            //src: "../content/images/hospital.png"
         })
     );
 
@@ -165,8 +169,8 @@ seajs.use(['index-debug.js'], function (Xian) {
             }),
             //new TilingSprite2D({
             //    texture: Assets.get("img_player"),
-            //    destWidth: 500,
-            //    destHeight: 500,
+            //    width: 500,
+            //    height: 500,
             //    alpha: 0.5,
             //    tint: 0xff0000,
             //}),
@@ -174,15 +178,15 @@ seajs.use(['index-debug.js'], function (Xian) {
                 //enabled: false,
                 name: "sprite2d_0",
                 alpha: 1,
-                tint: 0xff0000,
+                //tint: 0xff0000,
                 //mask: new Rect(10,10,20,20),
                 texture: Assets.get("img_player")
             }),
             new Renderer2D({
                 filters: [
-                    new FilterLib._classes.BlurXFilter({
-                        blur: 30
-                    }),
+                    //new FilterLib._classes.BlurXFilter({
+                    //    blur: 30
+                    //}),
                     //new FilterLib._classes.AsciiFilter({
                     //    size: 16
                     //}),
@@ -194,20 +198,20 @@ seajs.use(['index-debug.js'], function (Xian) {
                     //        0, 0, 0, 1
                     //    ]
                     //})
-                    //new FilterLib._classes.ColorStepFilter(),
+                    new FilterLib._classes.ColorStepFilter(),
                 ],
             }),
-            new Graphics({
-                //name: "graphics_0",
-                //isMask: true
-            }),
-            new GraphicsBehaviour()
-            //new CacheAsBitmapBehaviour
+            //new Graphics({
+            //    //name: "graphics_0",
+            //    //isMask: true
+            //}),
+            //new GraphicsBehaviour()
+            new CacheAsBitmapBehaviour
         ]
     });
     level1 = new GameObject({
         name: "level1",
-        active: false,
+        //active: false,
         components: [
             new Transform2D({
                 //identity: true
@@ -218,27 +222,9 @@ seajs.use(['index-debug.js'], function (Xian) {
                 alpha: 0.5,
                 //tint: 0x00ff00,
                 //blendMode: Enums.blendModes.ADD,
-                texture: Assets.get("img_player")
+                texture: Assets.get("img_hospital")
             }),
-            new Renderer2D({
-                //filters: [
-                //    //new FilterLib._classes.BlurXFilter({
-                //    //    blur: 30
-                //    //}),
-                //    //new FilterLib._classes.AsciiFilter({
-                //    //    size: 16
-                //    //}),
-                //    //new FilterLib._classes.ColorMatrixFilter({
-                //    //    matrix: [
-                //    //        1, 0, 0, 0,
-                //    //        0, 1, 0, 0,
-                //    //        0, 0, 0, 0,
-                //    //        0, 0, 0, 1
-                //    //    ]
-                //    //})
-                //    new FilterLib._classes.ColorStepFilter(),
-                //],
-            }),
+            new Renderer2D,
             new Sprite2DBehaviour({
                 //enabled: false
             })
@@ -246,7 +232,7 @@ seajs.use(['index-debug.js'], function (Xian) {
     });
     level2 = new GameObject({
         name: "level2",
-        active: false,
+        //active: false,
         components: [
             new Transform2D({
                 //identity: true

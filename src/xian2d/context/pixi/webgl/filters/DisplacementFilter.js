@@ -19,7 +19,7 @@ function DisplacementFilter(opts) {
     //this.passes = [this];
     //texture.baseTexture._powerOf2 = true;
 
-    var texture = opts.map;
+    var texture = undefined;
 
     // set the uniforms
     this.uniforms = {
@@ -29,7 +29,8 @@ function DisplacementFilter(opts) {
         mapDimensions: {type: '2f', value: {x: 1, y: 5112}},
         dimensions: {type: '4fv', value: [0, 0, 0, 0]}
     };
-    if (texture) this.map = texture;
+
+    if (opts.map) this.map = opts.map;
     if (opts.scale) this.scale = opts.scale;
     if (opts.offset) this.offset = opts.offset;
 

@@ -219,7 +219,8 @@ PixiShader.prototype.initSampler2D = function(uniform)
     var gl = this.gl;
 
     gl.activeTexture(gl['TEXTURE' + this.textureCount]);
-    gl.bindTexture(gl.TEXTURE_2D, uniform.value._glTextures[gl.id]);
+    gl.bindTexture(gl.TEXTURE_2D, uniform.value._glTexture);
+    //gl.bindTexture(gl.TEXTURE_2D, uniform.value._glTextures[gl.id]);
 
     //  Extended texture data
     if (uniform.textureData)
@@ -324,16 +325,18 @@ PixiShader.prototype.syncUniforms = function()
             {
                 gl.activeTexture(gl['TEXTURE' + this.textureCount]);
 
-                if(uniform.value._dirty[gl.id])
-                {
-                    //WebGLRenderer2D.instances[gl.id]._updateTexture(uniform.value);
-                    Utils.updateTexture(gl, uniform.value);
-                }
-                else
-                {
-                    // bind the current texture
-                    gl.bindTexture(gl.TEXTURE_2D, uniform.value._glTextures[gl.id]);
-                }
+                gl.renderer.textureManager.getGLTexture(uniform.value, true);
+                //if(uniform.value.needsUpdate)
+                //{
+                //    //WebGLRenderer2D.instances[gl.id]._updateTexture(uniform.value);
+                //    //gl.renderer.textureManager.getGLTexture(uniform.value);
+                //    Utils.updateTexture(gl, uniform.value);
+                //}
+                //else
+                //{
+                //    // bind the current texture
+                //    gl.bindTexture(gl.TEXTURE_2D, uniform.value._glTexture);
+                //}
 
              //   gl.bindTexture(gl.TEXTURE_2D, uniform.value.baseTexture._glTextures[gl.id] || createWebGLTexture( uniform.value.baseTexture, gl));
                 gl.uniform1i(uniform.uniformLocation, this.textureCount);

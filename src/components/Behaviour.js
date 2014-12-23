@@ -41,6 +41,8 @@ Behaviour.prototype.init = function () {
 Behaviour.prototype.start = function () {
     Component.prototype.start.call(this);
 
+    if(this.onLateUpdate)
+        this.gameObject.scene.on("afterRender", this.onLateUpdate.bind(this));
     this.onStart();
 };
 
@@ -53,6 +55,9 @@ Behaviour.prototype.update = function () {
 Behaviour.prototype.destroy = function () {
     Component.prototype.destroy.call(this);
 
+    if(this.onLateUpdate)
+        this.gameObject.scene.off("afterRender", this.onLateUpdate.bind(this));
+
     this.onDestory();
 };
 
@@ -62,6 +67,8 @@ Behaviour.prototype.onStart = function () {
 };
 Behaviour.prototype.onUpdate = function () {
 };
+//Behaviour.prototype.onLateUpdate = function () {
+//};
 //Behaviour.prototype.onEnabled = function () {
 //};
 //Behaviour.prototype.onDisabled = function () {

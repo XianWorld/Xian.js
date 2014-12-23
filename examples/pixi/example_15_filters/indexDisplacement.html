@@ -131,8 +131,8 @@
         game = new Game({
             debug: true,
             canvas: {
-                width: 960,
-                height: 640
+                width: bg_width,
+                height: bg_height
             },
             renderer: {
                 //canvasRenderer: CanvasRenderer2D,
@@ -168,8 +168,8 @@
                 }),
                 new TilingSprite2D({
                     texture: Assets.get("water"),
-                    destWidth: bg_width,
-                    destHeight: bg_height,
+                    width: bg_width,
+                    height: bg_height,
                     alpha: 0.2,
 //                    tint: 0xff0000,
                 }),

@@ -6,6 +6,10 @@ var Component = require("./../../core/component");
 var Assets = require("../../assets/assets");
 var Rect = require("../../math/rect");
 var FilterLib = require("../context/pixi/webgl/filters/FilterLib");
+var Sprite2D = require("./sprite_2d");
+var Camera2D = require("./camera_2d");
+var RenderTexture = require("../../assets/render_texture");
+var Sprite2dData = require("../context/sprite_2d_data");
 
 function Renderer2D(opts) {
     opts || (opts = {});
@@ -25,8 +29,10 @@ function Renderer2D(opts) {
 
     this._boundsSelf = new Rect;
     this._boundsAll = new Rect;
-}
 
+    this._cachedSprite = undefined;
+    this._cacheAsBitmap = false;
+}
 
 Component.extend(Renderer2D);
 
@@ -42,14 +48,11 @@ Object.defineProperty(Renderer2D.prototype, 'mask', {
     }
 });
 Object.defineProperty(Renderer2D.prototype, 'filters', {
-
     get: function () {
         return this._filters;
     },
-
     set: function (value) {
-
-        if (value) {
+        if (value && value.length > 0) {
             // now put all the passes in one place..
             var passes = [];
             for (var i = 0; i < value.length; i++) {
@@ -58,165 +61,139 @@ Object.defineProperty(Renderer2D.prototype, 'filters', {
                     passes.push(filterPasses[j]);
                 }
             }
-
             // TODO change this as it is legacy
             this._filterBlock = {target: this, filterPasses: passes};
+            this._filters = value;
+        }
+        else {
+            this._filterBlock = this._filters = undefined;
+        }
+    }
+});
+Object.defineProperty(Renderer2D.prototype, "cacheAsBitmap", {
+    get: function () {
+        return this._cacheAsBitmap;
+    },
+    set: function (value) {
+        if (this._cacheAsBitmap === value) return;
+
+        if (value) {
+            this._generateCachedSprite();
+        }
+        else {
+            this._destroyCachedSprite();
         }
 
-        this._filters = value;
+        this._cacheAsBitmap = value;
     }
 });
 
 Renderer2D.prototype.copy = function (other) {
+    this.alpha = other.alpha;
+    this.mask = other._mask;
+    this.filterArea = other.filterArea;
+    this.filters = other._filters;
 
     return this;
 };
 
-
 Renderer2D.prototype.clear = function () {
     Component.prototype.clear.call(this);
+    this.alpha = 1;
+    this.mask = undefined;
+    this.filterArea = undefined;
+    this.filters = undefined;
 
     return this;
 };
 
 function _getTransformBounds(transform, bounds, matrix) {
     var children = transform.children,
-        len = children.length, len1,
-        gameObject, components, component,
-        i, j;
+        len = children.length,
+        gameObject, component,
+        i;
 
     for (i = 0; i < len; i++) {
         var child = children[i];
 
         gameObject = child.gameObject;
         if (!gameObject.activeInHierarchy)continue;
-
-        _getTransformBounds(child, bounds);
+        _getTransformBounds(child, bounds, matrix);
     }
 
-    //var minX = bounds.xMin;
-    //var minY = bounds.yMin;
-    //
-    //var maxX = bounds.xMax;
-    //var maxY = bounds.yMax;
-
     var childBounds;
-    var childMaxX;
-    var childMaxY;
 
-    var childVisible = false;
-
+    //transform.updateMatrices(matrix);
     gameObject = transform.gameObject;
     component = gameObject.getComponent("Renderer2D");
     if (component && component.enabled) {
-        //transform.updateMatrices(viewMatrix);
-
-        childVisible = true;
-
         childBounds = component.getBoundsSelf();
 
         bounds.updateBounds(childBounds);
-        //minX = minX < childBounds.x ? minX : childBounds.x;
-        //minY = minY < childBounds.y ? minY : childBounds.y;
-        //
-        //childMaxX = childBounds.width + childBounds.x;
-        //childMaxY = childBounds.height + childBounds.y;
-        //
-        //maxX = maxX > childMaxX ? maxX : childMaxX;
-        //maxY = maxY > childMaxY ? maxY : childMaxY;
     }
-
-    //if (!childVisible)
-    //    return;
-    //
-    //bounds.xMin = minX;
-    //bounds.yMin = minY;
-    //bounds.xMax = maxX;
-    //bounds.yMax = maxY;
-    //
-    //return bounds;
 }
 
 Renderer2D.prototype.getBounds = function (matrix) {
 
     var bounds = this._boundsAll;
     bounds.infinity();
-    _getTransformBounds(this.transform, bounds);
+    _getTransformBounds(this.transform, bounds, matrix);
 
     return bounds;
 };
 
 Renderer2D.prototype.getBoundsSelf = function (matrix) {
-    var transform = this.transform,
-        children = transform.children,
-        len = children.length, len1,
-        gameObject, components, component,
-        i, j;
-
-    //var minX = Infinity;
-    //var minY = Infinity;
-    //
-    //var maxX = -Infinity;
-    //var maxY = -Infinity;
+    var len1, gameObject, components, component, j;
 
     var childBounds;
-    //var childMaxX;
-    //var childMaxY;
     var bounds = this._boundsSelf;
     bounds.infinity();
-
-    var childVisible = false;
 
     gameObject = this.gameObject;
     components = gameObject.getComponents("Renderable2D", true);
     if (components && components.length > 0) {
-
-        //transform.updateMatrices(viewMatrix);
-
         len1 = components.length;
         for (j = 0; j < len1; j++) {
             component = components[j];
             if (!component.enabled) continue;
 
-            childVisible = true;
-
             childBounds = component.getBounds();
-
             bounds.updateBounds(childBounds);
-            //minX = minX < childBounds.x ? minX : childBounds.x;
-            //minY = minY < childBounds.y ? minY : childBounds.y;
-            //
-            //childMaxX = childBounds.width + childBounds.x;
-            //childMaxY = childBounds.height + childBounds.y;
-            //
-            //maxX = maxX > childMaxX ? maxX : childMaxX;
-            //maxY = maxY > childMaxY ? maxY : childMaxY;
         }
     }
-
-    //if (!childVisible)
-    //    return Rect.Empty;
-    //
-    //var bounds = this._boundsSelf;
-    //
-    //bounds.x = minX;
-    //bounds.y = minY;
-    //bounds.width = maxX - minX;
-    //bounds.height = maxY - minY;
-
     return bounds;
 };
 
-//Renderer2D.prototype.update = function () {
-//// multiply the alphas..
-//    var transform = this.transform || this.transform2d;
-//    //this.worldAlpha = this.alpha * transform.parent.worldAlpha;
+//Renderer2D.prototype._render = function (renderer) {
+//    if(this._cacheAsBitmap){
+//        if(!this._cachedSprite){
+//            this._generateCachedSprite();
+//        }
+//        this._cachedSprite.worldMatrix = this.worldMatrix;
+//        this._cachedSprite.worldAlpha = this.worldAlpha;
+//        renderer.renderSprite2D(this._cachedSprite);
+//    }
+//    else{
+//        if(this._cachedSprite){
+//            this._destroyCachedSprite();
+//        }
+//        renderer.renderGraphics(this);
 //
+//    }
 //};
-
 Renderer2D.prototype.startRender = function (renderer) {
-    var transform = this.transform;
 
+    if (this._cacheAsBitmap) {
+        //if (!this._cachedSprite) {
+        //    this._generateCachedSprite();
+        //}
+        this._cachedSprite.worldMatrix = this.transform.modelView;
+        //this._cachedSprite.worldAlpha = this.worldAlpha;
+        renderer.renderSprite2D(this._cachedSprite);
+        return;
+    }
+
+    var transform = this.transform;
     if (this._filters) {
         renderer.pushFilter(this._filterBlock);
     }
@@ -227,15 +204,12 @@ Renderer2D.prototype.startRender = function (renderer) {
 
     var children = transform.children,
         len = children.length,
-        gameObject, components, component,
-        i, mask, colorTransform;
+        gameObject, components, component, i;
 
     gameObject = transform.gameObject;
     //TODO local iterate gameObject.components and add a bool to the renderable2d component
     components = gameObject.getComponents("Renderable2D", true);
     if (components && components.length > 0) {
-
-        //transform.updateMatrices(viewMatrix);
 
         len = components.length;
         for (i = 0; i < len; i++) {
@@ -243,7 +217,6 @@ Renderer2D.prototype.startRender = function (renderer) {
             if (!component.enabled) continue;
 
             component.worldAlpha = this.worldAlpha * component.alpha;
-
             component.update();
             component._render(renderer);
         }
@@ -251,6 +224,10 @@ Renderer2D.prototype.startRender = function (renderer) {
 };
 
 Renderer2D.prototype.finishRender = function (renderer) {
+    if (this._cacheAsBitmap) {
+        return;
+    }
+
     if (this._mask) {
         renderer.popMask(this._mask);
     }
@@ -259,13 +236,62 @@ Renderer2D.prototype.finishRender = function (renderer) {
     }
 };
 
+Renderer2D.prototype._generateCachedSprite = function () {
+
+    var gameObject = this.gameObject;
+    var camera2d = gameObject.addComponent(new Camera2D({name: "camera_temp", transparent: true}));
+    var children = gameObject.transform.children;
+    camera2d.update();
+    camera2d.updateMVP(gameObject.transform);
+    var bounds = this.getBounds();
+    var renderTexture = new RenderTexture({width: bounds.width, height: bounds.height});
+    camera2d.renderTexture = renderTexture;
+    this._cacheAsBitmap = false;
+    camera2d.render(gameObject.transform);
+    this._cacheAsBitmap = true;
+    //camera2d.enabled = false;
+    gameObject.removeComponent(camera2d);
+
+    //this._cachedSprite = gameObject.addComponent(new Sprite2D({name: "sprite2d_temp"}));
+    //this._cachedSprite.texture = camera2d.renderTexture;
+    var i = children.length;
+    while (i--)
+        children[i].gameObject.setActive(false);
+
+    this._cachedSprite = new Sprite2dData();//gameObject.addComponent(new Sprite2D({name: "sprite2d_temp"}));
+    this._cachedSprite.destTexture = camera2d.renderTexture;
+    this._cachedSprite.sourceWidth = bounds.width;
+    this._cachedSprite.sourceHeight = bounds.height;
+    this._cachedSprite.destX = -bounds.x;
+    this._cachedSprite.destX = -bounds.y;
+    this._cachedSprite.destWidth = bounds.width;
+    this._cachedSprite.destHeight = bounds.height;
+
+    // now render the graphic..
+    this._cachedSprite.worldAlpha = 1;
+};
+Renderer2D.prototype._destroyCachedSprite = function () {
+    var gameObject = this.gameObject;
+    gameObject.removeComponent(this._cachedSprite);
+    this._cachedSprite.destroy();
+
+    // let the gc collect the unused sprite
+    // TODO could be object pooled!
+    this._cachedSprite = undefined;
+
+    var children = gameObject.transform.children;
+    var i = children.length;
+    while (i--)
+        children[i].gameObject.setActive(true);
+};
+
 Renderer2D.prototype.toJSON = function (json) {
     json = Component.prototype.toJSON.call(this, json);
 
     json.alpha = this.alpha;
 
-    //if(this.mask)
-    //    json.mask = this.mask.toJSON(json.mask);
+    if (this._mask)
+        json.mask = this._mask._id;
 
     if (this._filters) {
         json.filters = [];
@@ -287,12 +313,21 @@ Renderer2D.prototype.fromJSON = function (json) {
 
     this.alpha = json.alpha;
 
-    //if(json.mask){
-    //    this.mask = new Rect();
-    //    this.mask.fromJSON(json.mask);
-    //}
-    //else
-    //    this.mask = undefined;
+    //TODO how to confirm the unique id for the component
+    if (json.mask) {
+        var scene;
+        if (this.gameObject && (scene = this.gameObject.scene)) {
+            this.mask = scene.findComponentByJSONId(json.mask);
+        } else {
+            this.once("init", function () {
+                scene = this.gameObject.scene;
+                this.mask = scene.findComponentByJSONId(json.mask);
+            });
+        }
+    }
+    else {
+        this.mask = undefined;
+    }
 
     if (json.filters) {
         var filters = [];

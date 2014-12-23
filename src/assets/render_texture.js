@@ -31,11 +31,13 @@ RenderTexture.prototype.getBuffer = function (renderer) {
     //if(this.renderer.type === WEBGL_RENDERER)
     if (this.renderer.gl) {
         var gl = this.renderer.gl;
-        this._dirty[gl.id] = false;
+        this.needsUpdate = false;
+        //this._dirty[gl.id] = false;
 
         this.textureBuffer = new FilterTexture(gl, this.width * this.resolution, this.height * this.resolution, this.filter);
-        this._glTextures[gl.id] = this.textureBuffer.texture;
-        this.webGLTexture = this.textureBuffer.texture;
+        //this._glTextures[gl.id] = this.textureBuffer.texture;
+        //this.webGLTexture = this.textureBuffer.texture;
+        this._glTexture = this.textureBuffer.texture;
 
         //this.render = this.renderWebGL;
         //this.projection = new Vec2(this.width*0.5, -this.height*0.5);
@@ -115,98 +117,5 @@ RenderTexture.prototype.getCanvas = function () {
         return this.textureBuffer.canvas;
     }
 };
-
-///**
-// * This function will draw the display object to the texture.
-// *
-// * @method renderWebGL
-// * @param displayObject {DisplayObject} The display object to render this texture on
-// * @param [matrix] {Matrix} Optional matrix to apply to the display object before rendering.
-// * @param [clear] {Boolean} If true the texture will be cleared before the displayObject is drawn
-// * @private
-// */
-//RenderTexture.prototype.renderWebGL = function(displayObject, matrix, clear)
-//{
-//    if(!this.valid)return;
-//    //TOOD replace position with matrix..
-//
-//    //Lets create a nice matrix to apply to our display object. Frame buffers come in upside down so we need to flip the matrix
-//    var wt = displayObject.worldTransform;
-//    wt.identity();
-//    wt.translate(0, this.projection.y * 2);
-//    if(matrix)wt.append(matrix);
-//    wt.scale(1,-1);
-//
-//    // setWorld Alpha to ensure that the object is renderer at full opacity
-//    displayObject.worldAlpha = 1;
-//
-//    // Time to update all the children of the displayObject with the new matrix..
-//    var children = displayObject.children;
-//
-//    for(var i=0,j=children.length; i<j; i++)
-//    {
-//        children[i].updateTransform();
-//    }
-//
-//    // time for the webGL fun stuff!
-//    var gl = this.renderer.gl;
-//
-//    gl.viewport(0, 0, this.width * this.resolution, this.height * this.resolution);
-//
-//    gl.bindFramebuffer(gl.FRAMEBUFFER, this.textureBuffer.frameBuffer );
-//
-//    if(clear)this.textureBuffer.clear();
-//
-//    this.renderer.spriteBatch.dirty = true;
-//
-//    this.renderer.renderDisplayObject(displayObject, this.projection, this.textureBuffer.frameBuffer);
-//
-//    this.renderer.spriteBatch.dirty = true;
-//};
-//
-//
-///**
-// * This function will draw the display object to the texture.
-// *
-// * @method renderCanvas
-// * @param displayObject {DisplayObject} The display object to render this texture on
-// * @param [matrix] {Matrix} Optional matrix to apply to the display object before rendering.
-// * @param [clear] {Boolean} If true the texture will be cleared before the displayObject is drawn
-// * @private
-// */
-//RenderTexture.prototype.renderCanvas = function(displayObject, matrix, clear)
-//{
-//    if(!this.valid)return;
-//
-//    var wt = displayObject.worldTransform;
-//    wt.identity();
-//    if(matrix)wt.append(matrix);
-//
-//    // setWorld Alpha to ensure that the object is renderer at full opacity
-//    displayObject.worldAlpha = 1;
-//
-//    // Time to update all the children of the displayObject with the new matrix..
-//    var children = displayObject.children;
-//
-//    for(var i = 0, j = children.length; i < j; i++)
-//    {
-//        children[i].updateTransform();
-//    }
-//
-//    if(clear)this.textureBuffer.clear();
-//
-//    var context = this.textureBuffer.context;
-//
-//    var realResolution = this.renderer.resolution;
-//
-//    this.renderer.resolution = this.resolution;
-//
-//    this.renderer.renderDisplayObject(displayObject, context);
-//
-//    this.renderer.resolution = realResolution;
-//};
-//
-//
-//RenderTexture.tempMatrix = new Matrix();
 
 module.exports = RenderTexture;

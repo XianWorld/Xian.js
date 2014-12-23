@@ -26,8 +26,6 @@ function Sprite2D(opts) {
     this.destWidth = 0;
     this.destHeight = 0;
     this.destTexture = undefined;
-
-    //this._dirtyRenderSize = true;
 }
 
 Renderable2D.extend(Sprite2D);
@@ -39,10 +37,8 @@ Object.defineProperty(Sprite2D.prototype, "texture", {
     set: function (value) {
         if (this._texture === value) return;
         this._texture = value;
-        //this.destTexture = value;
-
         this._dirtyRender = true;
-        //this._updateRenderSize();
+        this._dirtyLocalBounds = true;
     }
 });
 Object.defineProperty(Sprite2D.prototype, "textureClip", {
@@ -51,9 +47,8 @@ Object.defineProperty(Sprite2D.prototype, "textureClip", {
     },
     set: function (value) {
         this._textureClip = value;
-
         this._dirtyRender = true;
-        //this._updateRenderSize();
+        this._dirtyLocalBounds = true;
     }
 });
 Object.defineProperty(Sprite2D.prototype, "width", {
@@ -63,8 +58,8 @@ Object.defineProperty(Sprite2D.prototype, "width", {
     set: function (value) {
         if(this._width === value) return;
         this._width = value;
-
         this._dirtyRender = true;
+        this._dirtyLocalBounds = true;
     }
 });
 Object.defineProperty(Sprite2D.prototype, "height", {
@@ -74,8 +69,8 @@ Object.defineProperty(Sprite2D.prototype, "height", {
     set: function (value) {
         if(this._height === value) return;
         this._height = value;
-
         this._dirtyRender = true;
+        this._dirtyLocalBounds = true;
     }
 });
 
@@ -105,55 +100,68 @@ Sprite2D.prototype._updateRenderSize = function () {
         this.destWidth = this._width <= 0 ? texture.width : this._width;//;
         this.destHeight = this._height <= 0 ? texture.height : this._height;
     }
-    //this._dirtyRenderSize = false;
 
     this.destTexture = texture;
-
-    var bounds = this._localBounds;
-    bounds.x =this.destX;
-    bounds.y =this.destY;
-    bounds.width =this.destWidth;
-    bounds.height =this.destHeight;
+    //
+    //var bounds = this._localBounds;
+    //bounds.x =this.destX;
+    //bounds.y =this.destY;
+    //bounds.width =this.destWidth;
+    //bounds.height =this.destHeight;
 
     return this;
+};
+
+Sprite2D.prototype.getLocalBounds = function()
+{
+    if(this._dirtyLocalBounds){
+        var texture = this._texture,
+            textureClip = this._textureClip;
+        var bounds = this._localBounds;
+
+        if (textureClip) {
+            bounds.x = -textureClip.offsetX;
+            bounds.y = -textureClip.offsetY;
+            bounds.width = this._width <= 0 ? textureClip.clipWidth : this._width;
+            bounds.height = this._height <= 0 ? textureClip.clipHeight : this._height;
+        }
+        else if (texture) {
+            bounds.x = 0;
+            bounds.y = 0;
+            bounds.width = this._width <= 0 ? texture.width : this._width;//;
+            bounds.height = this._height <= 0 ? texture.height : this._height;
+        }
+        this._dirtyLocalBounds = false;
+    }
+    return this._localBounds;
 };
 
 Sprite2D.prototype.copy = function (other) {
+    Renderable2D.prototype.copy.call(this, other);
+
+    this.width = other._width;
+    this.height = other._height;
+    this.texture = other.texture;
+    //TODO need test
+    this.textureClip = other.textureClip;
 
     return this;
 };
-
 
 Sprite2D.prototype.clear = function () {
     Renderable2D.prototype.clear.call(this);
 
+    this.width = 0;
+    this.height = 0;
+    this.texture = undefined;
+    this.textureClip = undefined;
+
     return this;
 };
 
-//Sprite2D.prototype.getLocalBounds = function()
-//{
-//    var bounds = this._localBounds;
-//    var texture = this._texture,
-//        textureClip = this.textureClip;
-//
-//    if(!texture) return bounds;
-//
-//    bounds.x = textureClip ? -textureClip.offsetX : 0;
-//    bounds.y = textureClip ? -textureClip.offsetX : 0;
-//    bounds.width = textureClip ? textureClip.clipWidth : texture.width;
-//    bounds.height = textureClip ? textureClip.clipHeight : texture.height;
-//
-//    return bounds;//this.getBounds(Mat32.Identity);///PIXI.EmptyRectangle();
-//};
-
-Sprite2D.prototype.update = function () {
-    Renderable2D.prototype.update.call(this);
-
-};
 Sprite2D.prototype._render = function (renderer) {
     if(this._dirtyRender){
         this._updateRenderSize();
-
         this._dirtyRender = false;
     }
 
@@ -164,16 +172,21 @@ Sprite2D.prototype._render = function (renderer) {
 Sprite2D.prototype.toJSON = function (json) {
     json = Renderable2D.prototype.toJSON.call(this, json);
 
+    json.width = this._width;
+    json.height = this._height;
     json.texture = this.texture ? this.texture.name : undefined;
+    if(json.textureClip) this.textureClip.fromJSON(json.textureClip);
 
     return json;
 };
 
-
 Sprite2D.prototype.fromJSON = function (json) {
     Renderable2D.prototype.fromJSON.call(this, json);
 
+    this.width = json.width;
+    this.height = json.height;
     this.texture = json.texture ? Assets.get(json.texture) : undefined;
+    if(this.textureClip) json.textureClip.toJSON(json.textureClip);
 
     return this;
 };

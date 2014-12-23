@@ -68,6 +68,7 @@ Asset.prototype.copy = function (other) {
 Asset.prototype.clear = function () {
 
     this.raw = null;
+
     return this;
 };
 
@@ -78,9 +79,11 @@ Asset.prototype.destroy = function () {
         return this;
     }
 
+    this.emit("destroy", this);
     this.assets.removeAsset(this);
     this.clear();
 
+    this.off();
     return this;
 };
 

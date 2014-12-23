@@ -26,14 +26,6 @@ function Texture(opts) {
 
     this.resolution = 1;
 
-    //this._webgl = undefined;
-    this.webGLTexture = undefined;
-    //this._webglUsed = 0;
-
-    this._glTextures = [];
-
-    this._dirty = [true, true, true, true];
-
     this.needsUpdate = true;
 
     this._powerOf2 = false;
@@ -41,6 +33,12 @@ function Texture(opts) {
 
 Asset.extend(Texture);
 
+Texture.prototype.clear = function () {
+
+    this.raw = null;
+
+    return this;
+};
 
 Texture.prototype.copy = function (other) {
     Asset.prototype.copy.call(this, other);
@@ -151,7 +149,6 @@ Texture.prototype.toJSON = function (json, pack) {
     return json;
 };
 
-
 Texture.prototype.fromJSON = function (json) {
     Asset.prototype.fromJSON.call(this, json);
 
@@ -183,6 +180,5 @@ Texture.prototype.fromJSON = function (json) {
 
     return this;
 };
-
 
 module.exports = Texture;

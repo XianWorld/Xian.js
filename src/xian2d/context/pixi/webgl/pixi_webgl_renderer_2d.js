@@ -6,6 +6,7 @@ var Color = require("../../../../math/color");
 var Mat32 = require("../../../../math/mat32");
 var Vec2 = require("../../../../math/vec2");
 var WebGLShaderManager = require("./utils/WebGLShaderManager");
+var WebGLTextureManager = require("./utils/WebGLTextureManager");
 var WebGLSpriteBatch = require("./utils/WebGLSpriteBatch");
 var WebGLMaskManager = require("./utils/WebGLMaskManager");
 var WebGLFilterManager = require("./utils/WebGLFilterManager");
@@ -34,8 +35,8 @@ function PIXIWebGLRenderer2D(canvas, opts) {
     this.canvas.addEventListener("webglcontextrestored", this._handleContextRestored.bind(this), false);
 
     //TODO should a total solution for autosize
-    this.width = this.canvas.width;
-    this.height = this.canvas.height;
+    //this.width = this.canvas.width;
+    //this.height = this.canvas.height;
 
     this.projection = new Vec2;
     this.offset = new Vec2;
@@ -54,6 +55,7 @@ function PIXIWebGLRenderer2D(canvas, opts) {
     };
 
     this.shaderManager = new WebGLShaderManager();
+    this.textureManager = new WebGLTextureManager();
     this.spriteBatch = new WebGLSpriteBatch();
     this.maskManager = new WebGLMaskManager();
     this.filterManager = new WebGLFilterManager();
@@ -89,12 +91,13 @@ PIXIWebGLRenderer2D.prototype.startRender = function (renderTexture) {
         gl.viewport(0, 0, renderTexture.width, renderTexture.height);
         gl.bindFramebuffer(gl.FRAMEBUFFER, buffer.frameBuffer);
 
+        buffer.clear();
         // start the sprite batch
         this.spriteBatch.begin(this);
 
         // start the filter manager
         //this.filterManager.begin(this);
-        this.filterManager.begin(this, buffer);
+        this.filterManager.begin(this, buffer.frameBuffer);
         this.blendModeManager.setBlendMode(Enums.blendModes.NORMAL);
 
     }else{
@@ -338,9 +341,10 @@ PIXIWebGLRenderer2D.prototype._initContext = function()
     }
     //gl.id = this.glContextId++;
     this.glContextId = gl.id = PIXIWebGLRenderer2D.glContextId ++;
+    gl.renderer = this;
 
-    PIXIWebGLRenderer2D.glContexts[this.glContextId] = gl;
-    PIXIWebGLRenderer2D.instances[this.glContextId] = this;
+    //PIXIWebGLRenderer2D.glContexts[this.glContextId] = gl;
+    //PIXIWebGLRenderer2D.instances[this.glContextId] = this;
 
     // set up the default pixi settings..
     gl.disable(gl.DEPTH_TEST);
@@ -349,6 +353,7 @@ PIXIWebGLRenderer2D.prototype._initContext = function()
 
     // need to set the context for all the managers...
     this.shaderManager.setContext(gl);
+    this.textureManager.setContext(gl);
     this.spriteBatch.setContext(gl);
     this.maskManager.setContext(gl);
     this.filterManager.setContext(gl);
@@ -383,11 +388,15 @@ PIXIWebGLRenderer2D.prototype._resize = function(width, height)
 PIXIWebGLRenderer2D.prototype._handleContextLost = function (event) {
     event.preventDefault();
     this.contextLost = true;
+    this.textureManager.clear();
 };
 
 PIXIWebGLRenderer2D.prototype._handleContextRestored = function () {
-    this.initWebGL();
-    this.shaderManager.setContext(this.gl);
+    this._initContext();
+    //this.shaderManager.setContext(this.gl);
+
+    //TODO how to release all lost context related object?
+
     this.contextLost = false;
 };
 
