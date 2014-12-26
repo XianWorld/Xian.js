@@ -45,7 +45,6 @@ windowOnResize();
  * @brief canvas helper
  * @param {Object} options
  */
-
 function Canvas() {
 
     EventEmitter.call(this);

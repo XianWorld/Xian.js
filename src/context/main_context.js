@@ -4,17 +4,19 @@
 var Device = require('./device');
 var Input = require('./input');
 var TimeContext = require('./time');
-var RendererContext = require('./renderer_context');
 var NetContext = require('./socket.io');
 var AudioContext = require('./audio_ctx');
-var CanvasContext = require('./canvas');
+//var CanvasContext = require('./canvas');
 var LogContext = require('./log');
+var ScreenContext = require('./screen_context');
+var RendererContext = require('./renderer_context');
 
 function MainContext()
 {
     this.Device = Device;
     this.Input = Input;
-    this.CanvasContext = CanvasContext;
+    //this.CanvasContext = CanvasContext;
+    this.ScreenContext = ScreenContext;
     this.RendererContext = RendererContext;
     this.Time = TimeContext;
     this.Net = NetContext;
@@ -24,7 +26,8 @@ function MainContext()
 
 MainContext.prototype.init = function()
 {
-    this.CanvasContext.init();
+    //this.CanvasContext.init();
+    this.ScreenContext.init();
     this.RendererContext.init();
     //this.Input.init();
     return this;

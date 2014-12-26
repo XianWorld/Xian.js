@@ -6,6 +6,7 @@ var Color = require("../../../math/color");
 var Mat32 = require("../../../math/mat32");
 var WebGLShaderManager = require("./webgl_shader_manager");
 var WebGLTextureManager = require("./utils/webgl_texture_manager");
+var ScreenContext = require('../../../context/screen_context');
 
 "use strict";
 
@@ -29,8 +30,8 @@ function WebGLRenderer2D(canvas, opts) {
     this.canvas.addEventListener("webglcontextlost", this._handleContextLost.bind(this), false);
     this.canvas.addEventListener("webglcontextrestored", this._handleContextRestored.bind(this), false);
 
-    this.projectionX = this.canvas.width / 2;
-    this.projectionY = -this.canvas.height / 2;
+    //this.projectionX = this.canvas.width / 2;
+    //this.projectionY = -this.canvas.height / 2;
     var numVerts = this.size * 4 * this.vertSize;
     var numIndices = this.size * 6;
     this.vertices = new Float32Array(numVerts);
@@ -56,27 +57,43 @@ function WebGLRenderer2D(canvas, opts) {
 
 Renderer2D.extend(WebGLRenderer2D);
 
-WebGLRenderer2D.prototype.startRender = function (renderTexture) {
+WebGLRenderer2D.prototype.startRender = function (renderTexture, viewportRect) {
 
     var gl = this.gl;
     gl.colorMask(true, true, true, true);
+
+    var viewportWidth, viewportHeight, x, y, width, height;
 
     if(renderTexture !== undefined){
         this.renderTexture = renderTexture;
         var buffer = renderTexture.getBuffer(this);
 
-        this.projectionX = renderTexture.width / 2;
-        this.projectionY = -renderTexture.height / 2;
+        viewportWidth = renderTexture.width;//this.canvas.width;
+        viewportHeight = renderTexture.height;//this.canvas.height;
+        x = viewportRect.x * viewportWidth;
+        y = viewportRect.y * viewportHeight;
+        width = viewportRect.width * viewportWidth;
+        height = viewportRect.height * viewportHeight;
 
-        gl.viewport(0, 0, renderTexture.width, renderTexture.height);
+        this.projectionX = viewportWidth / 2;
+        this.projectionY = -viewportHeight / 2;
+
+        gl.viewport(x, y, width, height);
         gl.bindFramebuffer(gl.FRAMEBUFFER, buffer.frameBuffer);
     }else{
         this.renderTexture = undefined;
 
-        this.projectionX = this.canvas.width / 2;
-        this.projectionY = -this.canvas.height / 2;
+        viewportWidth = ScreenContext._viewWidth;//this.canvas.width;
+        viewportHeight = ScreenContext._viewHeight;//this.canvas.height;
+        x = viewportRect.x * viewportWidth;
+        y = viewportRect.y * viewportHeight;
+        width = viewportRect.width * viewportWidth;
+        height = viewportRect.height * viewportHeight;
 
-        gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+        this.projectionX = viewportWidth / 2;
+        this.projectionY = -viewportHeight / 2;
+
+        gl.viewport(x, y, width, height);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
     this.rendering = true;

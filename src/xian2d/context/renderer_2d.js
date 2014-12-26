@@ -54,6 +54,9 @@ AbstractRenderer2D.prototype.pushFilter = function (filterBlock) {
 AbstractRenderer2D.prototype.popFilter = function () {
 };
 
+AbstractRenderer2D.prototype.resize = function (stageWidth, stageHeight, scaleX, scaleY) {
+};
+
 //AbstractRenderer2D.prototype.drawImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
 //    if (repeat === void 0) {
 //        repeat = "no-repeat";

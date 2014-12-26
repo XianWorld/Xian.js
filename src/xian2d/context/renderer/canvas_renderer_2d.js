@@ -3,6 +3,8 @@ var Enums = require("../../../core/enums");
 var Dom = require("../../../context/dom");
 var util = require("../../../base/util");
 var Color = require("../../../math/color");
+var ScreenContext = require('../../../context/screen_context');
+
 "use strict";
 
 function CanvasRenderer2D(canvas, opts) {
@@ -49,7 +51,7 @@ function CanvasRenderer2D(canvas, opts) {
 
 Renderer2D.extend(CanvasRenderer2D);
 
-CanvasRenderer2D.prototype.startRender = function (renderTexture) {
+CanvasRenderer2D.prototype.startRender = function (renderTexture, viewportRect) {
     if(renderTexture !== undefined){
         var buffer = renderTexture.getBuffer(this);
         if(!buffer.context._inited)
@@ -59,11 +61,13 @@ CanvasRenderer2D.prototype.startRender = function (renderTexture) {
         this.canvasContext = this.mainContext;
     }
 
+    this.viewportRect = viewportRect;
     this.rendering = true;
     this.canvasContext.save();
 };
 
 CanvasRenderer2D.prototype.finishRender = function (renderTexture) {
+    this.viewportRect = undefined;
     this.canvasContext.restore();
     this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
     this.canvasContext.globalAlpha = this.globalAlpha = 1;
@@ -72,20 +76,23 @@ CanvasRenderer2D.prototype.finishRender = function (renderTexture) {
 };
 
 CanvasRenderer2D.prototype.clearScreen = function (transparent, background) {
-    //if (navigator.isCocoonJS && this.canvas.screencanvas) {
-    //    this.canvasContext.fillStyle = "black";
-    //    this.canvasContext.clear();
-    //}
-
+    var viewportRect = this.viewportRect;
+    var viewportWidth = ScreenContext._viewWidth;//this.canvas.width;
+    var viewportHeight = ScreenContext._viewHeight;//this.canvas.height;
+    var x = viewportRect.x * viewportWidth;
+    var y = viewportRect.y * viewportHeight;
+    var width = viewportRect.width * viewportWidth;
+    var height = viewportRect.height * viewportHeight;
+    //TODO should clip to the viewport when render
     if (transparent)
     {
-        this._clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this._clearRect(x, y, width, height);
     }
     else
     {
         this.canvasContext.fillStyle = background.toHEX();//Color.colorNames.blue;//this.backgroundColorString;
         //this.canvasContext.clear();
-        this.canvasContext.fillRect(0, 0, this.canvas.width , this.canvas.height);
+        this.canvasContext.fillRect(x, y, width , height);
     }
 
     //this.clearRect(0, 0, this.canvas.width, this.canvas.height);

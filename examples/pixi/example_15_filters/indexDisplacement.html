@@ -130,17 +130,19 @@
 
         game = new Game({
             debug: true,
-            canvas: {
-                width: bg_width,
-                height: bg_height
+            screen: {
+                designWidth: bg_width,
+                designHeight: bg_height,
+                autoSize: true,
+                resolutionPolicy: new ResolutionPolicy({
+                    contentStrategy: ContentStrategy.get("ShowAll"),//FullScreen//ShowAll
+                })
             },
             renderer: {
                 //canvasRenderer: CanvasRenderer2D,
                 canvasRenderer: PIXICanvasRenderer2D,
                 //webglRenderer: WebGLRenderer2D
                 webglRenderer: PIXIWebGLRenderer2D,
-                width: bg_width,
-                height: bg_height
             }
         });
 

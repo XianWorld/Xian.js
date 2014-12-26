@@ -6,6 +6,7 @@ var Color = require("../../../../math/color");
 var CanvasGraphics = require("./utils/canvas_graphics");
 var CanvasMaskManager = require("./utils/canvas_mask_manager");
 var CanvasTinter = require("./utils/canvas_tinter");
+var ScreenContext = require('../../../../context/screen_context');
 
 "use strict";
 
@@ -54,7 +55,7 @@ function PIXICanvasRenderer2D(canvas, opts) {
 
 Renderer2D.extend(PIXICanvasRenderer2D);
 
-PIXICanvasRenderer2D.prototype.startRender = function (renderTexture) {
+PIXICanvasRenderer2D.prototype.startRender = function (renderTexture, viewportRect) {
     if(renderTexture !== undefined){
         var buffer = renderTexture.getBuffer(this);
         if(!buffer.context._inited)
@@ -64,6 +65,7 @@ PIXICanvasRenderer2D.prototype.startRender = function (renderTexture) {
         this.canvasContext = this.mainContext;
     }
 
+    this.viewportRect = viewportRect;
     this.rendering = true;
     this.canvasContext.save();
 };
@@ -77,21 +79,22 @@ PIXICanvasRenderer2D.prototype.finishRender = function (renderTexture) {
 };
 
 PIXICanvasRenderer2D.prototype.clearScreen = function (transparent, background) {
-    //if (navigator.isCocoonJS && this.canvas.screencanvas) {
-    //    this.canvasContext.fillStyle = "black";
-    //    this.canvasContext.clear();
-    //}
-    //this.canvasContext.globalAlpha = this.globalAlpha = 1;
-
+    var viewportRect = this.viewportRect;
+    var viewportWidth = ScreenContext._viewWidth;//this.canvas.width;
+    var viewportHeight = ScreenContext._viewHeight;//this.canvas.height;
+    var x = viewportRect.x * viewportWidth;
+    var y = viewportRect.y * viewportHeight;
+    var width = viewportRect.width * viewportWidth;
+    var height = viewportRect.height * viewportHeight;
     if (transparent)
     {
-        this._clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this._clearRect(x, y, width, height);
     }
     else
     {
         this.canvasContext.fillStyle = background.toHEX();//Color.colorNames.blue;//this.backgroundColorString;
         //this.canvasContext.clear();
-        this.canvasContext.fillRect(0, 0, this.canvas.width , this.canvas.height);
+        this.canvasContext.fillRect(x, y, width, height);
     }
 
     //this.clearRect(0, 0, this.canvas.width, this.canvas.height);
