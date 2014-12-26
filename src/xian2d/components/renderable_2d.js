@@ -72,7 +72,7 @@ Renderable2D.prototype.getLocalBounds = function()
 Renderable2D.prototype.update = function () {
     this.worldMatrix = this.transform.modelView;
     //when transform changed, the world bounds will update
-    if(this.transform._matrix_changed)
+    if(this.transform._pvm_changed)
         this._dirtyBounds = true;
 };
 

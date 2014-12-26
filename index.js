@@ -34,6 +34,9 @@ function Xian() {
 
     //context
     this.MainContext = require("./src/context/main_context");
+    this.ResolutionPolicy = require("./src/context/screen/ResolutionPolicy");
+    this.ContainerStrategy = require("./src/context/screen/ContainerStrategy");
+    this.ContentStrategy = require("./src/context/screen/ContentStrategy");
     //this.AudioCtx = require("./context/audio_ctx");
     //this.Device = require("./context/device");
     //this.Dom = require("./context/dom");

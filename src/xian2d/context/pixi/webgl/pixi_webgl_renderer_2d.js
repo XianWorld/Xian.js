@@ -13,6 +13,7 @@ var WebGLFilterManager = require("./utils/WebGLFilterManager");
 var WebGLStencilManager = require("./utils/WebGLStencilManager");
 var WebGLBlendModeManager = require("./utils/WebGLBlendModeManager");
 var WebGLGraphics = require("./utils/WebGLGraphics");
+var ScreenContext = require('../../../../context/screen_context');
 
 "use strict";
 
@@ -21,9 +22,9 @@ function PIXIWebGLRenderer2D(canvas, opts) {
 
     Renderer2D.call(this, opts);
 
-    this.width = opts.width || 800;
-    this.height = opts.height || 600;
-    this.autoResize = opts.autoResize || false;
+    //this.width = opts.width || 800;
+    //this.height = opts.height || 600;
+    //this.autoResize = opts.autoResize || false;
 
     this.canvasContext = document.createElement("canvas").getContext("2d");
 
@@ -43,8 +44,8 @@ function PIXIWebGLRenderer2D(canvas, opts) {
 
     this.resolution = opts.resolution || 1;
 
-    this.projection.x =  this.width / 2;// / this.resolution;
-    this.projection.y =  -this.height / 2;// / this.resolution;
+    //this.projection.x =  this.width / 2;// / this.resolution;
+    //this.projection.y =  -this.height / 2;// / this.resolution;
 
     this._contextOptions = {
         alpha: true,//this.transparent,
@@ -75,23 +76,31 @@ function PIXIWebGLRenderer2D(canvas, opts) {
 Renderer2D.extend(PIXIWebGLRenderer2D);
 
 
-PIXIWebGLRenderer2D.prototype.startRender = function (renderTexture) {
+PIXIWebGLRenderer2D.prototype.startRender = function (renderTexture, viewportRect) {
     if(this.contextLost)return;
 
     var gl = this.gl;
     //gl.colorMask(true, true, true, true);
 
+    var viewportWidth, viewportHeight, x, y, width, height;
     if(renderTexture !== undefined){
         this.renderTexture = renderTexture;
         var buffer = renderTexture.getBuffer(this);
 
-        this.projection.x =  renderTexture.width / 2;// / this.resolution;
-        this.projection.y =  -renderTexture.height / 2;// / this.resolution;
+        viewportWidth = renderTexture.width;//this.canvas.width;
+        viewportHeight = renderTexture.height;//this.canvas.height;
+        x = viewportRect.x * viewportWidth;
+        y = viewportRect.y * viewportHeight;
+        width = viewportRect.width * viewportWidth;
+        height = viewportRect.height * viewportHeight;
 
-        gl.viewport(0, 0, renderTexture.width, renderTexture.height);
+        this.projection.x =  viewportWidth / 2;// / this.resolution;
+        this.projection.y =  -viewportHeight / 2;// / this.resolution;
+
+        gl.viewport(x, y, width, height);
         gl.bindFramebuffer(gl.FRAMEBUFFER, buffer.frameBuffer);
 
-        buffer.clear();
+        //buffer.clear();
         // start the sprite batch
         this.spriteBatch.begin(this);
 
@@ -103,10 +112,17 @@ PIXIWebGLRenderer2D.prototype.startRender = function (renderTexture) {
     }else{
         this.renderTexture = undefined;
 
-            this.projection.x = this.width / 2;
-        this.projection.y = -this.height / 2;
+        viewportWidth = ScreenContext._viewWidth;//this.canvas.width;
+        viewportHeight = ScreenContext._viewHeight;//this.canvas.height;
+        x = viewportRect.x * viewportWidth;
+        y = viewportRect.y * viewportHeight;
+        width = viewportRect.width * viewportWidth;
+        height = viewportRect.height * viewportHeight;
 
-        gl.viewport(0, 0, this.width, this.height);
+        this.projection.x =  viewportWidth / 2;// / this.resolution;
+        this.projection.y =  -viewportHeight / 2;// / this.resolution;
+
+        gl.viewport(x, y, width, height);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         // start the sprite batch
@@ -363,27 +379,27 @@ PIXIWebGLRenderer2D.prototype._initContext = function()
     //this.renderSession.gl = this.gl;
 
     // now resize and we are good to go!
-    this._resize(this.width, this.height);
+    //this._resize(this.width, this.height);
 };
 
-PIXIWebGLRenderer2D.prototype._resize = function(width, height)
-{
-    this.width = width * this.resolution;
-    this.height = height * this.resolution;
-
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
-
-    if (this.autoResize) {
-        this.canvas.style.width = this.width / this.resolution + 'px';
-        this.canvas.style.height = this.height / this.resolution + 'px';
-    }
-
-    this.gl.viewport(0, 0, this.width, this.height);
-
-    this.projection.x =  this.width / 2 / this.resolution;
-    this.projection.y =  -this.height / 2 / this.resolution;
-};
+//PIXIWebGLRenderer2D.prototype._resize = function(width, height)
+//{
+//    this.width = width * this.resolution;
+//    this.height = height * this.resolution;
+//
+//    this.canvas.width = this.width;
+//    this.canvas.height = this.height;
+//
+//    if (this.autoResize) {
+//        this.canvas.style.width = this.width / this.resolution + 'px';
+//        this.canvas.style.height = this.height / this.resolution + 'px';
+//    }
+//
+//    this.gl.viewport(0, 0, this.width, this.height);
+//
+//    this.projection.x =  this.width / 2 / this.resolution;
+//    this.projection.y =  -this.height / 2 / this.resolution;
+//};
 
 PIXIWebGLRenderer2D.prototype._handleContextLost = function (event) {
     event.preventDefault();

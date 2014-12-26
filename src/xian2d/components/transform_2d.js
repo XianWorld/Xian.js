@@ -39,7 +39,10 @@ function Transform2D(opts) {
     //this.normalMatrix = new Mat3;
 
     this._dirty_rotation = true;
+    //world matrix changed flag
     this._matrix_changed = false;
+    //PVM changed flag
+    this._pvm_changed = false;
 }
 
 Transform.extend(Transform2D);
@@ -223,9 +226,12 @@ Transform2D.prototype.update = function () {
     };
 }();
 
-Transform2D.prototype.updateMatrices = function (viewMatrix) {
-
-    this.modelView.mmul(viewMatrix, this.matrixWorld);
+Transform2D.prototype.updateMatrices = function (viewMatrix, pv_changed) {
+    this._pvm_changed = false;
+    if(pv_changed || this._matrix_changed){
+        this._pvm_changed  =true;
+        this.modelView.mmul(viewMatrix, this.matrixWorld);
+    }
     //this.normalMatrix.inverseMat4(this.modelView).transpose();
 };
 

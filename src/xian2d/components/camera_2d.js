@@ -20,16 +20,11 @@ function Camera2D(opts) {
     Camera.call(this, opts);
 
     this.projection = new Mat32;
-    //this._projection = new Mat32;
-    //this.guiProjection = new Mat4;
 
     this.view = new Mat32;
-    //this._view = new Mat32;
 
     this._projectionView = new Mat32;
-
-    //this.needsUpdate = true;
-    //this._active = true;
+    this._pv_changed = false;
 
     this.renderer = undefined;
     this.transparent = opts.transparent !== undefined ? opts.transparent : false;
@@ -37,14 +32,12 @@ function Camera2D(opts) {
 
     //render target: default(main)/RenderTexture
     this.renderTexture = undefined;
-
 }
 
 Camera.extend(Camera2D);
 
 
 Camera2D.prototype.copy = function (other) {
-
     Camera.prototype.copy.call(this, other);
 
     this.transparent = other.transparent;
@@ -84,23 +77,24 @@ Camera2D.prototype.toScreen = function (v, out) {
 
 
 Camera2D.prototype.update = function () {
-    if (!this._active) return;
+    //if (!this._active) return;
 
-    var transform = this.transform,
-        changed = false;
+    var transform = this.transform;
+
+    this._pv_changed = false;
 
     if (this.needsUpdate) {
-        var orthographicSize = this.orthographicSize,
-            right = orthographicSize,// * this.aspect,
+        var orthographicSizeX = this.orthographicSizeX,
+            orthographicSizeY = this.orthographicSizeY,
+            right = orthographicSizeX,// * this.aspect,
             left = -right,
-            top = orthographicSize,
+            top = orthographicSizeY,
             bottom = -top;
 
         this.projection.orthographic(left, right, top, bottom, -1, 1);
-        //this._projection.fromMat4(this.projection);
         this.needsUpdate = false;
 
-        changed = true;
+        this._pv_changed = true;
         //this.guiProjection.orthographic(0, this.width, 0, this.height, -1, 1);
         //this.guiProjection.orthographic(-1, 1, 1, -1, -1, 1);
     }
@@ -108,10 +102,10 @@ Camera2D.prototype.update = function () {
     if (transform._matrix_changed) {
         this.view.inverseMat(transform.matrixWorld);
         //this._view.fromMat4(this.view);
-        changed = true;
+        this._pv_changed = true;
     }
 
-    if (changed)
+    if (this._pv_changed)
         this._projectionView.mmul(this.projection, this.view);
 };
 
@@ -122,7 +116,7 @@ Camera2D.prototype.render = function (target) {
 
     var renderer = this.renderer || MainContext.RendererContext.renderer;
 
-    renderer.startRender(this.renderTexture);
+    renderer.startRender(this.renderTexture, this.viewportRect);
     if (this.clearBeforeRender) renderer.clearScreen(this.transparent, this.background);
 
     if (!target) {
@@ -132,7 +126,7 @@ Camera2D.prototype.render = function (target) {
         var transforms = target;
         for (j = 0; j < transforms.length; j++) {
             transform = transforms[j];
-            _updateTransform(transform, _projectionView);
+            _updateTransform(transform, _projectionView, this._pv_changed);
             //if(transform.gameObject.activeInHierarchy)
             this._renderTransform(renderer, _projectionView, transform, 1.0);
         }
@@ -140,7 +134,7 @@ Camera2D.prototype.render = function (target) {
     else if (target instanceof Transform) {
         transform = target;
         //if(transform.gameObject.activeInHierarchy)
-        _updateTransform(transform, _projectionView);
+        _updateTransform(transform, _projectionView, this._pv_changed);
         this._renderTransform(renderer, _projectionView, transform, 1.0);
     }
     //else if (target instanceof Renderer2D) {
@@ -176,15 +170,16 @@ Camera2D.prototype.updateMVP = function (target) {
     }
 };
 
-function _updateTransform(transform, _projectionView) {
+function _updateTransform(transform, _projectionView, changed) {
     if (!transform.gameObject.activeInHierarchy) return;
 
     var children = transform.children,
         len = children.length, i;
-    transform.updateMatrices(_projectionView);
+
+    transform.updateMatrices(_projectionView, changed);
 
     for (i = 0; i < len; i++) {
-        _updateTransform(children[i], _projectionView);
+        _updateTransform(children[i], _projectionView, changed);
     }
 };
 

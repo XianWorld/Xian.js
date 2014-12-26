@@ -51,6 +51,10 @@
                 new Texture({
                     name: "map",
                     src: "./displacement_map.jpg"
+                }),
+                new Texture({
+                    name: "water",
+                    src: "./zeldaWaves.png"//
                 })
         );
 
@@ -165,6 +169,8 @@
 
         Behaviour.extend(PondBehaviour);
         PondBehaviour.prototype.onStart = function () {
+            var bg = this.gameObject.find("bg");
+            this.water = bg.tilingSprite2d;
 
         };
         PondBehaviour.prototype.onUpdate = function () {
@@ -181,6 +187,9 @@
             this.count += 0.1;
             displacementFilter.offset.x = this.count * 10;//blurAmount * 40;
             displacementFilter.offset.y = this.count * 10;
+
+            this.water.tilePosition.x = this.count * -10//blurAmount * 40;
+            this.water.tilePosition.y = this.count * -10
         };
 
         function FishBehaviour(opts) {
@@ -221,9 +230,13 @@
 
         game = new Game({
             debug: true,
-            canvas: {
-                width: 960,
-                height: 640
+            screen: {
+                designWidth: bg_width,
+                designHeight: bg_height,
+                autoSize: true,
+                resolutionPolicy: new ResolutionPolicy({
+                    contentStrategy: ContentStrategy.get("ShowAll"),//FullScreen//ShowAll
+                })
             },
             renderer: {
                 //canvasRenderer: CanvasRenderer2D,
@@ -266,6 +279,13 @@
                 }),
                 new Sprite2D({
                     texture: Assets.get("bg")
+                }),
+                new TilingSprite2D({
+                    texture: Assets.get("water"),
+                    width: bg_width,
+                    height: bg_height,
+                    alpha: 0.2,
+//                    tint: 0xff0000,
                 }),
                 new Renderer2D,
             ]

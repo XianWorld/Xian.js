@@ -2,6 +2,7 @@ var ComponentSystem = require("./../../systems/component_system");
 var Camera2D = require("./../components/camera_2d");
 var MainContext = require("./../../context/main_context");
 var Log = MainContext.Log;
+var ScreenContext = MainContext.ScreenContext;
 var Mat4 = require("../../math/mat4");
 "use strict";
 
@@ -19,6 +20,34 @@ function Render2DSystem(opts) {
 }
 
 ComponentSystem.extend(Render2DSystem);
+
+//Render2DSystem.prototype.start = function () {
+//    ComponentSystem.prototype.start.call(this);
+//
+//    ScreenContext.on("resize", this._onScreenResize.bind(this));
+//};
+//
+//Render2DSystem.prototype._onScreenResize = function () {
+//
+//};
+//
+//Render2DSystem.prototype.clear = function () {
+//    ComponentSystem.prototype.clear.call(this);
+//
+//    ScreenContext.off("resize", this._onScreenResize.bind(this));
+//
+//};
+Render2DSystem.prototype.onPreUpdate = function (component) {
+    if(component.renderTexture) return;
+
+    //TODO temporarily update the camera scale factor every frame, should listen the resize event for update
+    var scaleX = ScreenContext.getScaleX();
+    if(scaleX !== 0)
+        component.setOrthographicSizeX(1 / scaleX);
+    var scaleY = ScreenContext.getScaleY();
+    if(scaleY !== 0)
+        component.setOrthographicSizeY(1 / scaleY);
+};
 
 Render2DSystem.prototype.render = function () {
 

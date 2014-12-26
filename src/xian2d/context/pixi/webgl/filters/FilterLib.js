@@ -2,20 +2,20 @@
  * Created by Dianyan on 2014/12/18.
  */
 
-var ShaderLib = {};
+var FilterLib = {};
 
-ShaderLib.fromJSON = function (json) {
+FilterLib.fromJSON = function (json) {
 
-    return new ShaderLib._classes[json._className]().fromJSON(json);
+    return new FilterLib._classes[json._className]().fromJSON(json);
 };
 
-ShaderLib.create = function (type) {
+FilterLib.create = function (type) {
 
-    return new ShaderLib._classes[type];
+    return new FilterLib._classes[type];
 };
 
 
-ShaderLib._classes = {
+FilterLib._classes = {
     AlphaMaskFilter: require("./AlphaMaskFilter"),
     AsciiFilter: require("./AsciiFilter"),
     BlurFilter: require("./BlurFilter"),
@@ -42,4 +42,4 @@ ShaderLib._classes = {
 
 };
 
-module.exports = ShaderLib;
+module.exports = FilterLib;

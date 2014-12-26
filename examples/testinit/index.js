@@ -134,9 +134,11 @@ seajs.use(['index-debug.js'], function (Xian) {
 
     game = new Game({
         debug: true,
-        canvas: {
-            width: 960,
-            height: 640
+        screen: {
+            autoSize: true,
+            resolutionPolicy: new ResolutionPolicy({
+                contentStrategy: ContentStrategy.get("FullScreen"),//FullScreen//ShowAll
+            })
         },
         renderer: {
             //canvasRenderer: CanvasRenderer2D,
@@ -165,6 +167,7 @@ seajs.use(['index-debug.js'], function (Xian) {
                 //enabled: false,
                 transparent: false,
                 clearBeforeRender: true,
+                //viewportRect: new Rect(0,0,1,0.5),
                 background: new Color(0.5, 0.5, 0.5)
             }),
             //new TilingSprite2D({
