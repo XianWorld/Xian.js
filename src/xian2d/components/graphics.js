@@ -656,6 +656,7 @@ Graphics.prototype._render = function (renderer) {
     //this.worldMatrix = this.transform.modelView;
     if (!this.isMask) {
         if (this._dirtyRender) {
+            //TODO should set local bounds dirty flag, and update when necessary??
             this._updateLocalBounds();
             this.dirty = true;
             this._dirtyRender = false;
@@ -821,6 +822,7 @@ Graphics.prototype._generateCachedSprite = function()
 
     this._cachedSprite.destTexture.width = bounds.width;
     this._cachedSprite.destTexture.height = bounds.height;
+    this._cachedSprite.destTexture.needsUpdate = true;
 
     this._cachedSprite.sourceWidth = bounds.width;
     this._cachedSprite.sourceHeight = bounds.height;
@@ -860,6 +862,8 @@ Graphics.prototype._generateCachedSprite = function()
 //};
 Graphics.prototype._destroyCachedSprite = function()
 {
+    if(!this._cachedSprite) return;
+    this._cachedSprite.buffer.destroy();
     this._cachedSprite.destroy();
 
     // let the gc collect the unused sprite

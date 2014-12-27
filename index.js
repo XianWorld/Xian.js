@@ -103,6 +103,7 @@ function Xian() {
     this.Sprite2D = require("./src/xian2d/components/sprite_2d");
     this.TilingSprite2D = require("./src/xian2d/components/tiling_sprite_2d");
     this.Graphics = require("./src/xian2d/components/graphics");
+    this.Text2D = require("./src/xian2d/components/text_2d");
 
     this.CanvasRenderer2D = require("./src/xian2d/context/renderer/canvas_renderer_2d");
     this.WebGLRenderer2D = require("./src/xian2d/context/renderer/webgl_renderer_2d");

@@ -145,6 +145,18 @@ WebGLRenderer2D.prototype.renderSprite2D = function (sprite2D) {
     this._drawImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint);
 };
 
+WebGLRenderer2D.prototype.renderText = function (text2d) {
+    var sprite2D;
+    if(text2d._dirtyRender){
+        text2d._generateCachedSprite();
+        text2d._dirtyRender = false;
+    }
+    sprite2D = text2d._cachedSprite;
+    sprite2D.worldMatrix = text2d.worldMatrix;
+    sprite2D.worldAlpha = text2d.worldAlpha;
+
+    this.renderSprite2D(sprite2D);
+};
 
 WebGLRenderer2D.prototype._drawRepeatImage = function (texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, tint, repeat) {
     for (var x = destX; x < destWidth; x += sourceWidth) {

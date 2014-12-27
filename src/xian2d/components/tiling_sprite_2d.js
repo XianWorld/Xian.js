@@ -119,7 +119,7 @@ TilingSprite2D.prototype._generateTilingTexture = function (forcePowerOfTwo) {
 };
 
 TilingSprite2D.prototype.getLocalBounds = function () {
-    if (this._dirtyLocalBounds) {
+    if (this._dirtySize) {
         var textureClip = this._textureClip;
         var bounds = this._localBounds;
 
@@ -128,7 +128,7 @@ TilingSprite2D.prototype.getLocalBounds = function () {
         bounds.width = this._width;
         bounds.height = this._height;
 
-        this._dirtyLocalBounds = false;
+        this._dirtySize = false;
     }
     return this._localBounds;
 };

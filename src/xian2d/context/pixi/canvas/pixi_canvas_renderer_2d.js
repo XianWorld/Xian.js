@@ -7,7 +7,7 @@ var CanvasGraphics = require("./utils/canvas_graphics");
 var CanvasMaskManager = require("./utils/canvas_mask_manager");
 var CanvasTinter = require("./utils/canvas_tinter");
 var ScreenContext = require('../../../../context/screen_context');
-
+var CanvasText = require("../../render/canvas_text");
 "use strict";
 
 function PIXICanvasRenderer2D(canvas, opts) {
@@ -190,6 +190,19 @@ PIXICanvasRenderer2D.prototype.renderGraphics = function (graphics) {
     this._setAlpha(graphics.worldAlpha, graphics.blendMode);
     //this._setTransform(graphics.worldMatrix);
     CanvasGraphics.renderGraphics(this, graphics);
+};
+
+PIXICanvasRenderer2D.prototype.renderText = function (text2d) {
+    var worldAlpha = text2d.worldAlpha,
+        blendMode = text2d.blendMode,
+        worldMatrix = text2d.worldMatrix;
+
+    this._setAlpha(worldAlpha, blendMode);
+    this._setTransform(worldMatrix);
+
+    this.canvasContext.translate(this._transformTx,this._transformTy);
+    CanvasText.renderText(text2d, this.canvasContext);
+    this.canvasContext.translate(-this._transformTx,-this._transformTy);
 };
 
 //PIXICanvasRenderer2D.prototype.renderGraphicsMask = function (graphics) {

@@ -11,8 +11,8 @@ function Texture(opts) {
     this.width = 0;
     this.height = 0;
 
-    this.invWidth = 0;
-    this.invHeight = 0;
+    //this.invWidth = 0;
+    //this.invHeight = 0;
 
     this.generateMipmap = opts.generateMipmap !== undefined ? !!opts.generateMipmap : true;
     this.flipY = opts.flipY !== undefined ? !!opts.flipY : true;
@@ -46,8 +46,8 @@ Texture.prototype.copy = function (other) {
     this.width = other.width;
     this.height = other.height;
 
-    this.invWidth = other.invWidth;
-    this.invHeight = other.invHeight;
+    //this.invWidth = other.invWidth;
+    //this.invHeight = other.invHeight;
 
     this.generateMipmap = other.generateMipmap;
     this.flipY = other.flipY;
@@ -69,8 +69,8 @@ Texture.prototype.parse = function (raw) {
     this.width = raw.width;
     this.height = raw.height;
 
-    this.invWidth = 1 / this.width;
-    this.invHeight = 1 / this.height;
+    //this.invWidth = 1 / this.width;
+    //this.invHeight = 1 / this.height;
 
     return this;
 };
@@ -133,8 +133,8 @@ Texture.prototype.toJSON = function (json, pack) {
     json.width = this.width;
     json.height = this.height;
 
-    json.invWidth = this.invWidth;
-    json.invHeight = this.invHeight;
+    //json.invWidth = this.invWidth;
+    //json.invHeight = this.invHeight;
 
     json.generateMipmap = this.generateMipmap;
     json.flipY = this.flipY;
@@ -165,8 +165,8 @@ Texture.prototype.fromJSON = function (json) {
     this.width = json.width;
     this.height = json.height;
 
-    this.invWidth = json.invWidth;
-    this.invHeight = json.invHeight;
+    //this.invWidth = json.invWidth;
+    //this.invHeight = json.invHeight;
 
     this.generateMipmap = json.generateMipmap;
     this.flipY = json.flipY;

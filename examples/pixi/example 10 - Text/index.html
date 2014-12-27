@@ -1,0 +1,315 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>pixi.js example 10 Text</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+        }
+    </style>
+
+    <!--<script src="../../bin/pixi.dev.js"></script>-->
+    <script src="../../../spm_modules/seajs/2.3.0/dist/sea.js"></script>
+</head>
+<body>
+<script>
+    // Load them google fonts before starting...!
+//    WebFontConfig = {
+//        google: {
+//            families: ['Snippet', 'Arvo:700italic', 'Podkova:700']
+//        },
+//        active: function () {
+//            // do something
+//            init();
+//        }
+//    };
+//    (function () {
+//        var wf = document.createElement('script');
+//        wf.src = ('https:' === document.location.protocol ? 'https' : 'http') +
+//        '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+//        wf.type = 'text/javascript';
+//        wf.async = 'true';
+//        var s = document.getElementsByTagName('script')[0];
+//        s.parentNode.insertBefore(wf, s);
+//    })();
+//
+//    function init()
+    {
+
+        // Set configuration
+        seajs.config({
+            base: "../../../dist/"
+        });
+
+        seajs.use(['index-debug.js'], function (Xian) {
+            console.log(Xian);
+
+            Xian.globalize();
+
+            function TextBehaviour(opts) {
+                Behaviour.call(this, opts);
+                this.count = 0;
+            }
+
+            Behaviour.extend(TextBehaviour);
+            TextBehaviour.prototype.onUpdate = function () {
+                this.count += 0.1;
+                this.gameObject.text2d.setText("COUNT 4EVAR: " + (this.count | 0));
+            };
+
+            var game, scene;
+
+            Assets.addAssets(
+                    new Texture({
+                        name: "bg",
+                        src: "./textDemoBG.jpg"
+                    })
+            );
+
+            game = new Game({
+                debug: true,
+                screen: {
+                    designWidth: 620,
+                    designHeight: 400,
+                    autoSize: true,
+                    resolutionPolicy: new ResolutionPolicy({
+                        contentStrategy: ContentStrategy.get("ShowAll"),//FullScreen//ShowAll//NoScale
+                    })
+                },
+                renderer: {
+//                    canvasRenderer: CanvasRenderer2D,
+//                canvasRenderer: PIXICanvasRenderer2D,
+                    webglRenderer: WebGLRenderer2D
+//                webglRenderer: PIXIWebGLRenderer2D,
+                }
+            });
+
+            scene = new Scene({
+                name: "PlayGround",
+                systems: [
+                    new Transform2DSystem(),
+                    new BehaviourSystem(),
+                    new Render2DSystem(),
+                ]
+            });
+
+            var bg = new GameObject({
+                name: "bg",
+                components: [
+                    new Transform2D({
+                        //identity: true
+                    }),
+                    new Camera2D({
+                        transparent: true,
+                        clearBeforeRender: true,
+                    }),
+                    new Sprite2D({
+                        texture: Assets.get("bg")
+                    }),
+                    new Renderer2D,
+                ]
+            });
+            var text1 = new GameObject({
+                name: "text1",
+                components: [
+                    new Transform2D({
+                        //identity: true
+                        position: new Vec2(20, 20)
+                    }),
+                    new Text2D({
+                        text: "Pixi.js can has\nmultiline text!",
+                        style: {
+                            font: "35px Snippet",
+                            fill: "white",
+                            align: "left"
+                        }
+                    }),
+                    new Renderer2D,
+                ]
+            });
+            var text2 = new GameObject({
+                name: "text2",
+                components: [
+                    new Transform2D({
+                        //identity: true
+                        position: new Vec2(620 / 2, 400 / 2),
+//                    rotation: 0.5
+                    }),
+                    new Text2D({
+                        text: "I'm fun!",
+                        style: {
+                            font: "bold 60px Arial",
+                            fill: "#cc00ff",
+                            align: "center",
+                            stroke: "#FFFFFF",
+                            strokeThickness: 20
+                        }
+                    }),
+                    new Renderer2D,
+                ]
+            });
+            var text3 = new GameObject({
+                name: "text3",
+                components: [
+                    new Transform2D({
+                        //identity: true
+                        position: new Vec2(0, 320),
+//                    rotation: 0.5
+                    }),
+                    new Text2D({
+                        text: "COUNT 4EVAR: 0",
+                        style: {
+                            font: "bold italic 60px Arvo",
+                            fill: "#3e1707",
+                            align: "center",
+                            stroke: "#a4410e",
+                            strokeThickness: 7
+                        }
+                    }),
+                    new Renderer2D,
+                    new TextBehaviour
+                ]
+            });
+
+//        bg.transform.addChild(text1.transform);
+            scene.addGameObjects(bg, text1, text2, text3);
+
+            game.addScene(scene);
+
+            function start() {
+                game.setScene("PlayGround");
+                console.log("Game Started!");
+            }
+
+            game.on("start", function () {
+                start();
+            });
+            //game.start();
+
+            AssetLoader.on("load", function () {
+                game.start();
+            }).load();
+
+        });
+    }
+    //    // Load them google fonts before starting...!
+    //    WebFontConfig = {
+    //      google: {
+    //        families: [ 'Snippet', 'Arvo:700italic', 'Podkova:700' ]
+    //      },
+    //
+    //      active: function() {
+    //        // do something
+    //        init();
+    //      }
+    //    };
+    //    (function() {
+    //        var wf = document.createElement('script');
+    //        wf.src = ('https:' === document.location.protocol ? 'https' : 'http') +
+    //            '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    //        wf.type = 'text/javascript';
+    //        wf.async = 'true';
+    //        var s = document.getElementsByTagName('script')[0];
+    //        s.parentNode.insertBefore(wf, s);
+    //      })();
+    //
+    //    function runList(item)
+    //    {
+    //        console.log("_");
+    //        var safe = 0;
+    //        var tmp = item;
+    //        while(tmp._iNext)
+    //        {
+    //            safe++;
+    //            tmp = tmp._iNext;
+    //            console.log(tmp);
+    //
+    //            if(safe > 100)
+    //            {
+    //                console.log("BREAK");
+    //                break;
+    //            }
+    //        }
+    //    }
+    //
+    //    function init()
+    //    {
+    //        var assetsToLoader = ["desyrel.xml"];
+    //
+    //        // create a new loader
+    //        var loader = new PIXI.AssetLoader(assetsToLoader);
+    //
+    //        // use callback
+    //        loader.onComplete = onAssetsLoaded;
+    //
+    //        // create an new instance of a pixi stage
+    //        var stage = new PIXI.Stage(0x66FF99);
+    //
+    //        // begin load
+    //        loader.load();
+    //
+    //        function onAssetsLoaded()
+    //        {
+    //            var bitmapFontText = new PIXI.BitmapText("bitmap fonts are\n now supported!", { font: "35px Desyrel", align: "right" });
+    //            bitmapFontText.position.x = 620 - bitmapFontText.textWidth - 20;
+    //            bitmapFontText.position.y = 20;
+    //
+    //            runList(bitmapFontText);
+    //
+    //            stage.addChild(bitmapFontText);
+    //        }
+    //
+    //        // add a shiny background...
+    //        var background = PIXI.Sprite.fromImage("textDemoBG.jpg");
+    //        stage.addChild(background);
+    //
+    //        // create a renderer instance
+    //        var renderer = PIXI.autoDetectRenderer(620, 400);
+    //        // add the renderer view element to the DOM
+    //        document.body.appendChild(renderer.view);
+    //
+    //        // create some white text using the Snippet webfont
+    //        var textSample = new PIXI.Text("Pixi.js can has\nmultiline text!", { font: "35px Snippet", fill: "white", align: "left" });
+    //        textSample.position.x = 20;
+    //        textSample.position.y = 20;
+    //
+    //        // create a text object with a nice stroke
+    //        var spinningText = new PIXI.Text("I'm fun!", { font: "bold 60px Arial", fill: "#cc00ff", align: "center", stroke: "#FFFFFF", strokeThickness: 20 });
+    //
+    //        // setting the anchor point to 0.5 will center align the text... great for spinning!
+    //        spinningText.anchor.x = spinningText.anchor.y = 0.5;
+    //        spinningText.position.x = 620 / 2;
+    //        spinningText.position.y = 400 / 2;
+    //
+    //        // create a text object that will be updated..
+    //        var countingText = new PIXI.Text("COUNT 4EVAR: 0", { font: "bold italic 60px Arvo", fill: "#3e1707", align: "center", stroke: "#a4410e", strokeThickness: 7 });
+    //        countingText.position.x = 620 / 2;
+    //        countingText.position.y = 320;
+    //        countingText.anchor.x = 0.5;
+    //
+    //        stage.addChild(textSample);
+    //        stage.addChild(spinningText);
+    //        stage.addChild(countingText);
+    //
+    //        var count = 0;
+    //        var score = 0;
+    //        var remaining = 10;
+    //
+    //
+    //        function animate() {
+    //            requestAnimFrame(animate);
+    //            renderer.render(stage);
+    //
+    //            count+=0.1;
+    //            countingText.setText("COUNT 4EVAR: " + (count | 0));
+    //        }
+    //
+    //        requestAnimFrame(animate);
+    //    }
+
+</script>
+
+</body>
+</html>
