@@ -230,6 +230,19 @@ PIXIWebGLRenderer2D.prototype.renderGraphics = function (graphics) {
     WebGLGraphics.renderGraphics(this, graphics);
 };
 
+PIXIWebGLRenderer2D.prototype.renderText = function (text2d) {
+    var sprite2D;
+    if(text2d._dirtyRender){
+        text2d._generateCachedSprite();
+        text2d._dirtyRender = false;
+    }
+    sprite2D = text2d._cachedSprite;
+    sprite2D.worldMatrix = text2d.worldMatrix;
+    sprite2D.worldAlpha = text2d.worldAlpha;
+
+    this.renderSprite2D(sprite2D);
+};
+
 //PIXIWebGLRenderer2D.prototype.renderGraphicsMask = function (graphics) {
 //    //CanvasGraphics.renderGraphicsMask(this, worldTransform, graphicsData, worldAlpha, tint);
 //    WebGLGraphics.renderGraphicsMask(this, graphics);

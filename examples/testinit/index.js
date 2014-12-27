@@ -137,7 +137,7 @@ seajs.use(['index-debug.js'], function (Xian) {
         screen: {
             autoSize: true,
             resolutionPolicy: new ResolutionPolicy({
-                contentStrategy: ContentStrategy.get("FullScreen"),//FullScreen//ShowAll
+                contentStrategy: ContentStrategy.get("ShowAll"),//FullScreen//ShowAll
             })
         },
         renderer: {
@@ -187,9 +187,9 @@ seajs.use(['index-debug.js'], function (Xian) {
             }),
             new Renderer2D({
                 filters: [
-                    //new FilterLib._classes.BlurXFilter({
-                    //    blur: 30
-                    //}),
+                    new FilterLib._classes.BlurXFilter({
+                        blur: 30
+                    }),
                     //new FilterLib._classes.AsciiFilter({
                     //    size: 16
                     //}),
@@ -201,7 +201,7 @@ seajs.use(['index-debug.js'], function (Xian) {
                     //        0, 0, 0, 1
                     //    ]
                     //})
-                    new FilterLib._classes.ColorStepFilter(),
+                    //new FilterLib._classes.ColorStepFilter(),
                 ],
             }),
             //new Graphics({
@@ -226,6 +226,16 @@ seajs.use(['index-debug.js'], function (Xian) {
                 //tint: 0x00ff00,
                 //blendMode: Enums.blendModes.ADD,
                 texture: Assets.get("img_hospital")
+            }),
+            new Text2D({
+                text: "I'm fun!",
+                style: {
+                    font: "bold 60px Arial",
+                    fill: "#cc00ff",
+                    align: "center",
+                    stroke: "#FFFFFF",
+                    strokeThickness: 20
+                }
             }),
             new Renderer2D,
             new Sprite2DBehaviour({

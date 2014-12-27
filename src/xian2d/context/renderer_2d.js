@@ -41,6 +41,11 @@ AbstractRenderer2D.prototype.renderSprite2D = function (sprite2D) {
 AbstractRenderer2D.prototype.renderTilingSprite2D = function (tilingSprite) {
 
 };
+AbstractRenderer2D.prototype.renderGraphics = function (graphics) {
+};
+
+AbstractRenderer2D.prototype.renderText = function (text2d) {
+};
 
 AbstractRenderer2D.prototype.pushMask = function (mask) {
 };
@@ -83,7 +88,7 @@ AbstractRenderer2D.prototype.resize = function (stageWidth, stageHeight, scaleX,
 //    var result = this.canvasContext.measureText(text);
 //    return result.width;
 //};
-//
+
 //AbstractRenderer2D.prototype.drawText = function (textField, text, x, y, maxWidth, style) {
 //};
 //

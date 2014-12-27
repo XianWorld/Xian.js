@@ -10,6 +10,9 @@ function Renderable2D(opts) {
 
     Component.call(this, opts);
 
+    this._width = opts.width || 0;
+    this._height = opts.height || 0;
+
     this.blendMode = opts.blendMode !== undefined ? opts.blendMode : Enums.blendModes.NORMAL;
 
     this.alpha = opts.alpha !== undefined ? opts.alpha : 1;
@@ -22,12 +25,55 @@ function Renderable2D(opts) {
     this._bounds = new Rect(0, 0, 1, 1);
     this._localBounds = new Rect(0, 0, 1, 1);
     this._dirtyBounds = true;
-    this._dirtyLocalBounds = true;
+    this._dirtySize = true;
 
     this._dirtyRender = true;
 }
 
 Component.extend(Renderable2D);
+
+Object.defineProperty(Renderable2D.prototype, "width", {
+    get: function () {
+        return this._textureClip;
+    },
+    set: function (value) {
+        if(this._width === value) return;
+        this._width = value;
+        this._dirtyRender = true;
+        this._dirtySize = true;
+    }
+});
+Object.defineProperty(Renderable2D.prototype, "height", {
+    get: function () {
+        return this._textureClip;
+    },
+    set: function (value) {
+        if(this._height === value) return;
+        this._height = value;
+        this._dirtyRender = true;
+        this._dirtySize = true;
+    }
+});
+
+Renderable2D.prototype._setDirty= function() {
+    this._dirtyRender = true;
+};
+Renderable2D.prototype.getDirty = function() {
+    return this._dirtyRender || this._dirtySize;
+};
+Renderable2D.prototype._setSizeDirty = function() {
+    if (this._dirtySize) {
+        return;
+    }
+    this._dirtySize = true;
+    this._setDirty();
+};
+Renderable2D.prototype._clearDirty = function() {
+    this._dirtyRender = false;
+};
+Renderable2D.prototype._clearSizeDirty = function() {
+    this._dirtySize = false;
+};
 
 Renderable2D.prototype.copy = function (other) {
 
@@ -47,7 +93,7 @@ Renderable2D.prototype.clear = function () {
 
     this._dirtyBounds = true;
     this._dirtyRender = true;
-    this._dirtyLocalBounds = true;
+    this._dirtySize = true;
 
     return this;
 };
@@ -82,6 +128,8 @@ Renderable2D.prototype._render = function (renderer) {
 Renderable2D.prototype.toJSON = function (json) {
     json = Component.prototype.toJSON.call(this, json);
 
+    json.width = this._width;
+    json.height = this._height;
     json.blendMode = this.blendMode;
     json.alpha = this.alpha;
     json.tint = this.tint;
@@ -92,6 +140,8 @@ Renderable2D.prototype.toJSON = function (json) {
 Renderable2D.prototype.fromJSON = function (json) {
     Component.prototype.fromJSON.call(this, json);
 
+    this.width = json.width;
+    this.height = json.height;
     this.blendMode = json.blendMode;
     this.alpha = json.alpha;
     this.tint = json.tint;
