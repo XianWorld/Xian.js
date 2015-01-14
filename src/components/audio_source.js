@@ -4,7 +4,7 @@ var Time = Context.Time;
 var Mathf = require("../math/mathf");
 var Vec2 = require("../math/vec2");
 var Vec3 = require("../math/vec3");
-var Assets = require("../assets/assets");
+var Assets = require("../context/main_context").Assets;
 var Component = require("./../core/component");
 "use strict";
 
@@ -277,7 +277,7 @@ AudioSource.prototype.toJSON = function (json) {
 AudioSource.prototype.fromJSON = function (json) {
     Component.prototype.fromJSON.call(this, json);
 
-    this.clip = json.clip ? Assets.get(json.clip) : undefined;
+    this.clip = json.clip ? Assets.load(json.clip, "AudioClip") : undefined;
 
     this.dopplerLevel = json.dopplerLevel;
     this.loop = json.loop;

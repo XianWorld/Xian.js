@@ -1,6 +1,6 @@
-var Enums = require("../../core/enums");
+var Enums = require("../../base/enums");
 var Axis = require("./axis");
-var Log = require("../log");
+var Log = require("../log/log");
 "use strict";
 
 

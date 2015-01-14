@@ -48,27 +48,27 @@ function Transform2D(opts) {
 Transform.extend(Transform2D);
 
 Object.defineProperty(Transform2D.prototype, "position", {
-    get: function(){
+    get: function () {
         return this._position;
     },
-    set: function(value){
+    set: function (value) {
         this._position.copy(value);
     }
 });
 Object.defineProperty(Transform2D.prototype, "scale", {
-    get: function(){
+    get: function () {
         return this._scale;
     },
-    set: function(value){
+    set: function (value) {
         this._scale.copy(value);
     }
 });
 Object.defineProperty(Transform2D.prototype, "rotation", {
-    get: function(){
+    get: function () {
         return this._rotation;
     },
-    set: function(value){
-        if(this._rotation === value) return;
+    set: function (value) {
+        if (this._rotation === value) return;
         this._rotation = value;
         this._dirty_rotation = true;
     }
@@ -179,57 +179,53 @@ Transform2D.prototype.toLocal = function () {
     };
 }();
 
-
 Transform2D.prototype.update = function () {
-    var mat = new Mat32;
+    //var mat = new Mat32;
+    var matrix = this.matrix,
+        parent = this.parent;
 
-    return function () {
-        var matrix = this.matrix,
-            parent = this.parent;
-
-        this._matrix_changed = false;
-        if(this.identity){
-            if (parent) {
-                this.matrixWorld = parent.matrixWorld;
-                this._matrix_changed = parent._matrix_changed;
-            } else {
-                this.matrixWorld.copy(matrix);
-            }
-        }else{
-            //if(this._position._dirty || this._scale._dirty || this._dirty_rotation)
-            //{
-            //    //matrix.fromMat32(mat.compose(this._position, this._scale, this._rotation));
-            //    matrix.compose(this._position, this._scale, this._rotation);
-            //    this._position._dirty = this._scale._dirty = this._dirty_rotation = false;
-            //}
-            if(this._position._dirty){
-                matrix.setPosition(this._position);
-                this._position._dirty = false;
-                this._matrix_changed = true;
-            }
-            if(this._dirty_rotation || this._scale._dirty) {
-                matrix.setScaleRotation(this._scale, this.rotation);
-                this._scale._dirty = this._dirty_rotation = false;
-                this._matrix_changed = true;
-            }
-
-            if (parent) {
-                if(parent._matrix_changed || this._matrix_changed){
-                    this.matrixWorld.mmul(parent.matrixWorld, matrix);
-                    this._matrix_changed = true;
-                }
-            } else {
-                if(this._matrix_changed)
-                    this.matrixWorld.copy(matrix);
-            }
+    this._matrix_changed = false;
+    if (this.identity) {
+        if (parent) {
+            this.matrixWorld = parent.matrixWorld;
+            this._matrix_changed = parent._matrix_changed;
+        } else {
+            this.matrixWorld.copy(matrix);
         }
-    };
-}();
+    } else {
+        //if(this._position._dirty || this._scale._dirty || this._dirty_rotation)
+        //{
+        //    //matrix.fromMat32(mat.compose(this._position, this._scale, this._rotation));
+        //    matrix.compose(this._position, this._scale, this._rotation);
+        //    this._position._dirty = this._scale._dirty = this._dirty_rotation = false;
+        //}
+        if (this._position._dirty) {
+            matrix.setPosition(this._position);
+            this._position._dirty = false;
+            this._matrix_changed = true;
+        }
+        if (this._dirty_rotation || this._scale._dirty) {
+            matrix.setScaleRotation(this._scale, this.rotation);
+            this._scale._dirty = this._dirty_rotation = false;
+            this._matrix_changed = true;
+        }
+
+        if (parent) {
+            if (parent._matrix_changed || this._matrix_changed) {
+                this.matrixWorld.mmul(parent.matrixWorld, matrix);
+                this._matrix_changed = true;
+            }
+        } else {
+            if (this._matrix_changed)
+                this.matrixWorld.copy(matrix);
+        }
+    }
+};
 
 Transform2D.prototype.updateMatrices = function (viewMatrix, pv_changed) {
     this._pvm_changed = false;
-    if(pv_changed || this._matrix_changed){
-        this._pvm_changed  =true;
+    if (pv_changed || this._matrix_changed) {
+        this._pvm_changed = true;
         this.modelView.mmul(viewMatrix, this.matrixWorld);
     }
     //this.normalMatrix.inverseMat4(this.modelView).transpose();
@@ -252,11 +248,11 @@ Transform2D.prototype.toJSON = function (json) {
 Transform2D.prototype.fromJSON = function (json) {
     Transform.prototype.fromJSON.call(this, json);
 
-    this.identity = json.identity;
+    this.identity = json.identity || false;
 
-    this.position.fromJSON(json.position);
-    this.scale.fromJSON(json.scale);
-    this.rotation = json.rotation;
+    if (json.position) this.position.fromJSON(json.position);
+    if (json.scale) this.scale.fromJSON(json.scale);
+    this.rotation = json.rotation || 0;
 
     return this;
 };

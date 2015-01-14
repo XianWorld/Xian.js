@@ -1,0 +1,221 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>pixi.js example 2 loading a sprite sheet</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+        }
+    </style>
+    <!--<script src="../../bin/pixi.dev.js"></script>-->
+    <script src="../../../spm_modules/seajs/2.3.0/dist/sea.js"></script>
+</head>
+<body>
+    <script>
+
+        // Set configuration
+        seajs.config({
+            base: "../../../dist/"
+        });
+
+        seajs.use(['index-debug.js'], function (Xian) {
+            console.log(Xian);
+
+            Xian.globalize();
+
+            var game, scene;
+            var Assets = MainContext.Assets;
+            game = Game;
+//            Config.fromJSON({
+//                debug: true,
+//                screen: {
+//                    designWidth: 800,
+//                    designHeight: 600,
+//                    autoSize: true,
+//                    resolutionPolicy: new ResolutionPolicy({
+//                        contentStrategy: ContentStrategy.get("NoScale"),//FullScreen//ShowAll//NoScale
+//                    })
+//                },
+//                renderer: {
+////                    canvasRenderer: CanvasRenderer2D,
+////                canvasRenderer: PIXICanvasRenderer2D,
+////                webglRenderer: WebGLRenderer2D
+//                    webglRenderer: PIXIWebGLRenderer2D,
+//                }
+//            });
+
+            function RootBehaviour(opts) {
+                Behaviour.call(this, opts);
+
+                this._spriteSheet = undefined;
+
+                this._fighter = undefined;
+                this._count = 0;
+
+                this._inited = false;
+            }
+
+            Behaviour.extend(RootBehaviour);
+            RootBehaviour.prototype.onStart = function () {
+                var agent = this.gameObject.assetAgent;
+
+                function _init() {
+                    agent.off("complete", _init, this);
+
+                    var transform;
+                    var sprite;
+
+                    this._spriteSheet = agent.get("fighter.json");
+
+                    var spriteSheet = this._spriteSheet;
+                    if (!spriteSheet || !spriteSheet.ready) return;
+
+                    this._fighter = new GameObject;
+                    transform = this._fighter.addComponent(Transform2D);
+                    transform.position.x = 400;
+                    transform.position.y = 300;
+                    sprite = this._fighter.addComponent(Sprite2D);
+                    sprite.texture = spriteSheet.texture;
+                    sprite.anchor.x = 0.5;
+                    sprite.anchor.y = 0.5;
+                    this._fighter.addComponent(Renderer2D);
+                    this.gameObject.scene.addGameObject(this._fighter);
+
+                    this._inited = true;
+                }
+
+                if (!agent.preloaded)
+                    agent.on("complete", _init, this);
+                else
+                    _init();
+            };
+            RootBehaviour.prototype.onUpdate = function () {
+                if (!this._inited) return;
+
+                var transform;
+                var sprite;
+                transform = this._fighter.transform;
+                transform.rotation += 0.01;
+                sprite = this._fighter.sprite2d;
+                var i = this._count % this._spriteSheet.frames.length;
+                sprite.textureClip = this._spriteSheet.frames[i];
+                sprite.anchored = true;
+
+                this._count ++;
+            };
+
+            scene = new Scene({
+                name: "PlayGround",
+                systems: [
+                    new Transform2DSystem(),
+                    new BehaviourSystem(),
+                    new Render2DSystem(),
+                ]
+            });
+
+            var root = new GameObject({
+                name: "root",
+                components: [
+                    new Transform2D({}),
+                    new Camera2D({
+                        transparent: false,
+                        clearBeforeRender: true,
+                    }),
+                    new AssetAgent({
+                        preloads: [
+                            {name: "fighter.json", type: "SpriteSheet"},
+                        ]
+                    }),
+                    new RootBehaviour
+                ]
+            });
+            game.addScene(scene);
+
+            function start() {
+                game.setScene("PlayGround");
+
+                game.scene.addGameObjects(root);
+
+                console.log("Game Started!");
+            }
+
+            game.on("start", function () {
+                start();
+            });
+
+            game.start();
+
+        });
+        //    // create an array of assets to load
+        //    var assetsToLoader = [ "fighter.json"];
+        //
+        //    // create a new loader
+        //    loader = new PIXI.AssetLoader(assetsToLoader);
+        //
+        //    // use callback
+        //    loader.onComplete = onAssetsLoaded
+        //
+        //    //begin load
+        //    loader.load();
+        //
+        //    // holder to store aliens
+        //    var aliens = [];
+        //
+        //    var count = 0;
+        //
+        //    // create an new instance of a pixi stage
+        //    var stage = new PIXI.Stage(0xFFFFFF);
+        //
+        //    // create a renderer instance.
+        ////    renderer = PIXI.autoDetectRenderer(800, 600);
+        //    renderer = new PIXI.CanvasRenderer(800, 600);
+        //
+        //    // add the renderer view element to the DOM
+        //    document.body.appendChild(renderer.view);
+        //
+        //    // create an empty container
+        //    var alienContainer = new PIXI.DisplayObjectContainer();
+        //    alienContainer.position.x = 400;
+        //    alienContainer.position.y = 300;
+        //
+        //    stage.addChild(alienContainer);
+        //
+        //    function onAssetsLoaded()
+        //    {
+        //        // create a texture from an image path
+        //        // add a bunch of aliens
+        //        var frames = [];
+        //
+        //        for (var i = 0; i < 30; i++) {
+        //            var val = i < 10 ? "0" + i : i;
+        //            frames.push(PIXI.Texture.fromFrame("rollSequence00" + val + ".png"));
+        //        };
+        //
+        //        movie = new PIXI.MovieClip(frames);
+        //
+        //        movie.position.x = 300;
+        //        movie.position.y = 300;
+        //
+        //        movie.anchor.x = movie.anchor.y =  0.5;
+        //        movie.play();
+        //        movie.animationSpeed = 0.5;
+        //        stage.addChild(movie);
+        //
+        //        // start animating
+        //        requestAnimFrame(animate);
+        //    }
+        //
+        //    function animate() {
+        //        movie.rotation += 0.01;
+        //
+        //        // render the stage
+        //        renderer.render(stage);
+        //
+        //        requestAnimFrame(animate);
+        //    }
+    </script>
+
+    </body>
+</html>

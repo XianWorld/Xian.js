@@ -1,15 +1,16 @@
 /**
  * Created by Dianyan on 2014/12/19.
  */
-var Enums = require("../../core/enums");
+var Enums = require("../../base/enums");
 var Component = require("./../../core/component");
-var Assets = require("../../assets/assets");
+//var Assets = require("../../assets/core/assets");
 var Rect = require("../../math/rect");
-var FilterLib = require("../context/pixi/webgl/filters/FilterLib");
-var Sprite2D = require("./sprite_2d");
+var FilterLib = require("../context/graphics/g2d/webgl/filters/FilterLib");
+//var Sprite2D = require("./sprite_2d");
 var Camera2D = require("./camera_2d");
-var RenderTexture = require("../../assets/render_texture");
-var Sprite2dData = require("../context/sprite_2d_data");
+var Renderable2D = require("./renderable_2d");
+var RenderTexture = require("../../context/assets/render_texture");
+var Sprite2dData = require("../context/graphics/g2d/sprite_2d_data");
 
 function Renderer2D(opts) {
     opts || (opts = {});
@@ -32,6 +33,8 @@ function Renderer2D(opts) {
 
     this._cachedSprite = undefined;
     this._cacheAsBitmap = false;
+
+    this.renderables = undefined;
 }
 
 Component.extend(Renderer2D);
@@ -88,6 +91,19 @@ Object.defineProperty(Renderer2D.prototype, "cacheAsBitmap", {
     }
 });
 
+Renderer2D.prototype.start = function () {
+    var gameObject = this.gameObject;
+    this.renderables = gameObject.getComponents(Renderable2D, true);
+    gameObject.on("addComponent", _onComponentChange, this);
+    gameObject.on("removeComponent", _onComponentChange, this);
+};
+
+function _onComponentChange(component){
+    if(!(component instanceof Renderable2D)) return;
+    this.renderables = this.gameObject.getComponents(Renderable2D, true);
+    //renderables.push(component);
+}
+
 Renderer2D.prototype.copy = function (other) {
     this.alpha = other.alpha;
     this.mask = other._mask;
@@ -103,6 +119,17 @@ Renderer2D.prototype.clear = function () {
     this.mask = undefined;
     this.filterArea = undefined;
     this.filters = undefined;
+
+    return this;
+};
+
+Renderer2D.prototype.destroy = function () {
+    var gameObject = this.gameObject;
+    if(gameObject){
+        gameObject.off("addComponent", _onComponentChange, this);
+        gameObject.off("removeComponent", _onComponentChange, this);
+    }
+    Component.prototype.destroy.call(this);
 
     return this;
 };
@@ -125,7 +152,7 @@ function _getTransformBounds(transform, bounds, matrix) {
 
     //transform.updateMatrices(matrix);
     gameObject = transform.gameObject;
-    component = gameObject.getComponent("Renderer2D");
+    component = gameObject.renderer2d;//getComponent("Renderer2D");
     if (component && component.enabled) {
         childBounds = component.getBoundsSelf();
 
@@ -150,7 +177,7 @@ Renderer2D.prototype.getBoundsSelf = function (matrix) {
     bounds.infinity();
 
     gameObject = this.gameObject;
-    components = gameObject.getComponents("Renderable2D", true);
+    components = this.renderables;//gameObject.getComponents("Renderable2D", true);
     if (components && components.length > 0) {
         len1 = components.length;
         for (j = 0; j < len1; j++) {
@@ -206,9 +233,9 @@ Renderer2D.prototype.startRender = function (renderer) {
         len = children.length,
         gameObject, components, component, i;
 
-    gameObject = transform.gameObject;
-    //TODO local iterate gameObject.components and add a bool to the renderable2d component
-    components = gameObject.getComponents("Renderable2D", true);
+    //gameObject = transform.gameObject;
+
+    components = this.renderables;//gameObject.getComponents("Renderable2D", true);
     if (components && components.length > 0) {
 
         len = components.length;
@@ -311,7 +338,7 @@ Renderer2D.prototype.toJSON = function (json) {
 Renderer2D.prototype.fromJSON = function (json) {
     Component.prototype.fromJSON.call(this, json);
 
-    this.alpha = json.alpha;
+    this.alpha = json.alpha || 1;
 
     //TODO how to confirm the unique id for the component
     if (json.mask) {

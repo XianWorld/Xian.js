@@ -61,30 +61,31 @@
 
             var game, scene;
 
-            Assets.addAssets(
-                    new Texture({
-                        name: "bg",
-                        src: "./textDemoBG.jpg"
-                    })
-            );
-
-            game = new Game({
-                debug: true,
-                screen: {
-                    designWidth: 620,
-                    designHeight: 400,
-                    autoSize: true,
-                    resolutionPolicy: new ResolutionPolicy({
-                        contentStrategy: ContentStrategy.get("ShowAll"),//FullScreen//ShowAll//NoScale
-                    })
-                },
-                renderer: {
-//                    canvasRenderer: CanvasRenderer2D,
-//                canvasRenderer: PIXICanvasRenderer2D,
-                    webglRenderer: WebGLRenderer2D
-//                webglRenderer: PIXIWebGLRenderer2D,
-                }
-            });
+//            Assets.addAssets(
+//                    new Texture({
+//                        name: "bg",
+//                        src: "./textDemoBG.jpg"
+//                    })
+//            );
+            var Assets = MainContext.Assets;
+            game = Game;
+//            game = new Game({
+//                debug: true,
+//                screen: {
+//                    designWidth: 620,
+//                    designHeight: 400,
+//                    autoSize: true,
+//                    resolutionPolicy: new ResolutionPolicy({
+//                        contentStrategy: ContentStrategy.get("ShowAll"),//FullScreen//ShowAll//NoScale
+//                    })
+//                },
+//                renderer: {
+////                    canvasRenderer: CanvasRenderer2D,
+////                canvasRenderer: PIXICanvasRenderer2D,
+//                    webglRenderer: WebGLRenderer2D
+////                webglRenderer: PIXIWebGLRenderer2D,
+//                }
+//            });
 
             scene = new Scene({
                 name: "PlayGround",
@@ -106,7 +107,7 @@
                         clearBeforeRender: true,
                     }),
                     new Sprite2D({
-                        texture: Assets.get("bg")
+                        texture: Assets.load("textDemoBG.jpg", "Texture")
                     }),
                     new Renderer2D,
                 ]
@@ -174,23 +175,20 @@
             });
 
 //        bg.transform.addChild(text1.transform);
-            scene.addGameObjects(bg, text1, text2, text3);
+//            scene.addGameObjects(bg, text1, text2, text3);
 
             game.addScene(scene);
 
             function start() {
                 game.setScene("PlayGround");
+                game.scene.addGameObjects(bg, text1, text2, text3);
                 console.log("Game Started!");
             }
 
             game.on("start", function () {
                 start();
             });
-            //game.start();
-
-            AssetLoader.on("load", function () {
-                game.start();
-            }).load();
+            game.start();
 
         });
     }

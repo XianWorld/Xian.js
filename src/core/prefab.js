@@ -1,18 +1,15 @@
 var Class = require("../base/class");
-var ObjectPool = require("../base/object_pool");
+var MainContext = require("../context/main_context");
+var ObjectPools = MainContext.ObjectPools;
 "use strict";
 
-
 function Prefab(object) {
-
     Class.call(this);
 
-    this.object = object.toJSON();
-    this.objectPool = new ObjectPool(object.constructor);
+    this.setObject(object);
 }
 
 Class.extend(Prefab);
-
 
 Prefab.prototype.create = function () {
     var object = this.objectPool.create();
@@ -23,11 +20,10 @@ Prefab.prototype.create = function () {
     return object;
 };
 
-
 Prefab.prototype.setObject = function (object) {
 
     this.object = object.toJSON();
-    this.objectPool = new ObjectPool(object.constructor);
+    this.objectPool = ObjectPools.getPool(object.constructor);
 
     return this;
 };

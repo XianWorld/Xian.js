@@ -28,6 +28,7 @@ Component.extend(Behaviour);
 //});
 
 Behaviour.prototype.copy = function (other) {
+    Component.prototype.copy.call(other);
 
     return this;
 };
@@ -52,6 +53,11 @@ Behaviour.prototype.update = function () {
     this.onUpdate();
 };
 
+Behaviour.prototype.clear = function () {
+    Component.prototype.clear.call(this);
+
+    this.onClear();
+};
 Behaviour.prototype.destroy = function () {
     Component.prototype.destroy.call(this);
 
@@ -73,6 +79,8 @@ Behaviour.prototype.onUpdate = function () {
 //};
 //Behaviour.prototype.onDisabled = function () {
 //};
+Behaviour.prototype.onClear = function () {
+};
 Behaviour.prototype.onDestory = function () {
 };
 

@@ -138,12 +138,14 @@ GameObject.prototype.clear = function () {
 
 
 GameObject.prototype.destroy = function () {
-    if (!this.scene) {
-        Log.error("GameObject.destroy: can't destroy GameObject if it's not added to a Scene");
-        return this;
-    }
+    //if (!this.scene) {
+    //    Log.error("GameObject.destroy: can't destroy GameObject if it's not added to a Scene");
+    //    return this;
+    //}
 
-    this.scene.removeGameObject(this);
+    if(this.scene){
+        this.scene.removeGameObject(this);
+    }
     this.emit("destroy");
 
     this.clear();
@@ -205,7 +207,8 @@ GameObject.prototype.hasTag = function (tag) {
 
 
 GameObject.prototype.addComponent = function (component, others) {
-    if (typeof(component) === "string") component = new Class._classes[component];
+    if (typeof(component) === "string") component = Class.create(component);
+    if (typeof(component) === "function") component = new component;
     if (!(component instanceof Component)) {
         Log.error("GameObject.addComponent: can't add passed argument, it is not an instance of Component");
         return undefined;
@@ -406,7 +409,7 @@ GameObject.prototype.getComponent = function (type, inherit) {
     }
 };
 
-GameObject.prototype.getComponents = function (type, inherit) {
+GameObject.prototype.getComponents = function (type, inherit, results) {
     var components, len, i, component;
 
     if (!inherit) {
@@ -419,7 +422,7 @@ GameObject.prototype.getComponents = function (type, inherit) {
         if (typeof(type) === "string") type = Class._classes[type];
 
         components = this.components;
-        var results = [];
+        results = results || [];
         len = components.length;
         for (i = 0; i < len; i++) {
             component = components[i];
@@ -533,8 +536,9 @@ GameObject.prototype.fromJSON = function (json) {
     //        this.addComponent(Class.fromJSON(jsonComponent));
     //    }
     //}
-    this.name = json.name;
-    this._activeSelf = json.active;
+
+    this.name = json.name || "GameObject_" + this._id;
+    this._activeSelf = json.active || true;
     this.activeInHierarchy = this._activeSelf;
 
     while (i--) {

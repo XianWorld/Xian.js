@@ -835,8 +835,8 @@ Vec2.prototype.notEquals = function (other) {
  */
 Vec2.prototype.fromJSON = function (json) {
 
-    this.x = json.x;
-    this.y = json.y;
+    this.x = json.x || 0.0;
+    this.y = json.y || 0.0;
 
     return this;
 };
@@ -898,5 +898,8 @@ Vec2.prototype.toString = function () {
     return "Vec2( " + this.x + ", " + this.y + " )";
 };
 
+Vec2.prototype.clear = function () {
+    this._x = this._y = 0;
+};
 
 module.exports = Vec2;

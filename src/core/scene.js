@@ -28,25 +28,23 @@ function Scene(opts) {
     this.gameObjects = [];
     this._gameObjectHash = {};
     this._gameObjectJSONHash = {};
-    this._newGameObjects = [];
+    //this._newGameObjects = [];
 
     this._systemTypeHash = {};
     this._systems = [];
-    this._newSystems = [];
+    //this._newSystems = [];
 
     //this.componentManagers = {};
     //this._componentManagerTypes = [];
     this._componentHash = {};
     this._componentJSONHash = {};
 
-    this._newComponents = [];
+    //this._newComponents = [];
 
     //add systems
     if (opts.systems) {
         this.addSystems.apply(this, opts.systems);
     }
-
-    //this.setWorld(opts.world instanceof World ? opts.world : new World(opts.world));
     if (opts.gameObjects) this.addGameObjects.apply(this, opts.gameObjects);
 }
 
@@ -54,7 +52,7 @@ Class.extend(Scene);
 
 
 Scene.prototype.copy = function (other) {
-    var otherGameObjects = other.gameObjects,
+      var otherGameObjects = other.gameObjects,
         i = otherGameObjects.length;
 
     this.clear();
@@ -69,23 +67,26 @@ Scene.prototype.copy = function (other) {
 Scene.prototype.init = function () {
     var systems = this._systems,
         gameObjects = this.gameObjects,
-        newComponents = this._newComponents,
+        //newComponents = this._newComponents,
         i, il, key, component;
 
     //this.world && this.world.init();
 
-    //var componentHash = this._componentHash;
-    //for (key in componentHash) {
-    //    if (component = componentHash[key]){
-    //        component.init();
-    //        component.emit("init");
-    //    }
-    //}
+    var componentHash = this._componentHash;
+    for (key in componentHash) {
+        if (component = componentHash[key]){
+            component.init();
+            component.emit("init");
+        }
+    }
 
-    this._updateNewInit();
+    //this._updateNewInit();
 
-    //for (i = 0, il = gameObjects.length; i < il; i++) gameObjects[i].emit("init");
-    //for (i = 0, il = systems.length; i < il; i++) systems[i].init();
+    for (i = 0, il = gameObjects.length; i < il; i++) gameObjects[i].emit("init");
+    for (i = 0, il = systems.length; i < il; i++) {
+        systems[i].init();
+        systems[i].emit("init");
+    }
 };
 
 
@@ -96,99 +97,91 @@ Scene.prototype.start = function () {
         i, il, key, component;
 
     //this.world && this.world.start();
-    //var componentHash = this._componentHash;
-    //for (key in componentHash) {
-    //    if (component = componentHash[key]){
-    //        component.start();
-    //        component.emit("start");
-    //    }
-    //}
-    this._updateNewStart();
-
-    //for (i = 0, il = gameObjects.length; i < il; i++) gameObjects[i].emit("start");
-    //for (i = 0, il = systems.length; i < il; i++) systems[i].start();
-};
-
-Scene.prototype._updateNewInit = function () {
-    var systems = this._newSystems,
-        gameObjects = this._newGameObjects,
-        newComponents = this._newComponents,
-        len, i, il;
-
-    len = newComponents.length;
-    if (len > 0) {
-        for (i = 0, il = len; i < il; i++) {
-            newComponents[i].init();
-            newComponents[i].emit("init");
-        }
-    }
-    len = gameObjects.length;
-    if (len > 0) {
-        for (i = 0, il = len; i < il; i++) gameObjects[i].emit("init");
-    }
-    len = systems.length;
-    if (len > 0) {
-        for (i = 0, il = len; i < il; i++) {
-            systems[i].init();
-            systems[i].emit("init");
-        }
-    }
-
-};
-Scene.prototype._updateNewStart = function () {
-    var systems = this._newSystems,
-        gameObjects = this._newGameObjects,
-        newComponents = this._newComponents,
-        system, gameObject, component,
-        len, i, il;
-
-    len = newComponents.length;
-    if (len > 0) {
-        for (i = 0, il = len; i < il; i++) {
-            component = newComponents[i];
+    var componentHash = this._componentHash;
+    for (key in componentHash) {
+        if (component = componentHash[key]){
             component.start();
-            component.emit("start", component);
-
-            //only when the component started then emit the start event
-            this.emit("start" + component._className, component);
-            this.emit("startComponent", component);
+            component.emit("start");
         }
-        newComponents.length = 0;
     }
-    len = gameObjects.length;
-    if (len > 0) {
-        for (i = 0, il = len; i < il; i++) {
-            gameObject = gameObjects[i];
-            gameObject.emit("start", gameObject);
+    //this._updateNewStart();
 
-            ////only check the new-start gameobject for root
-            //if ((transform = gameObject.transform || gameObject.transform2d)) {
-            //    //add the root gameobject
-            //    if(transform.parent === undefined)
-            //        roots.push(gameObject);
-        }
-        gameObjects.length = 0;
-    }
-    len = systems.length;
-    if (len > 0) {
-        for (i = 0, il = len; i < il; i++) {
-            system = systems[i];
-            system.start();
-            system.emit("start", system);
-        }
-        systems.length = 0;
+    for (i = 0, il = gameObjects.length; i < il; i++) gameObjects[i].emit("start");
+    for (i = 0, il = systems.length; i < il; i++) {
+        systems[i].start();
+        systems[i].emit("start", systems[i]);
     }
 };
-//Scene.prototype._updateRootGameObjects = function(){
+
+//Scene.prototype._updateNewInit = function () {
+//    var systems = this._newSystems,
+//        gameObjects = this._newGameObjects,
+//        newComponents = this._newComponents,
+//        len, i, il;
 //
-//    var transform, i,il;
+//    len = newComponents.length;
+//    if (len > 0) {
+//        for (i = 0, il = len; i < il; i++) {
+//            newComponents[i].init();
+//            newComponents[i].emit("init");
+//        }
+//    }
+//    len = gameObjects.length;
+//    if (len > 0) {
+//        for (i = 0, il = len; i < il; i++) gameObjects[i].emit("init");
+//    }
+//    len = systems.length;
+//    if (len > 0) {
+//        for (i = 0, il = len; i < il; i++) {
+//            systems[i].init();
+//            systems[i].emit("init");
+//        }
+//    }
 //
-//    for (i = 0, il = len; i < il; i++) gameObjects[i].emit("start");
-//    if ((transform = gameObject.transform || gameObject.transform2d)) {
-//    //add the root gameobject
-//    if(transform.parent === undefined)
-//        roots.push(gameObject);
+//};
+//Scene.prototype._updateNewStart = function () {
+//    var systems = this._newSystems,
+//        gameObjects = this._newGameObjects,
+//        newComponents = this._newComponents,
+//        system, gameObject, component,
+//        len, i, il;
 //
+//    len = newComponents.length;
+//    if (len > 0) {
+//        for (i = 0, il = len; i < il; i++) {
+//            component = newComponents[i];
+//            component.start();
+//            component.emit("start", component);
+//
+//            //only when the component started then emit the start event
+//            this.emit("start" + component._className, component);
+//            this.emit("startComponent", component);
+//        }
+//        newComponents.length = 0;
+//    }
+//    len = gameObjects.length;
+//    if (len > 0) {
+//        for (i = 0, il = len; i < il; i++) {
+//            gameObject = gameObjects[i];
+//            gameObject.emit("start", gameObject);
+//
+//            ////only check the new-start gameobject for root
+//            //if ((transform = gameObject.transform || gameObject.transform2d)) {
+//            //    //add the root gameobject
+//            //    if(transform.parent === undefined)
+//            //        roots.push(gameObject);
+//        }
+//        gameObjects.length = 0;
+//    }
+//    len = systems.length;
+//    if (len > 0) {
+//        for (i = 0, il = len; i < il; i++) {
+//            system = systems[i];
+//            system.start();
+//            system.emit("start", system);
+//        }
+//        systems.length = 0;
+//    }
 //};
 
 Scene.prototype.update = function () {
@@ -196,8 +189,8 @@ Scene.prototype.update = function () {
         system, i, il;
 
     //this.world && this.world.update();
-    this._updateNewInit();
-    this._updateNewStart();
+    //this._updateNewInit();
+    //this._updateNewStart();
 
     for (i = 0, il = systems.length; i < il; i++) {
         if ((system = systems[i])) system.update();
@@ -217,10 +210,16 @@ Scene.prototype.render = function () {
 
 Scene.prototype.clear = function () {
     var gameObjects = this.gameObjects,
-        i = gameObjects.length;
+        i = gameObjects.length,
+        systems = this._systems;
 
     //this.removeWorld();
     while (i--) this.removeGameObject(gameObjects[i], true);
+
+    this.name = undefined;//opts.name !== undefined ? opts.name : "Scene_" + this._id;
+
+    i = systems.length;
+    while (i--) this.removeSystem(systems[i], true);
 
     this.off();
 
@@ -268,19 +267,21 @@ Scene.prototype.toJSON = function (json) {
 Scene.prototype.fromJSON = function (json) {
     Class.prototype.fromJSON.call(this, json);
 
-    this.name = json.name;
+    this.name = json.name !== undefined ? json.name : "Scene_" + this._id;
 
     var jsonSystems = json.systems,
-        system, jsonSystem,
+        system, jsonSystem,i;
+    if(jsonSystems){
         i = jsonSystems.length;
 
-    while (i--) {
-        if (!(jsonSystem = jsonSystems[i])) continue;
+        while (i--) {
+            if (!(jsonSystem = jsonSystems[i])) continue;
 
-        if ((system = this._systemTypeHash[jsonSystem._className])) {
-            system.fromJSON(jsonSystem);
-        } else {
-            this.addSystem(Class.fromJSON(jsonSystem));
+            if ((system = this._systemTypeHash[jsonSystem._className])) {
+                system.fromJSON(jsonSystem);
+            } else {
+                this.addSystem(Class.fromJSON(jsonSystem));
+            }
         }
     }
 
@@ -293,16 +294,18 @@ Scene.prototype.fromJSON = function (json) {
     var jsonGameObjects = json.gameObjects,
         gameObject, jsonGameObject, len;
 
-    len = jsonGameObjects.length;
+    if(jsonGameObjects){
+        len = jsonGameObjects.length;
 
-    //while (i--) {
-    for (i = 0; i < len; i++) {
-        if (!(jsonGameObject = jsonGameObjects[i])) continue;
+        //while (i--) {
+        for (i = 0; i < len; i++) {
+            if (!(jsonGameObject = jsonGameObjects[i])) continue;
 
-        if ((gameObject = this._gameObjectJSONHash[jsonGameObject._id])) {
-            gameObject.fromJSON(jsonGameObject);
-        } else {
-            this.addGameObject(Class.fromJSON(jsonGameObject));
+            if ((gameObject = this._gameObjectJSONHash[jsonGameObject._id])) {
+                gameObject.fromJSON(jsonGameObject);
+            } else {
+                this.addGameObject(Class.fromJSON(jsonGameObject));
+            }
         }
     }
 
@@ -346,8 +349,8 @@ Scene.prototype.addGameObject = function (gameObject) {
             }
         }
 
-        this._newGameObjects.push(gameObject);
-        //if (this.game) gameObject.emit("init");
+        //this._newGameObjects.push(gameObject);
+        if (this.game) gameObject.emit("init");
         this.emit("addGameObject", gameObject);
     } else {
         Log.error("Scene.addGameObject: GameObject is already a member of Scene");
@@ -409,13 +412,13 @@ Scene.prototype.removeGameObject = function (gameObject, clear) {
             }
         }
 
-        i = this._newGameObjects.indexOf(gameObject);
-        if (i !== -1)
-            this._newGameObjects.splice(i, 1);
+        //i = this._newGameObjects.indexOf(gameObject);
+        //if (i !== -1)
+        //    this._newGameObjects.splice(i, 1);
 
         this.emit("removeGameObject", gameObject);
         gameObject.emit("remove", gameObject);
-        if (clear) gameObject.clear();
+        if (clear) gameObject.destroy();
     } else {
         Log.error("Scene.removeGameObject: GameObject is not a member of Scene");
     }
@@ -514,20 +517,21 @@ Scene.prototype._addComponent = function (component) {
     this._componentHash[component._id] = component;
     if (component._jsonId !== -1) this._componentJSONHash[component._jsonId] = component;
 
-    if (component._comp_state === undefined) {
-        this._newComponents.push(component);
-    }
+    //if (component._comp_state === undefined) {
+    //    this._newComponents.push(component);
+    //}
 
     this.emit("add" + type, component);
     this.emit("addComponent", component);
     component.emit("addToScene");
 
-    //if (this.game) {
-    //    component.init();
-    //    component.emit("init");
-    //    component.start();
-    //    component.emit("start");
-    //}
+    if (this.game) {
+        component.init();
+        component.emit("init");
+        component.start();
+        component.emit("start");
+        //component.update();
+    }
 };
 
 Scene.prototype._removeComponent = function (component, clear) {
@@ -547,10 +551,10 @@ Scene.prototype._removeComponent = function (component, clear) {
     //    componentManager.scene = undefined;
     //}
 
-    if (component._comp_state === undefined) {
-        var index = this._newComponents.indexOf(component);
-        if (index !== -1) this._newComponents.splice(index, 1);
-    }
+    //if (component._comp_state === undefined) {
+    //    var index = this._newComponents.indexOf(component);
+    //    if (index !== -1) this._newComponents.splice(index, 1);
+    //}
 
     this.emit("remove" + type, component);
     this.emit("removeComponent", component);
@@ -585,9 +589,15 @@ Scene.prototype.addSystem = function (system) {
     systems.sort(sortSystemList);
     system.scene = this;
 
-    this._newSystems.push(system);
+    //this._newSystems.push(system);
 
     this.emit("addSystem", system);
+    if(this.game){
+        system.init();
+        system.emit("init");
+        system.start();
+        system.emit("start");
+    }
 
     return this;
 };
@@ -616,11 +626,11 @@ Scene.prototype.removeSystem = function (system, clear) {
         systems.splice(index, 1);
         system.scene = undefined;
 
-        index = this._newSystems.indexOf(system);
-        if (index !== -1) this._newSystems.splice(index, 1);
+        //index = this._newSystems.indexOf(system);
+        //if (index !== -1) this._newSystems.splice(index, 1);
 
         this.emit("removeSystem", system);
-        if (clear) system.clear();
+        if (clear) system.destroy();
     } else {
         Log.error("Scene.removeSystem: System is not a member of Scene");
     }

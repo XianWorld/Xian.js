@@ -1,12 +1,12 @@
 var Renderer2D = require("./../renderer_2d");
-var Enums = require("../../../core/enums");
-var Dom = require("../../../context/dom");
+var Enums = require("../../../base/enums");
+var Dom = require("../../../context/utils/dom");
 var util = require("../../../base/util");
 var Color = require("../../../math/color");
 var Mat32 = require("../../../math/mat32");
 var WebGLShaderManager = require("./webgl_shader_manager");
 var WebGLTextureManager = require("./utils/webgl_texture_manager");
-var ScreenContext = require('../../../context/screen_context');
+var ScreenContext = require('../../../context/screen/screen_context');
 
 "use strict";
 

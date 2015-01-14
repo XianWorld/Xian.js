@@ -1,23 +1,5 @@
 "use strict";
 
-
-//var Device = require("./src/context/device"),
-//    Time = require("./src/context/time"),
-//    now = Time.now,
-//
-//    IS_SERVER = !(typeof(window) !== "undefined" && window.document),
-//    IS_CLIENT = !IS_SERVER,
-//
-//    defineProperty = Object.defineProperty;
-//
-//
-//if (Device.mobile) {
-//    window.onerror = function (message, page, line) {
-//        alert("line: " + line + ", page: " + page + "\nmessage: " + message);
-//    };
-//}
-
-
 /**
  * Holds all accessible Classes
  * @class Xian
@@ -28,15 +10,16 @@ function Xian() {
     this.Class = require("./src/base/class");
     this.Enum = require("./src/base/enum");
     this.EventEmitter = require("./src/base/event_emitter");
-    this.ObjectPool = require("./src/base/object_pool");
     this.util = require("./src/base/util");
     this.Config = require("./src/base/config");
+    this.Enums = require("./src/base/enums");
 
     //context
     this.MainContext = require("./src/context/main_context");
-    this.ResolutionPolicy = require("./src/context/screen/ResolutionPolicy");
-    this.ContainerStrategy = require("./src/context/screen/ContainerStrategy");
-    this.ContentStrategy = require("./src/context/screen/ContentStrategy");
+    //context/screen
+    //this.ResolutionPolicy = require("./src/context/screen/ResolutionPolicy");
+    //this.ContainerStrategy = require("./src/context/screen/container_strategy");
+    //this.ContentStrategy = require("./src/context/screen/content_strategy");
     //this.AudioCtx = require("./context/audio_ctx");
     //this.Device = require("./context/device");
     //this.Dom = require("./context/dom");
@@ -47,28 +30,32 @@ function Xian() {
     //this.Handler = require("./context/input/handler");
     //this.Input = require("./context/input");
     //this.Canvas = require("./context/canvas");
-
-    //assets
-    this.Asset = require("./src/assets/asset");
-    this.AssetLoader = require("./src/assets/asset_loader");
-    this.Assets = require("./src/assets/assets");
-    this.AudioClip = require("./src/assets/audio_clip");
-    this.Texture = require("./src/assets/texture");
-    this.RenderTexture = require("./src/assets/render_texture");
+    //context/assets
+    this.Asset = require("./src/context/assets/asset");
+    this.AssetLoader = require("./src/context/assets/asset_loader");
+    this.AssetLoaderLib = require("./src/context/assets/asset_loader_lib");
+    this.AudioClip = require("./src/context/assets/audio_clip");
+    this.Texture = require("./src/context/assets/texture");
+    this.RenderTexture = require("./src/context/assets/render_texture");
+    this.JsonData = require("./src/context/assets/json_data");
+    this.Prefab = require("./src/context/assets/prefab");
+    //context/render
+    //this.RendererLib = require("./src/context/graphics/renderer_lib");
 
     //components
     this.AudioSource = require("./src/components/audio_source");
     this.Camera = require("./src/components/camera");
     this.Component = require("./src/core/component");
-    this.Sprite = require("./src/components/sprite");
+    //this.Sprite = require("./src/components/sprite");
     this.Transform = require("./src/components/transform");
     this.Behaviour = require("./src/components/behaviour");
 
+    //behaviours
+    this.AssetAgent = require("./src/components/behaviours/asset_agent");
+
     //core
     this.Game = require("./src/core/game");
-    this.Enums = require("./src/core/enums");
     this.GameObject = require("./src/core/game_object");
-    this.Prefab = require("./src/core/prefab");
     this.Scene = require("./src/core/scene");
     this.System = require("./src/core/system");
 
@@ -76,6 +63,7 @@ function Xian() {
     this.ComponentSystem = require("./src/systems/component_system");
     this.TransformSystem = require("./src/systems/transform_system");
     this.BehaviourSystem = require("./src/systems/behaviour_system");
+    //this.AssetSystem = require("./src/systems/asset_system");
 
     //math
     this.AABB2 = require("./src/math/aabb2");
@@ -93,10 +81,31 @@ function Xian() {
     this.Vec3 = require("./src/math/vec3");
     this.Vec4 = require("./src/math/vec4");
 
-    //xian2d
+    //xian2d/base
+    this.Enums2D = require("./src/xian2d/base/enums_2d");
+    //xian2d/contexts
+    //this.XianShader = require("./src/xian2d/context/renderer/shaders/xian_shader");
+    this.FilterLib = require("./src/xian2d/context/graphics/g2d/webgl/filters/FilterLib");
+    //register renderer lib
+    //var CanvasRenderer2D = require("./src/xian2d/context/renderer/canvas_renderer_2d");
+    //var WebGLRenderer2D = require("./src/xian2d/context/renderer/webgl_renderer_2d");
+    var CanvasRenderContext2D = require("./src/xian2d/context/graphics/g2d/canvas/canvas_render_context_2d");
+    var WebGLRenderContext2D = require("./src/xian2d/context/graphics/g2d/webgl/webgl_render_context_2d");
+    this.MainContext.GraphicsContext.setRenderContext("2d", CanvasRenderContext2D, WebGLRenderContext2D);
+    //this.RendererLib.register(CanvasRenderer2D);
+    //this.RendererLib.register(WebGLRenderer2D);
+    //this.RendererLib.register(PIXICanvasRenderer2D);
+    //this.RendererLib.register(PIXIWebGLRenderer2D);
+    //xian2d/context/assets
+    this.TextureClipData = require("./src/xian2d/context/assets/texture_clip_data");
+    this.SpriteSheet = require("./src/xian2d/context/assets/sprite_sheet");
+    //register asset loaders
+    var SpriteSheetLoader = require("./src/xian2d/context/assets/sprite_sheet_loader");
+    this.AssetLoaderLib.registerLoader("json", "SpriteSheet", SpriteSheetLoader);
+
+    //xian2d/components
     this.Transform2D = require("./src/xian2d/components/transform_2d");
     this.Camera2D = require("./src/xian2d/components/camera_2d");
-    this.TextureClip = require("./src/xian2d/assets/texture_clip");
     //this.Renderer2D = require("./src/xian2d/context/renderer/canvas_renderer_2d");
     this.Renderer2D = require("./src/xian2d/components/renderer_2d");
     this.Renderable2D = require("./src/xian2d/components/renderable_2d");
@@ -105,33 +114,11 @@ function Xian() {
     this.Graphics = require("./src/xian2d/components/graphics");
     this.Text2D = require("./src/xian2d/components/text_2d");
 
-    this.CanvasRenderer2D = require("./src/xian2d/context/renderer/canvas_renderer_2d");
-    this.WebGLRenderer2D = require("./src/xian2d/context/renderer/webgl_renderer_2d");
-    this.XianShader = require("./src/xian2d/context/renderer/shaders/xian_shader");
+    //xian2d systems
     this.Render2DSystem = require("./src/xian2d/systems/render_2d_system");
     this.Transform2DSystem = require("./src/xian2d/systems/transform_2d_system");
 
-    this.PIXICanvasRenderer2D = require("./src/xian2d/context/pixi/canvas/pixi_canvas_renderer_2d");
-    this.PIXIWebGLRenderer2D = require("./src/xian2d/context/pixi/webgl/pixi_webgl_renderer_2d");
-
-    this.FilterLib = require("./src/xian2d/context/pixi/webgl/filters/FilterLib");
-
 }
-
-
-//defineProperty(Xian.prototype, "isServer", {
-//    get: function () {
-//        return IS_SERVER;
-//    }
-//});
-//
-//
-//defineProperty(Xian.prototype, "isClient", {
-//    get: function () {
-//        return IS_CLIENT;
-//    }
-//});
-
 
 /**
  * attaches Xian to window/global and all subclasses
@@ -141,26 +128,5 @@ Xian.prototype.globalize = function () {
     for (var key in this) window[key] = this[key];
     window.Xian = this;
 };
-
-///**
-// * benchmarks function console.logs number of operations / second
-// * @param String name
-// * @param Function fn
-// */
-//Xian.prototype.benchmark = function (name, fn, times) {
-//    times || (times = 1000);
-//    var start = 0.0,
-//        time = 0.0,
-//        i = times;
-//
-//    while (i--) {
-//        start = now();
-//        fn();
-//        time += now() - start;
-//    }
-//
-//    console.log(name + ":\n\t" + times / time + " (ops/sec)\n\t" + time / times + "(avg/call)");
-//};
-
 
 module.exports = new Xian();

@@ -18,20 +18,39 @@ function Component(opts) {
     //this._type = type || this._className;
     this._name = opts.name !== undefined ? opts.name : camelize(this._className, true);
 
-    this.sync = opts.sync !== undefined ? !!opts.sync : false;
+    //this.sync = opts.sync !== undefined ? !!opts.sync : false;
     this.json = opts.json !== undefined ? !!opts.json : true;
 
-    this._comp_state = undefined;
+    //this._comp_state = undefined;
     this.gameObject = undefined;
 
-    this.enabled = opts.enabled !== undefined ? opts.enabled : true;
+    this.enabled = opts.enabled !== undefined ? !!opts.enabled : true;
 }
 
 Class.extend(Component);
 
+//Object.defineProperty(Component.prototype, 'json', {
+//    get: function() {
+//        return this._json = this.toJSON();
+//    },
+//    set: function(value){
+//        this._json = value;
+//        if(this._comp_state !== undefined){
+//            //this.clear();
+//            this.fromJSON(this._json);
+//        }
+//    }
+//});
+
 Object.defineProperty(Component.prototype, 'transform', {
     get: function() {
         return this.gameObject === undefined ? undefined : this.gameObject.transform;
+    }
+});
+
+Object.defineProperty(Component.prototype, 'inScene', {
+    get: function() {
+        return this.gameObject !== undefined && this.gameObject.scene !== undefined;
     }
 });
 
@@ -43,21 +62,25 @@ Object.defineProperty(Component.prototype, 'transform', {
 //
 Component.prototype.copy = function (other) {
 
-    this.sync = other.sync;
+    //this.sync = other.sync;
     this.json = other.json;
-
+    this.enabled = other.enabled;
     return this;
 };
 
 
 Component.prototype.init = function () {
-    this._comp_state = "init";
+    //this._comp_state = "init";
+
+    //only when add to scene and call init.
+    //this.fromJSON(this._json);
+
     return this;
 };
 
 
 Component.prototype.start = function () {
-    this._comp_state = "start";
+    //this._comp_state = "start";
 
     return this;
 };
@@ -70,7 +93,7 @@ Component.prototype.update = function () {
 
 Component.prototype.clear = function () {
 
-    this._comp_state = undefined;
+    //this._comp_state = undefined;
     this.off();
 
     return this;
@@ -78,12 +101,13 @@ Component.prototype.clear = function () {
 
 
 Component.prototype.destroy = function () {
-    if (!this.gameObject) {
-        Log.error("Component.destroy: can't destroy Component if it's not added to a GameObject");
-        return this;
+    //if (!this.gameObject) {
+    //    Log.error("Component.destroy: can't destroy Component if it's not added to a GameObject");
+    //    return this;
+    //}
+    if (this.gameObject) {
+        this.gameObject.removeComponent(this);
     }
-
-    this.gameObject.removeComponent(this);
     this.emit("destroy");
 
     this.clear();
@@ -107,7 +131,7 @@ Component.prototype.toJSON = function (json) {
     json = Class.prototype.toJSON.call(this, json);
 
     json.name = this._name;
-    json.sync = this.sync;
+    //json.sync = this.sync;
     json.json = this.json;
 
     json.enabled = this.enabled;
@@ -118,11 +142,11 @@ Component.prototype.toJSON = function (json) {
 Component.prototype.fromJSON = function (json) {
     Class.prototype.fromJSON.call(this, json);
 
-    this._name = json.name;
-    this.sync = json.sync;
-    this.json = json.json;
+    if(json.name) this._name = json.name;// || camelize(this._className, true);
+    //this.sync = json.sync;
+    this.json = json.json !== undefined ? !!json.json : true;
 
-    this.enabled = json.enabled;
+    this.enabled = json.enabled !== undefined ? !!json.enabled : true;
     return this;
 };
 

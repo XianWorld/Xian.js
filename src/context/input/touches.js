@@ -1,10 +1,10 @@
-var ObjectPool = require("../../base/object_pool");
+var ObjectPools = require("../pool/object_pools");
 var Touch = require("./touch");
 "use strict";
 
 
-var TOUCH_POOL = new ObjectPool(Touch),
-    OBJECT_POOL = new ObjectPool(Object);
+var TOUCH_POOL = ObjectPools.getPool(Touch);
+    //OBJECT_POOL = ObjectPools.getPool(Object);
 
 
 function Touches() {
@@ -59,31 +59,31 @@ Touches.prototype.move = function (index, targetTouch) {
 };
 
 
-Touches.prototype.toSYNC = function (json) {
-    json || (json = this._SYNC);
-    var jsonTouches = json.touches || (json.touches = []),
-        i = this.length;
-
-    jsonTouches.length = 0;
-    OBJECT_POOL.clear();
-
-    while (i--) jsonTouches[i] = this[i].toSYNC(OBJECT_POOL.create());
-
-    return json;
-};
-
-
-Touches.prototype.fromSYNC = function (json) {
-    var jsonTouches = json.touches,
-        i = jsonTouches.length;
-
-    this.length = 0;
-    TOUCH_POOL.clear();
-
-    while (i--) this[i] = TOUCH_POOL.create().fromSYNC(jsonTouches[i]);
-
-    return this;
-};
+//Touches.prototype.toSYNC = function (json) {
+//    json || (json = this._SYNC);
+//    var jsonTouches = json.touches || (json.touches = []),
+//        i = this.length;
+//
+//    jsonTouches.length = 0;
+//    OBJECT_POOL.clear();
+//
+//    while (i--) jsonTouches[i] = this[i].toSYNC(OBJECT_POOL.create());
+//
+//    return json;
+//};
+//
+//
+//Touches.prototype.fromSYNC = function (json) {
+//    var jsonTouches = json.touches,
+//        i = jsonTouches.length;
+//
+//    this.length = 0;
+//    TOUCH_POOL.clear();
+//
+//    while (i--) this[i] = TOUCH_POOL.create().fromSYNC(jsonTouches[i]);
+//
+//    return this;
+//};
 
 
 Touches.prototype.toJSON = function (json) {

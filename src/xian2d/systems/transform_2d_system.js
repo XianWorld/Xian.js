@@ -8,7 +8,7 @@ function Transform2DSystem(opts) {
 
     TransformSystem.call(this, opts);
 
-    this.addEventName = "startTransform2D";
+    this.addEventName = "addTransform2D";
     this.removeEventName = "removeTransform2D";
     this.componentType = Transform2D;
 }

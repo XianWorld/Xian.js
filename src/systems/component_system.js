@@ -12,7 +12,7 @@ function ComponentSystem(opts) {
     this.needsSort = true;
     this._dirty = true;
 
-    this.addEventName = "startComponent";
+    this.addEventName = "addComponent";
     this.removeEventName = "removeComponent";
     this.componentType = Component;
 

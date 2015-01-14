@@ -6,6 +6,7 @@ var ScreenContext = MainContext.ScreenContext;
 var Mat4 = require("../../math/mat4");
 "use strict";
 
+//TODO it seems the name should be changed to Camera2DSystem
 function Render2DSystem(opts) {
     opts || (opts = {});
 
@@ -13,7 +14,7 @@ function Render2DSystem(opts) {
 
     this.order = 99999;
 
-    this.addEventName = "startCamera2D";
+    this.addEventName = "addCamera2D";
     this.removeEventName = "removeCamera2D";
     this.componentType = Camera2D;
 

@@ -1,9 +1,9 @@
 var Renderer2D = require("./../renderer_2d");
-var Enums = require("../../../core/enums");
-var Dom = require("../../../context/dom");
+var Enums = require("../../../base/enums");
+var Dom = require("../../../context/utils/dom");
 var util = require("../../../base/util");
 var Color = require("../../../math/color");
-var ScreenContext = require('../../../context/screen_context');
+var ScreenContext = require('../../../context/screen/screen_context');
 var CanvasText = require("../render/canvas_text");
 
 "use strict";
@@ -241,7 +241,7 @@ CanvasRenderer2D.prototype._drawImage = function (texture, sourceX, sourceY, sou
     sourceWidth = sourceWidth / scale;
     sourceHeight = sourceHeight / scale;
 
-    var image = texture.raw;
+    var image = texture.image;
     destX += this._transformTx;
     destY += this._transformTy;
     //var beforeDraw = egret.getTimer();

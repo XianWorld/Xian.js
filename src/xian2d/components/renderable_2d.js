@@ -1,4 +1,4 @@
-var Enums = require("../../core/enums");
+var Enums = require("../../base/enums");
 var Component = require("./../../core/component");
 var Rect = require("../../math/rect");
 //var Mat32 = require("../../math/mat32");
@@ -12,11 +12,8 @@ function Renderable2D(opts) {
 
     this._width = opts.width || 0;
     this._height = opts.height || 0;
-
     this.blendMode = opts.blendMode !== undefined ? opts.blendMode : Enums.blendModes.NORMAL;
-
     this.alpha = opts.alpha !== undefined ? opts.alpha : 1;
-
     this.tint = opts.tint !== undefined ? opts.tint : 0xFFFFFF;
 
     this.worldAlpha = 1.0;
@@ -24,9 +21,8 @@ function Renderable2D(opts) {
 
     this._bounds = new Rect(0, 0, 1, 1);
     this._localBounds = new Rect(0, 0, 1, 1);
-    this._dirtyBounds = true;
+    //this._dirtyBounds = true;
     this._dirtySize = true;
-
     this._dirtyRender = true;
 }
 
@@ -91,7 +87,7 @@ Renderable2D.prototype.clear = function () {
     this.alpha = 1;
     this.tint = 0xFFFFFF;
 
-    this._dirtyBounds = true;
+    //this._dirtyBounds = true;
     this._dirtyRender = true;
     this._dirtySize = true;
 
@@ -100,12 +96,12 @@ Renderable2D.prototype.clear = function () {
 
 Renderable2D.prototype.getBounds = function()
 {
-    if(this._dirtyBounds)
+    //if(this._dirtyBounds)
     {
         var worldTransform = this.transform.modelView;
         this.getLocalBounds();
         this._localBounds.getBounds(worldTransform, this._bounds);
-        this._dirtyBounds = false;
+        //this._dirtyBounds = false;
     }
     return this._bounds;
 };
@@ -140,11 +136,11 @@ Renderable2D.prototype.toJSON = function (json) {
 Renderable2D.prototype.fromJSON = function (json) {
     Component.prototype.fromJSON.call(this, json);
 
-    this.width = json.width;
-    this.height = json.height;
-    this.blendMode = json.blendMode;
-    this.alpha = json.alpha;
-    this.tint = json.tint;
+    this.width = json.width || 0;
+    this.height = json.height || 0;
+    this.blendMode = json.blendMode || Enums.blendModes.NORMAL;
+    this.alpha = json.alpha || 1;
+    this.tint = json.tint || 0xFFFFFF;
     return this;
 };
 

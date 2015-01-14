@@ -1,0 +1,259 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>pixi.js example 2 loading a sprite sheet</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+        }
+    </style>
+    <!--<script src="../../bin/pixi.dev.js"></script>-->
+    <script src="../../../spm_modules/seajs/2.3.0/dist/sea.js"></script>
+</head>
+<body>
+<script>
+    // Set configuration
+    seajs.config({
+        base: "../../../dist/"
+    });
+
+    seajs.use(['index-debug.js'], function (Xian) {
+        console.log(Xian);
+
+        Xian.globalize();
+
+        var game, scene;
+        var Assets = MainContext.Assets;
+        game = Game;
+//        Config.fromJSON({
+//            debug: true,
+//            screen: {
+//                designWidth: 800,
+//                designHeight: 600,
+//                autoSize: true,
+//                resolutionPolicy: new ResolutionPolicy({
+//                    contentStrategy: ContentStrategy.get("NoScale"),//FullScreen//ShowAll//NoScale
+//                })
+//            },
+//            renderer: {
+////                    canvasRenderer: CanvasRenderer2D,
+////                canvasRenderer: PIXICanvasRenderer2D,
+////                webglRenderer: WebGLRenderer2D
+//                webglRenderer: PIXIWebGLRenderer2D,
+//            }
+//        });
+
+        function RootBehaviour(opts) {
+            Behaviour.call(this, opts);
+
+            this._spriteSheet = undefined;
+            this._prefab = undefined;
+
+            this._container = undefined;
+            this._sprites = [];
+            this._count = 0;
+
+            this._inited = false;
+        }
+
+        Behaviour.extend(RootBehaviour);
+        RootBehaviour.prototype.onStart = function () {
+            var agent = this.gameObject.assetAgent;
+
+            function _init() {
+                agent.off("complete", _init, this);
+
+                var i, len = 1000;
+                var transform;
+                var sprite, sprites = this._sprites;
+
+                this._spriteSheet = agent.get("SpriteSheet.json");
+                this._prefab = agent.get("spritePrefab.json");
+
+                var spriteSheet = this._spriteSheet;
+                var prefab = this._prefab;
+                if (!spriteSheet || !spriteSheet.ready) return;
+                if (!prefab || !prefab.ready) return;
+
+                this._container = new GameObject;
+                var containerTransform = this._container.addComponent(Transform2D);
+                containerTransform.position.x = 400;
+                containerTransform.position.y = 300;
+                var container = this._container;
+                var flen = spriteSheet.frames.length;
+                for (i = 0; i < len; i++) {
+                    sprite = new GameObject().fromJSON(prefab.jsonData);//prefab.create();
+
+                    var sprite2d = sprite.sprite2d;
+                    transform = sprite.transform;
+
+                    sprite2d.texture = spriteSheet.texture;
+                    sprite2d.textureClip = spriteSheet.frames[i % flen];
+                    sprite2d.tint = Math.random() * 0xFFFFFF;
+                    transform.position.x = Math.random() * 800 - 400;
+                    transform.position.y = Math.random() * 600 - 300;
+
+                    sprites.push(sprite);
+
+                    containerTransform.addChild(transform);
+                }
+
+                this.gameObject.scene.addGameObject(container);
+
+                this._inited = true;
+            }
+
+            if (!agent.preloaded)
+                agent.on("complete", _init, this);
+            else
+                _init();
+        };
+        RootBehaviour.prototype.onUpdate = function () {
+            if (!this._inited) return;
+
+            var i, len = 1000;
+            var transform;
+            var sprite, sprites = this._sprites;
+            for (i = 0; i < len; i++) {
+                sprite = sprites[i];
+                transform = sprite.transform;
+                transform.rotation += 0.1;
+            }
+            transform = this._container.transform;
+            this._count += 0.01;
+            var sin = Math.sin(this._count);
+            transform.scale.x = sin;
+            transform.scale.y = sin;
+            transform.rotation += 0.01;
+        };
+
+        scene = new Scene({
+            name: "PlayGround",
+            systems: [
+                new Transform2DSystem(),
+                new BehaviourSystem(),
+                new Render2DSystem(),
+            ]
+        });
+
+        var root = new GameObject({
+            name: "root",
+            components: [
+                new Transform2D({}),
+                new Camera2D({
+                    transparent: false,
+                    clearBeforeRender: true,
+                }),
+                new AssetAgent({
+                    preloads: [
+                        {name: "SpriteSheet.json", type: "SpriteSheet"},
+                        {name: "spritePrefab.json", type: "Prefab"},
+                    ]
+                }),
+                new RootBehaviour({
+                })
+            ]
+        });
+        game.addScene(scene);
+
+        function start() {
+            game.setScene("PlayGround");
+
+            game.scene.addGameObjects(root);
+
+            console.log("Game Started!");
+        }
+
+        game.on("start", function () {
+            start();
+        });
+
+        game.start();
+
+    });
+
+    //    // create an array of assets to load
+    //    var assetsToLoader = ["SpriteSheet.json"];
+    //
+    //    // create a new loader
+    //    loader = new PIXI.AssetLoader(assetsToLoader);
+    //
+    //    // use callback
+    //    loader.onComplete = onAssetsLoaded
+    //
+    //    //begin load
+    //    loader.load();
+    //
+    //    // holder to store aliens
+    //    var aliens = [];
+    //    var alienFrames = ["eggHead.png", "flowerTop.png", "helmlok.png", "skully.png"];
+    //
+    //    var count = 0;
+    //
+    //    // create an new instance of a pixi stage
+    //    var stage = new PIXI.Stage(0xFFFFFF);
+    //
+    //    // create a renderer instance.
+    //    var renderer = PIXI.CanvasRenderer(800, 600);
+    //
+    //    // add the renderer view element to the DOM
+    //    document.body.appendChild(renderer.view);
+    //
+    //    // create an empty container
+    //    var alienContainer = new PIXI.DisplayObjectContainer();
+    //    alienContainer.position.x = 400;
+    //    alienContainer.position.y = 300;
+    //
+    //    stage.addChild(alienContainer);
+    //
+    //    function onAssetsLoaded() {
+    //        // add a bunch of aliens with textures from image paths
+    //        for (var i = 0; i < 100; i++) {
+    //            var frameName = alienFrames[i % 4];
+    //
+    //            // create an alien using the frame name..
+    //            var alien = PIXI.Sprite.fromFrame(frameName);
+    //            alien.tint = Math.random() * 0xFFFFFF;
+    //
+    //            /*
+    //             * fun fact for the day :)
+    //             * another way of doing the above would be
+    //             * var texture = PIXI.Texture.fromFrame(frameName);
+    //             * var alien = new PIXI.Sprite(texture);
+    //             */
+    //            alien.position.x = Math.random() * 800 - 400;
+    //            alien.position.y = Math.random() * 600 - 300;
+    //            alien.anchor.x = 0.5;
+    //            alien.anchor.y = 0.5;
+    //            aliens.push(alien);
+    //            alienContainer.addChild(alien);
+    //        }
+    //
+    //        // start animating
+    //        requestAnimFrame(animate);
+    //    }
+    //
+    //    function animate() {
+    //        // just for fun, lets rotate mr rabbit a little
+    //        for (var i = 0; i < 100; i++) {
+    //            var alien = aliens[i];
+    //            alien.rotation += 0.1;
+    //        }
+    //
+    //        count += 0.01;
+    //        alienContainer.scale.x = Math.sin(count);
+    //        alienContainer.scale.y = Math.sin(count);
+    //
+    //        alienContainer.rotation += 0.01;
+    //
+    //        // render the stage
+    //        renderer.render(stage);
+    //
+    //        requestAnimFrame(animate);
+    //    }
+</script>
+
+</body>
+</html>

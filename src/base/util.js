@@ -401,9 +401,6 @@ if (!isServer) {
 
 /**
  * 转换数字为颜色字符串
- * @method egret.toColorString
- * @param value {number}
- * @returns {string}
  */
 function toColorString(value){
     if(isNaN(value)||value < 0)
