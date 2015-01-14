@@ -4,8 +4,8 @@ function Config() {
 
     this.debug = false;
 
-    this.host = '127.0.0.1';
-    this.port = 3000;
+    //this.host = '127.0.0.1';
+    //this.port = 3000;
 
     //this.FAKE_LAG = 0;
     //this.SCENE_SYNC_RATE = 0.5;
@@ -14,6 +14,22 @@ function Config() {
 
     this.MIN_DELTA = 0.000001;
     this.MAX_DELTA = 0.25;
+
+    //default configurations...
+    this.screen = {
+        designWidth: 960,
+        designHeight: 640,
+        autoSize: true,
+        //resolutionPolicy: {
+        //    contentStrategy: {
+        //        _className: "NoScale"
+        //    },//FullScreen//ShowAll//NoScale
+        //}
+    };
+    this.graphics = {
+        type: "auto"
+    };
+    //TODO should provide interface for load or update from file or net
 }
 
 

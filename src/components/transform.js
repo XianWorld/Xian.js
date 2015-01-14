@@ -372,23 +372,12 @@ Transform.prototype.toJSON = function (json) {
 
 Transform.prototype.fromJSON = function (json) {
     Component.prototype.fromJSON.call(this, json);
-    var children = json.children,
-        i, len = children.length,
-        child, scene;
+    var children = json.children;
+    if(children){
+        var i, len = children.length,
+            child, scene;
 
-    if (this.gameObject && (scene = this.gameObject.scene)) {
-        //while (i--) {
-        for(i=0;i<len;i++){
-            child = scene.findComponentByJSONId(children[i]);
-
-            if (!this.hasChild(child)) {
-                this.addChild(child);
-            }
-        }
-    } else {
-        this.once("init", function () {
-            var scene = this.gameObject.scene;
-
+        if (this.gameObject && (scene = this.gameObject.scene)) {
             //while (i--) {
             for(i=0;i<len;i++){
                 child = scene.findComponentByJSONId(children[i]);
@@ -397,7 +386,20 @@ Transform.prototype.fromJSON = function (json) {
                     this.addChild(child);
                 }
             }
-        });
+        } else {
+            this.once("init", function () {
+                var scene = this.gameObject.scene;
+
+                //while (i--) {
+                for(i=0;i<len;i++){
+                    child = scene.findComponentByJSONId(children[i]);
+
+                    if (!this.hasChild(child)) {
+                        this.addChild(child);
+                    }
+                }
+            });
+        }
     }
 
     //this.position.fromJSON(json.position);

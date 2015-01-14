@@ -13,12 +13,22 @@ function Class() {
     EventEmitter.call(this);
 
     this._id = ++CLASS_ID;
+    //this._json = undefined;
     this._jsonId = -1;
     this._name = '';
 }
 
+//TODO in order to let Class be the root Object, EventEmitter should be removed from this root Object and mixed in child Object when required. Refer to PIXI's EventTarget
 EventEmitter.extend(Class);
 
+//Object.defineProperty(Class.prototype, 'json', {
+//    get: function() {
+//        return this._json = this.toJSON();
+//    },
+//    set: function(value){
+//        this._json = value;
+//    }
+//});
 
 /**
  * returns new copy of this
@@ -27,7 +37,8 @@ EventEmitter.extend(Class);
  */
 Class.prototype.clone = function () {
 
-    return new this.constructor().copy(this);
+    return Class.create(this._className).copy(this);
+    //return new this.constructor().copy(this);
 };
 
 /**
@@ -47,7 +58,14 @@ Class.prototype.copy = function () {
  * @return this
  */
 Class.prototype.clear = function () {
+    //this._json = undefined;
 
+    return this;
+};
+
+Class.prototype.destroy = function () {
+
+    this.clear();
     return this;
 };
 
@@ -106,7 +124,8 @@ Class.extend = function (child, parent) {
     (this._children || (this._children = {}))[child.name] = child;
     child._parent = this;
 
-    if(Class._classes[child.name]) console.log("Class exist: "+child.name);
+    if(Class._classes[child.name])
+        console.log("Class exist: "+child.name);
     Class._classes[child.name] = child;
 
     if (parent.onExtend) {
@@ -125,7 +144,11 @@ Class.extend = function (child, parent) {
  */
 Class.fromJSON = function (json) {
 
-    return new Class._classes[json._className]().fromJSON(json);
+    return Class.create(json._className).fromJSON(json);
+    //return new Class._classes[json._className]().fromJSON(json);
+    //var obj = new Class._classes[json._className]();
+    //obj.json = json;
+    //return obj;
 };
 
 /**

@@ -1,17 +1,18 @@
-var Class = require("../base/class");
+//var Class = require("../base/class");
+var EventEmitter = require('../base/event_emitter');
 var Config = require("../base/config");
-var Loop = require("./loop");
 var Scene = require("./scene");
 var Context = require("../context/main_context");
 var Log = Context.Log;
 var Time = Context.Time;
+var Loop = Context.Loop;
 "use strict";
 
 function Game(opts) {
-    opts || (opts = {});
-    Config.fromJSON(opts);
+    //opts || (opts = {});
+    //Config.fromJSON(opts);
 
-    Class.call(this);
+    EventEmitter.call(this);
 
     this._loop = new Loop(this.loop, this);
 
@@ -24,7 +25,7 @@ function Game(opts) {
 
 }
 
-Class.extend(Game);
+EventEmitter.extend(Game);
 
 Game.prototype.init = function () {
 
@@ -229,4 +230,4 @@ Game.prototype.setScene = function (scene) {
 //};
 
 
-module.exports = Game;
+module.exports = new Game;

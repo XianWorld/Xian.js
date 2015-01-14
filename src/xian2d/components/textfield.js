@@ -2,9 +2,9 @@
  * Created by Dianyan on 2014/12/26.
  */
 //var Enums = require("../../core/enums");
-var Enums2D = require("../common/enums_2d");
+var Enums2D = require("../base/enums_2d");
 var Renderable2D = require("./renderable_2d");
-var Assets = require("../../assets/assets");
+//var Assets = require("../../assets/core/assets");
 var Color = require("../../math/color");
 var Rect = require("../../math/rect");
 var MainContext = require("../../context/main_context");
@@ -460,7 +460,7 @@ TextField.prototype._getLinesArr = function () {
     }
     this._isArrayChanged = false;
     var text2Arr = this._textArr;
-    var renderContext = MainContext.RendererContext;
+    var renderContext = MainContext.GraphicsContext;
 
     this._linesArr = [];
     var linesArr = this._linesArr;

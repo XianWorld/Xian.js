@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Assets Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+        }
+    </style>
+
+    <!--<script src="../../bin/pixi.dev.js"></script>-->
+    <script src="../../spm_modules/seajs/2.3.0/dist/sea.js"></script>
+</head>
+<body>
+<script>
+
+    // Set configuration
+    seajs.config({
+        base: "../../dist/"
+    });
+
+    seajs.use(['index-debug.js'], function (Xian) {
+        console.log(Xian);
+
+        Xian.globalize();
+
+        var game, scene;
+        var Assets = MainContext.Assets;
+        game = Game;
+//        Config.fromJSON({
+//            debug: true,
+//            screen: {
+//                designWidth: 620,
+//                designHeight: 400,
+//                autoSize: true,
+//                resolutionPolicy: new ResolutionPolicy({
+//                    contentStrategy: ContentStrategy.get("NoScale"),//FullScreen//ShowAll//NoScale
+//                })
+//            },
+//            renderer: {
+////                    canvasRenderer: CanvasRenderer2D,
+////                canvasRenderer: PIXICanvasRenderer2D,
+////                webglRenderer: WebGLRenderer2D
+//                webglRenderer: PIXIWebGLRenderer2D,
+//            }
+//        });
+
+        function PreloadBehaviour(opts) {
+            Behaviour.call(this, opts);
+        }
+        Behaviour.extend(PreloadBehaviour);
+        PreloadBehaviour.prototype.onStart = function () {
+            var gameObject = this.gameObject;
+            var assetAgent = gameObject.assetAgent;
+            var preloadProgress = function(total, left){
+                console.log((total-left)+" / " + total);
+            };
+            var preloadComplete = function(total){
+                console.log("finished: " + total);
+                gameObject.scene.addGameObject(view);
+            };
+            if(assetAgent.preloaded){
+                preloadComplete();
+            }
+            else{
+                assetAgent.on("progress", preloadProgress.bind(this));
+                assetAgent.on("complete", preloadComplete.bind(this));
+            }
+        };
+
+        scene = new Scene({
+            name: "PlayGround",
+            systems: [
+//                new AssetSystem(),
+                new Transform2DSystem(),
+                new BehaviourSystem(),
+                new Render2DSystem(),
+            ]
+        });
+
+        var root = new GameObject({
+            name: "root",
+            components: [
+                new Transform2D({
+//                    identity: true
+                }),
+                new Camera2D({
+                    transparent: true,
+                    clearBeforeRender: true,
+                }),
+                new AssetAgent({
+                    preloads: [
+                        {name: "eggHead.png", type: "Texture"},
+                        {name: "flowerTop.png", type: "Texture"},
+                        {name: "skully.png", type: "Texture"},
+                        {name: "helmlok.png", type: "Texture"}
+                    ]
+                }),
+                new PreloadBehaviour(),
+            ]
+        });
+        var view = new GameObject({
+            name: "view",
+            components: [
+                new Transform2D({
+//                    identity: true
+                }),
+                new Sprite2D({
+                    name: "sprite2d_0",
+                    alpha: 1,
+                    //tint: 0xff0000,
+                    //mask: new Rect(10,10,20,20),
+                    texture: Assets.load("eggHead.png", "Texture")
+                }),
+                new Renderer2D({
+                    filters: [
+                        new FilterLib._classes.BlurXFilter({
+                            blur: 30
+                        }),
+                    ],
+                }),
+            ]
+        });
+
+//        bg.transform.addChild(text1.transform);
+//        scene.addGameObject(root);
+//        scene.addGameObjects(bg, text1, text2, text3);
+
+        game.addScene(scene);
+
+        function start() {
+            game.setScene("PlayGround");
+            game.scene.addGameObject(root);
+            console.log("Game Started!");
+        }
+
+        game.on("start", function () {
+            start();
+        });
+
+        game.start();
+
+    });
+</script>
+
+</body>
+</html>

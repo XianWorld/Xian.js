@@ -26,42 +26,44 @@
         console.log(Xian);
 
         Xian.globalize();
+        var Assets = MainContext.Assets;
+        game = Game;
 
-        Assets.addAssets(
-                new Texture({
-                    name: "bg",
-                    src: "./displacement_BG.jpg"
-                }),
-                new Texture({
-                    name: "fish1",
-                    src: "./displacement_fish1.png"
-                }),
-                new Texture({
-                    name: "fish2",
-                    src: "./displacement_fish2.png"
-                }),
-                new Texture({
-                    name: "fish3",
-                    src: "./displacement_fish3.png"
-                }),
-                new Texture({
-                    name: "fish4",
-                    src: "./displacement_fish4.png"
-                }),
-                new Texture({
-                    name: "map",
-                    src: "./displacement_map.jpg"
-                }),
-                new Texture({
-                    name: "water",
-                    src: "./zeldaWaves.png"//
-                })
-        );
+//        Assets.addAssets(
+//                new Texture({
+//                    name: "bg",
+//                    src: "./displacement_BG.jpg"
+//                }),
+//                new Texture({
+//                    name: "fish1",
+//                    src: "./displacement_fish1.png"
+//                }),
+//                new Texture({
+//                    name: "fish2",
+//                    src: "./displacement_fish2.png"
+//                }),
+//                new Texture({
+//                    name: "fish3",
+//                    src: "./displacement_fish3.png"
+//                }),
+//                new Texture({
+//                    name: "fish4",
+//                    src: "./displacement_fish4.png"
+//                }),
+//                new Texture({
+//                    name: "map",
+//                    src: "./displacement_map.jpg"
+//                }),
+//                new Texture({
+//                    name: "water",
+//                    src: "./zeldaWaves.png"//
+//                })
+//        );
 
         var filtersSwitchs = [true, false, false, false, false, false, false, false, false, false, false];
         var gui = new dat.GUI({});
 
-        var displacementFilter = new FilterLib._classes.DisplacementFilter({map: Assets.get("map")});
+        var displacementFilter = new FilterLib._classes.DisplacementFilter({map: Assets.load("displacement_map.jpg", "Texture")});
 
         var displacementFolder = gui.addFolder('Displacement');
         displacementFolder.add(filtersSwitchs, '0').name("apply");
@@ -228,25 +230,31 @@
             if (position.y > bounds.y + bounds.height)position.y -= bounds.height
         };
 
-        game = new Game({
-            debug: true,
-            screen: {
-                designWidth: bg_width,
-                designHeight: bg_height,
-                autoSize: true,
-                resolutionPolicy: new ResolutionPolicy({
-                    contentStrategy: ContentStrategy.get("ShowAll"),//FullScreen//ShowAll
-                })
-            },
-            renderer: {
-                //canvasRenderer: CanvasRenderer2D,
-                canvasRenderer: PIXICanvasRenderer2D,
-                //webglRenderer: WebGLRenderer2D
-                webglRenderer: PIXIWebGLRenderer2D,
-                width: bg_width,
-                height: bg_height
-            }
-        });
+//        Config.fromJSON({
+////        game = new Game({
+//            debug: true,
+//            screen: {
+//                designWidth: bg_width,
+//                designHeight: bg_height,
+//                autoSize: true,
+//                resolutionPolicy: new ResolutionPolicy({
+//                    contentStrategy: ContentStrategy.get("ShowAll"),//FullScreen//ShowAll
+//                })
+//            },
+//            renderer: {
+//                //canvasRenderer: CanvasRenderer2D,
+//                canvasRenderer: PIXICanvasRenderer2D,
+//                //webglRenderer: WebGLRenderer2D
+//                webglRenderer: PIXIWebGLRenderer2D,
+//                width: bg_width,
+//                height: bg_height
+//            }
+//        });
+//        Config.screen.designWidth = bg_width;
+//        Config.screen.designHeight = bg_height;
+//        Config.screen.resolutionPolicy = {
+//            contentStrategy: {_className: "ShowAll"}
+//        };
 
         scene = new Scene({
             name: "PlayGround",
@@ -278,10 +286,10 @@
                     //identity: true
                 }),
                 new Sprite2D({
-                    texture: Assets.get("bg")
+                    texture: Assets.load("displacement_BG.jpg", "Texture")
                 }),
                 new TilingSprite2D({
-                    texture: Assets.get("water"),
+                    texture: Assets.load("zeldaWaves.png", "Texture"),
                     width: bg_width,
                     height: bg_height,
                     alpha: 0.2,
@@ -299,7 +307,7 @@
 //                    position: new Vec2(Math.random() * bounds.width, Math.random() * bounds.height)
                 }),
                 new Sprite2D({
-                    texture: Assets.get("fish1")
+                    texture: Assets.load("displacement_fish1.png","Texture")
                 }),
                 new Renderer2D,
                 new FishBehaviour
@@ -315,6 +323,9 @@
         game.addScene(scene);
 
         function start() {
+            MainContext.ScreenContext.designWidth = bg_width;
+            MainContext.ScreenContext.designHeight = bg_height;
+            MainContext.ScreenContext.scaleMode = "ShowAll";
             game.setScene("PlayGround");
             console.log("Game Started!");
 //            game.scene.addGameObject(pond);
@@ -323,11 +334,11 @@
         game.on("start", function () {
             start();
         });
-        //game.start();
+        game.start();
 
-        AssetLoader.on("load", function () {
-            game.start();
-        }).load();
+//        AssetLoader.on("load", function () {
+//            game.start();
+//        }).load();
 
     });
 

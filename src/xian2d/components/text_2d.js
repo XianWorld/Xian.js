@@ -19,11 +19,11 @@
  * @param [style.dropShadowAngle=Math.PI/4] {Number} Set a angle of the drop shadow
  * @param [style.dropShadowDistance=5] {Number} Set a distance of the drop shadow
  */
-var CanvasText = require("../context/render/canvas_text");
+var CanvasText = require("../context/graphics/canvas_text");
 var Renderable2D = require("./renderable_2d");
-var CanvasBuffer = require("../../render/CanvasBuffer");
-var Texture = require("../../assets/texture");
-var Sprite2DData = require("../context/sprite_2d_data");
+var CanvasBuffer = require("../../context/graphics/canvas_buffer");
+var Texture = require("../../context/assets/texture");
+var Sprite2DData = require("../context/graphics/g2d/sprite_2d_data");
 
 function Text2D(opts) {
     opts || (opts = {});
@@ -90,8 +90,8 @@ Text2D.prototype._generateCachedSprite = function () {
     var sprite2D = this._cachedSprite;
     if (!sprite2D) {
         var canvasBuffer = new CanvasBuffer(1, 1);
-        var texture = new Texture();//(canvasBuffer.canvas);
-        texture.parse(canvasBuffer.canvas);
+        var texture = Texture.fromCanvas(canvasBuffer.canvas);//new Texture();//(canvasBuffer.canvas);
+        //texture.parse(canvasBuffer.canvas);
 
         sprite2D = this._cachedSprite = new Sprite2DData();
         sprite2D.buffer = canvasBuffer;

@@ -1,0 +1,14 @@
+{
+  "name": "sprite",
+  "components": [
+    {
+      "_className": "Transform2D"
+    },
+    {
+      "_className": "Sprite2D"
+    },
+    {
+      "_className": "Renderer2D"
+    }
+  ]
+}

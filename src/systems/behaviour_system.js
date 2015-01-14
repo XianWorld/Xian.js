@@ -9,7 +9,8 @@ function BehaviourSystem(opts) {
     ComponentSystem.call(this, opts);
 
     this.needsSort = false;
-    //this.order = 0;
+    this.order = -99999;
+
 
     //this.addEventName = "startComponent";
     //this.removeEventName = "removeComponent";

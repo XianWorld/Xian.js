@@ -3,10 +3,17 @@
   "version": "0.0.6",
   "description": "",
   "keywords": [
-    "MMO","Game","World","Framework","Engine","Node.js","Browser","Sea.js"
+    "MMO",
+    "Game",
+    "World",
+    "Framework",
+    "Engine",
+    "Node.js",
+    "Browser",
+    "Sea.js"
   ],
   "homepage": "",
-  "author": "huodianyan <huodianyan@126.com>",
+  "author": "RichardHuo <huodianyan@126.com>",
   "repository": {
     "type": "git",
     "url": ""
@@ -34,9 +41,9 @@
     "main": "index.js",
     "buildArgs": "--idleading  ",
     "dependencies": {
-      "seajs": "2.3.0"
+      "seajs": "2.3.0",
+      "seajs-wrap": "1.0.2"
     },
-    "devDependencies": {
-    }
+    "devDependencies": {}
   }
 }

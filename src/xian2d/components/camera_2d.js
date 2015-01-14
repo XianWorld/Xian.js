@@ -7,6 +7,7 @@ var Camera = require("./../../components/camera");
 var Transform = require("./../../components/transform");
 //var Renderer2D = require("./renderer_2d");
 var MainContext = require("../../context/main_context");
+var GraphicsContext = MainContext.GraphicsContext;
 "use strict";
 
 
@@ -111,22 +112,20 @@ Camera2D.prototype.update = function () {
 
 Camera2D.prototype.render = function (target) {
 
-    var j, transform,
+    var j, transform, _pv_changed = this._pv_changed,
         _projectionView = this._projectionView;
 
-    var renderer = this.renderer || MainContext.RendererContext.renderer;
-
-    renderer.startRender(this.renderTexture, this.viewportRect);
+    var renderer = this.renderer || GraphicsContext.renderContext2D;
+    var renderTexture = this.renderTexture;
+    renderer.startRender(renderTexture, this.viewportRect);
     if (this.clearBeforeRender) renderer.clearScreen(this.transparent, this.background);
 
-    if (!target) {
-
-    }
-    else if (target instanceof Array) {
+    if (target instanceof Array) {
         var transforms = target;
-        for (j = 0; j < transforms.length; j++) {
+        var len = transforms.length;
+        for (j = 0; j < len; j++) {
             transform = transforms[j];
-            _updateTransform(transform, _projectionView, this._pv_changed);
+            _updateTransform(transform, _projectionView, _pv_changed);
             //if(transform.gameObject.activeInHierarchy)
             this._renderTransform(renderer, _projectionView, transform, 1.0);
         }
@@ -134,7 +133,7 @@ Camera2D.prototype.render = function (target) {
     else if (target instanceof Transform) {
         transform = target;
         //if(transform.gameObject.activeInHierarchy)
-        _updateTransform(transform, _projectionView, this._pv_changed);
+        _updateTransform(transform, _projectionView, _pv_changed);
         this._renderTransform(renderer, _projectionView, transform, 1.0);
     }
     //else if (target instanceof Renderer2D) {
@@ -147,7 +146,7 @@ Camera2D.prototype.render = function (target) {
     //    }
     //}
 
-    renderer.finishRender(this.renderTexture);
+    renderer.finishRender(renderTexture);
 
 };
 
@@ -181,21 +180,19 @@ function _updateTransform(transform, _projectionView, changed) {
     for (i = 0; i < len; i++) {
         _updateTransform(children[i], _projectionView, changed);
     }
-};
+}
 
 Camera2D.prototype._renderTransform = function (renderer, viewMatrix, transform, alpha) {
-    if (!transform.gameObject.activeInHierarchy) return;
+    var gameObject = transform.gameObject;
+    if (!gameObject.activeInHierarchy) return;
 
     var children = transform.children,
-        len = children.length,
-        gameObject, components, component,
-        i;
+        len, component, i;
 
-
-    gameObject = transform.gameObject;
-
-    component = gameObject.getComponent("Renderer2D", true);
-    if (component && component.enabled) {
+    //component = gameObject.getComponent("Renderer2D", true);
+    component = gameObject.renderer2d;//getComponent("Renderer2D", true);
+    var enable = component && component.enabled;
+    if (enable) {
         //transform.updateMatrices(viewMatrix);
 
         alpha = component.worldAlpha = alpha * component.alpha;
@@ -207,7 +204,7 @@ Camera2D.prototype._renderTransform = function (renderer, viewMatrix, transform,
         this._renderTransform(renderer, viewMatrix, children[i], alpha);
     }
 
-    if (component && component.enabled) {
+    if (enable) {
         component.finishRender(renderer);
     }
     //components = gameObject.getComponents("Renderable2D", true);
@@ -274,8 +271,8 @@ Camera2D.prototype.fromJSON = function (json) {
     //
     //this.needsUpdate = true;
 
-    this.transparent = json.transparent;
-    this.clearBeforeRender = json.clearBeforeRender;
+    this.transparent = json.transparent || false;
+    this.clearBeforeRender = json.clearBeforeRender || true;
 
     return this;
 };

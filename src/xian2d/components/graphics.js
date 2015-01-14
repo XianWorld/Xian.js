@@ -2,13 +2,13 @@
  * Created by Dianyan on 2014/12/13.
  */
 var Renderable2D = require("./renderable_2d");
-var Enums2D = require("../common/enums_2d");
+var Enums2D = require("../base/enums_2d");
 var Rect = require("../../math/rect");
 var Vec2 = require("../../math/vec2");
-var CanvasBuffer = require("../../render/CanvasBuffer");
-var CanvasGraphics = require("../context/pixi/canvas/utils/canvas_graphics");
-var Texture = require("../../assets/texture");
-var Sprite2DData = require("../context/sprite_2d_data");
+var CanvasBuffer = require("../../context/graphics/canvas_buffer");
+var CanvasGraphics = require("../context/graphics/g2d/canvas/utils/canvas_graphics");
+var Texture = require("../../context/assets/texture");
+var Sprite2DData = require("../context/graphics/g2d/sprite_2d_data");
 
 function Graphics(opts) {
     opts || (opts = {});
@@ -808,8 +808,8 @@ Graphics.prototype._generateCachedSprite = function()
     if(!this._cachedSprite)
     {
         var canvasBuffer = new CanvasBuffer(bounds.width, bounds.height);
-        var texture = new Texture();//(canvasBuffer.canvas);
-        texture.parse(canvasBuffer.canvas);
+        var texture = Texture.fromCanvas(canvasBuffer.canvas);//new Texture();//(canvasBuffer.canvas);
+        //texture.parse(canvasBuffer.canvas);
 
         this._cachedSprite = new Sprite2DData();
         this._cachedSprite.buffer = canvasBuffer;

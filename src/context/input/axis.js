@@ -1,4 +1,4 @@
-var Enums = require("../../core/enums");
+var Enums = require("../../base/enums");
 "use strict";
 
 

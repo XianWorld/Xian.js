@@ -1,6 +1,6 @@
-var Time = require("../time");
+var Time = require("../time/time");
 var Button = require("./button");
-var Log = require("../log");
+var Log = require("../log/log");
 "use strict";
 
 

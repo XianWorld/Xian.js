@@ -270,10 +270,10 @@ Rect.prototype.toJSON = function (json) {
 
 Rect.prototype.fromJSON = function (json) {
 
-    this.x = json.x;
-    this.y = json.y;
-    this.width = json.width;
-    this.height = json.height;
+    this.x = json.x || 0.0;
+    this.y = json.y || 0.0;
+    this.width = json.width || 0.0;
+    this.height = json.height || 0.0;
 
     return this;
 };
@@ -282,6 +282,13 @@ Rect.prototype.fromJSON = function (json) {
 Rect.prototype.toString = function () {
 
     return "Rect( " + this._x + ", " + this._y + ", " + this._width + ", " + this._height + " )";
+};
+
+Rect.prototype.clear = function () {
+    this.x = 0;
+    this.y = 0;
+    this.width = 0;
+    this.height = 0;
 };
 
 Rect.Empty = new Rect(0,0,0,0);
