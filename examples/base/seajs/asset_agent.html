@@ -11,14 +11,14 @@
     </style>
 
     <!--<script src="../../bin/pixi.dev.js"></script>-->
-    <script src="../../spm_modules/seajs/2.3.0/dist/sea.js"></script>
+    <script src="../../../spm_modules/seajs/2.3.0/dist/sea.js"></script>
 </head>
 <body>
 <script>
 
     // Set configuration
     seajs.config({
-        base: "../../dist/"
+        base: "../../../dist/"
     });
 
     seajs.use(['index-debug.js'], function (Xian) {
@@ -92,10 +92,10 @@
                 }),
                 new AssetAgent({
                     preloads: [
-                        {name: "eggHead.png", type: "Texture"},
-                        {name: "flowerTop.png", type: "Texture"},
-                        {name: "skully.png", type: "Texture"},
-                        {name: "helmlok.png", type: "Texture"}
+                        {name: "../contents/eggHead.png", type: "Texture"},
+                        {name: "../contents/flowerTop.png", type: "Texture"},
+                        {name: "../contents/skully.png", type: "Texture"},
+                        {name: "../contents/helmlok.png", type: "Texture"}
                     ]
                 }),
                 new PreloadBehaviour(),
@@ -112,7 +112,7 @@
                     alpha: 1,
                     //tint: 0xff0000,
                     //mask: new Rect(10,10,20,20),
-                    texture: Assets.load("eggHead.png", "Texture")
+                    texture: Assets.load("../contents/eggHead.png", "Texture")
                 }),
                 new Renderer2D({
                     filters: [

@@ -10,10 +10,13 @@ module.exports = function(config) {
         files : [
             'node_modules/chai/chai.js',
             'spm_modules/seajs/2.3.0/dist/sea.js',
+            //'spm_modules/seajs-wrap/1.0.2/dist/seajs-wrap.js',
             'dist/index-debug.js',
-            'test/lib/**/*.js',
-            'test/unit/**/*.js',
-            // 'test/functional/**/*.js',
+            //'index.js',
+            //'src/**/*.js',
+            //'test/lib/**/*.js',
+            //'test/unit/**/*.js',
+            'test/unit/xian/Xian.js',
             //{pattern: 'test/**/*.png', watched: false, included: false, served: true}
         ],
 

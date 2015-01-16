@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Common Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+        }
+    </style>
+
+    <!--<script src="../../bin/pixi.dev.js"></script>-->
+    <script src="../../../spm_modules/seajs/2.3.0/dist/sea.js"></script>
+    <script src="../../../spm_modules/seajs-wrap/1.0.2/dist/seajs-wrap.js"></script>
+</head>
+<body>
+<script>
+    seajs.use(['/Xian/index.js'], function (Xian) {
+        Xian.globalize();
+
+        var game, scene;
+        var Assets = MainContext.Assets;
+        game = Game;
+
+        scene = new Scene({
+            name: "PlayGround",
+            systems: [
+                new Transform2DSystem(),
+                new BehaviourSystem(),
+                new Render2DSystem()
+            ]
+        });
+
+        var root = new GameObject({
+            name: "root",
+            components: [
+                new Transform2D,
+                new Camera2D,
+                new Sprite2D({
+                    texture: Assets.load("../contents/eggHead.png", "Texture")
+                }),
+                new Renderer2D
+            ]
+        });
+
+        game.addScene(scene);
+
+        function start() {
+            game.setScene("PlayGround");
+            game.scene.addGameObject(root);
+        }
+
+        game.on("start", function () {
+            start();
+        });
+
+        game.start();
+    });
+</script>
+
+</body>
+</html>

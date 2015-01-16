@@ -12,7 +12,8 @@ describe('xian/Xian', function () {
             base: "/base/dist/"
         });
         seajs.use(['index-debug.js'], function (Xian) {
-            //console.log(Xian);
+        //seajs.use(['../../../../index.js'], function (Xian) {
+            console.log(Xian);
 
             Xian.globalize();
 
