@@ -11,7 +11,7 @@ var Texture = require("../../context/assets/texture");
 var Sprite2DData = require("../context/graphics/g2d/sprite_2d_data");
 
 function Graphics(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Renderable2D.call(this, opts);
 

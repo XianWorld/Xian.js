@@ -26,7 +26,7 @@ var Texture = require("../../context/assets/texture");
 var Sprite2DData = require("../context/graphics/g2d/sprite_2d_data");
 
 function Text2D(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Renderable2D.call(this, opts);
 
@@ -37,9 +37,10 @@ function Text2D(opts) {
     this.resolution = 1;
 
     this.text = "";
-    this.setText(opts.text);
-    this.setStyle(opts.style);
-};
+    //this.setText(opts.text);
+    //this.setStyle(opts.style);
+    this.setStyle();
+}
 
 Renderable2D.extend(Text2D);
 
@@ -135,8 +136,8 @@ Text2D.prototype.toJSON = function (json) {
 Text2D.prototype.fromJSON = function (json) {
     Renderable2D.prototype.fromJSON.call(this, json);
 
-    this.text = json.text;
-    this.style = json.style;
+    this.setText(json.text);
+    this.setStyle(json.style);
 
     return this;
 };

@@ -7,11 +7,11 @@ var JsonData = require("./json_data");
 //var objectPool = ObjectPools.getPool(GameObject);
 
 function Prefab(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
     JsonData.call(this, opts);
 
-    if(opts.object)
-        this.setObject(opts.object);
+    //if(opts.object)
+    //    this.setObject(opts.object);
 }
 
 JsonData.extend(Prefab);

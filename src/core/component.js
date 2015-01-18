@@ -8,7 +8,7 @@ var camelize = util.camelize;
 
 
 function Component(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
     //if (!type) {
     //    //Log.error("Component defined without a type, use Component.call(this, \"ComponentName\", { sync: Boolean, json: Boolean })");
     //}
@@ -16,15 +16,17 @@ function Component(opts) {
     Class.call(this);
 
     //this._type = type || this._className;
-    this._name = opts.name !== undefined ? opts.name : camelize(this._className, true);
+    this._name = camelize(this._className, true);
+    this.json = true;
+    this.enabled = true;
 
+    //this._name = opts.name !== undefined ? opts.name : camelize(this._className, true);
     //this.sync = opts.sync !== undefined ? !!opts.sync : false;
-    this.json = opts.json !== undefined ? !!opts.json : true;
-
+    //this.json = opts.json !== undefined ? !!opts.json : true;
     //this._comp_state = undefined;
     this.gameObject = undefined;
 
-    this.enabled = opts.enabled !== undefined ? !!opts.enabled : true;
+    //this.enabled = opts.enabled !== undefined ? !!opts.enabled : true;
 }
 
 Class.extend(Component);

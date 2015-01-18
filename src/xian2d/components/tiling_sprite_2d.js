@@ -10,12 +10,14 @@ var MainContext = require("../../context/main_context");
 var GraphicsContext = MainContext.GraphicsContext;
 
 function TilingSprite2D(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Sprite2D.call(this, opts);
 
-    this.tileScale = opts.tileScale || new Vec2(1, 1);
-    this.tilePosition = opts.tilePosition || new Vec2(0, 0);
+    this.tileScale = new Vec2(1, 1);
+    this.tilePosition = new Vec2(0, 0);
+    //this.tileScale = opts.tileScale || new Vec2(1, 1);
+    //this.tilePosition = opts.tilePosition || new Vec2(0, 0);
 
     this.tileScaleOffset = new Vec2(1, 1);
     this.destTexture = undefined;
@@ -76,7 +78,7 @@ TilingSprite2D.prototype._generateTilingTexture = function (forcePowerOfTwo) {
             this.destTexture.isTiling = true;
         }
 
-        canvasBuffer.drawImage(texture.raw,
+        canvasBuffer.drawImage(texture.image,
             sourceX,
             sourceY,
             sourceWidth,
@@ -157,8 +159,8 @@ TilingSprite2D.prototype.toJSON = function (json) {
 TilingSprite2D.prototype.fromJSON = function (json) {
     Sprite2D.prototype.fromJSON.call(this, json);
 
-    this.tileScale.fromJSON(json.tileScale);
-    this.tilePosition.fromJSON(json.tilePosition);
+    if(json.tileScale) this.tileScale.fromJSON(json.tileScale);
+    if(json.tilePosition) this.tilePosition.fromJSON(json.tilePosition);
 
     return this;
 };

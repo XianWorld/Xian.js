@@ -6,12 +6,12 @@ var CanvasBuffer = require("../graphics/canvas_buffer");
 var Vec2 = require("../../math/vec2");
 
 function RenderTexture(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Texture.call(this, opts);
 
-    this.width = opts.width || 100;
-    this.height = opts.height || 100;
+    this.width = 100;
+    this.height = 100;
 
     this.valid = true;
 

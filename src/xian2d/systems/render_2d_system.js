@@ -8,7 +8,7 @@ var Mat4 = require("../../math/mat4");
 
 //TODO it seems the name should be changed to Camera2DSystem
 function Render2DSystem(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     ComponentSystem.call(this, opts);
 

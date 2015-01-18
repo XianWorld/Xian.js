@@ -13,20 +13,22 @@ var RenderTexture = require("../../context/assets/render_texture");
 var Sprite2dData = require("../context/graphics/g2d/sprite_2d_data");
 
 function Renderer2D(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Component.call(this, opts);
 
     //this.worldMatrix = undefined;
-    this.alpha = opts.alpha !== undefined ? opts.alpha : 1.0;
+    this.alpha = 1.0;
+    //this.alpha = opts.alpha !== undefined ? opts.alpha : 1.0;
     this.worldAlpha = 1.0;
 
-    this._mask = opts.mask !== undefined ? opts.mask : undefined;
+    //this._mask = opts.mask !== undefined ? opts.mask : undefined;
+    this._mask = undefined;
 
     this.filterArea = undefined;
     this._filters = undefined;
     this._filterBlock = undefined;
-    if (opts.filters) this.filters = opts.filters;
+    //if (opts.filters) this.filters = opts.filters;
 
     this._boundsSelf = new Rect;
     this._boundsAll = new Rect;

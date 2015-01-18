@@ -11,13 +11,15 @@ var Log = require("../context/main_context").Log;
  * @param Object options
  */
 function GameObject(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Class.call(this);
 
-    this.name = opts.name !== undefined ? opts.name : "GameObject_" + this._id;
+    //this.name = opts.name !== undefined ? opts.name : "GameObject_" + this._id;
+    this.name = "GameObject_" + this._id;
 
-    this._activeSelf = opts.active !== undefined ? opts.active : true;
+    //this._activeSelf = opts.active !== undefined ? opts.active : true;
+    this._activeSelf = true;
     this.activeInHierarchy = true;
     //this._activeParent = true;
 
@@ -31,10 +33,10 @@ function GameObject(opts) {
     this._componentJSONHash = {};
     this._componentClassTypes = {};
 
-    if (opts.tag) this.addTag(opts.tag);
-    if (opts.tags) this.addTags.apply(this, opts.tags);
-
-    if (opts.components) this.addComponents.apply(this, opts.components);
+    //if (opts.tag) this.addTag(opts.tag);
+    //if (opts.tags) this.addTags.apply(this, opts.tags);
+    //
+    //if (opts.components) this.addComponents.apply(this, opts.components);
 }
 
 Class.extend(GameObject);

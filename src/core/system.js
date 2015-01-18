@@ -6,9 +6,10 @@ var Class = require("../base/class");
 
 
 function System(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
-    this.order = opts.order || 0;
+    //this.order = opts.order || 0;
+    this.order = 0;
 
     this.scene = undefined;
 
@@ -40,7 +41,7 @@ System.prototype.toJSON = function (json) {
 System.prototype.fromJSON = function (json) {
     Class.prototype.fromJSON.call(this, json);
 
-    this.order = json.order;
+    this.order = json.order || 0;
 
     return this;
 };
