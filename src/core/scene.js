@@ -12,13 +12,14 @@ var Log = require("../context/main_context").Log;
  * @param Object options
  */
 function Scene(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Class.call(this);
 
     this.game = undefined;
 
-    this.name = opts.name !== undefined ? opts.name : "Scene_" + this._id;
+    //this.name = opts.name !== undefined ? opts.name : "Scene_" + this._id;
+    this.name = "Scene_" + this._id;
 
     //this.world = undefined;
 
@@ -42,10 +43,10 @@ function Scene(opts) {
     //this._newComponents = [];
 
     //add systems
-    if (opts.systems) {
-        this.addSystems.apply(this, opts.systems);
-    }
-    if (opts.gameObjects) this.addGameObjects.apply(this, opts.gameObjects);
+    //if (opts.systems) {
+    //    this.addSystems.apply(this, opts.systems);
+    //}
+    //if (opts.gameObjects) this.addGameObjects.apply(this, opts.gameObjects);
 }
 
 Class.extend(Scene);

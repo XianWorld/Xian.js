@@ -6,15 +6,20 @@ var Rect = require("../../math/rect");
 
 
 function Renderable2D(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Component.call(this, opts);
 
-    this._width = opts.width || 0;
-    this._height = opts.height || 0;
-    this.blendMode = opts.blendMode !== undefined ? opts.blendMode : Enums.blendModes.NORMAL;
-    this.alpha = opts.alpha !== undefined ? opts.alpha : 1;
-    this.tint = opts.tint !== undefined ? opts.tint : 0xFFFFFF;
+    this._width = 0;
+    this._height = 0;
+    this.blendMode = Enums.blendModes.NORMAL;
+    this.alpha = 1;
+    this.tint = 0xFFFFFF;
+    //this._width = opts.width || 0;
+    //this._height = opts.height || 0;
+    //this.blendMode = opts.blendMode !== undefined ? opts.blendMode : Enums.blendModes.NORMAL;
+    //this.alpha = opts.alpha !== undefined ? opts.alpha : 1;
+    //this.tint = opts.tint !== undefined ? opts.tint : 0xFFFFFF;
 
     this.worldAlpha = 1.0;
     this.worldMatrix = undefined;

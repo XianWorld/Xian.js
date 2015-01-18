@@ -5,7 +5,7 @@ var TextureClipData = require("./texture_clip_data");
 
 
 function SpriteSheet(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Asset.call(this, opts);
 

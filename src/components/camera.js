@@ -12,18 +12,27 @@ var degsToRads = Mathf.degsToRads,
 
 
 function Camera(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Component.call(this, opts);
 
-    this.viewportRect = opts.viewportRect !== undefined ? opts.viewportRect : new Rect(0,0,1,1);
-    this.background = opts.background !== undefined ? opts.background : new Color(0.5, 0.5, 0.5);
+    this.viewportRect = new Rect(0,0,1,1);
+    this.background = new Color(0.5, 0.5, 0.5);
 
-    this.orthographicSizeX = opts.orthographicSizeX !== undefined ? opts.orthographicSizeX : 1;
-    this.orthographicSizeY = opts.orthographicSizeY !== undefined ? opts.orthographicSizeY : 1;
+    this.orthographicSizeX = 1;
+    this.orthographicSizeY = 1;
 
-    this.minOrthographicSize = opts.minOrthographicSize !== undefined ? opts.minOrthographicSize : EPSILON;
-    this.maxOrthographicSize = opts.maxOrthographicSize !== undefined ? opts.maxOrthographicSize : 1024;
+    this.minOrthographicSize = EPSILON;
+    this.maxOrthographicSize = 1024;
+
+    //this.viewportRect = opts.viewportRect !== undefined ? opts.viewportRect : new Rect(0,0,1,1);
+    //this.background = opts.background !== undefined ? opts.background : new Color(0.5, 0.5, 0.5);
+    //
+    //this.orthographicSizeX = opts.orthographicSizeX !== undefined ? opts.orthographicSizeX : 1;
+    //this.orthographicSizeY = opts.orthographicSizeY !== undefined ? opts.orthographicSizeY : 1;
+    //
+    //this.minOrthographicSize = opts.minOrthographicSize !== undefined ? opts.minOrthographicSize : EPSILON;
+    //this.maxOrthographicSize = opts.maxOrthographicSize !== undefined ? opts.maxOrthographicSize : 1024;
 
     this.needsUpdate = true;
 }
@@ -76,13 +85,13 @@ Camera.prototype.toJSON = function (json) {
 Camera.prototype.fromJSON = function (json) {
     Component.prototype.fromJSON.call(this, json);
 
-    this.viewportRect.fromJSON(json.viewportRect);
-    this.background.fromJSON(json.background);
+    if(json.viewportRect) this.viewportRect.fromJSON(json.viewportRect);
+    if(json.background) this.background.fromJSON(json.background);
 
-    this.orthographicSizeX = json.orthographicSizeX;
-    this.orthographicSizeY = json.orthographicSizeY;
-    this.minOrthographicSize = json.minOrthographicSize;
-    this.maxOrthographicSize = json.maxOrthographicSize;
+    this.orthographicSizeX = json.orthographicSizeX || 1;
+    this.orthographicSizeY = json.orthographicSizeY || 1;
+    this.minOrthographicSize = json.minOrthographicSize || EPSILON;
+    this.maxOrthographicSize = json.maxOrthographicSize || 1024;
 
     this.needsUpdate = true;
 

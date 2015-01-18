@@ -10,11 +10,11 @@ var Time = MainContext.Time;
 
 //TODO AssetAgent now have two function: manage agent(asset holder) and preload agent
 function AssetAgent(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
     Behaviour.call(this, opts);
 
     //{name, type, fileType}
-    this.preloads = opts.preloads;
+    this.preloads = [];//opts.preloads;
 
     this._assetHash = {};
     this._assetMetaHash = {};
@@ -50,7 +50,7 @@ AssetAgent.prototype.clear = function () {
 
 AssetAgent.prototype.onStart = function () {
 
-    if(this.preloads){
+    if (this.preloads) {
         this.loadAll(this.preloads, true);
     }
 };
@@ -66,14 +66,22 @@ AssetAgent.prototype.onDestroy = function () {
 AssetAgent.prototype.toJSON = function (json) {
     json = Behaviour.prototype.toJSON.call(this, json);
 
-    json.preloads = this.preloads;
+    var jsonPreloads = json.preloads || (json.preloads = []);
+    var i, len = this.preloads.length;
+    for (i = 0; i < len; i++)
+        jsonPreloads[i] = this.preloads[i];
     return json;
 };
 
 AssetAgent.prototype.fromJSON = function (json) {
     Behaviour.prototype.fromJSON.call(this, json);
 
-    this.preloads = json.preloads;
+    this.preloads.length = 0;
+    if (json.preloads) {
+        var i, len = json.preloads.length;
+        for (i = 0; i < len; i++)
+            this.preloads[i] = json.preloads[i];
+    }
     return this;
 };
 
@@ -84,7 +92,7 @@ AssetAgent.prototype.get = function (name) {
 AssetAgent.prototype.load = function (name, type, fileType) {
     var meta;
     var asset = this._assetHash[name];
-    if(asset){
+    if (asset) {
         meta = this._assetMetaHash[name];
         meta.count++;
         meta.time = Time.now();
@@ -105,7 +113,7 @@ AssetAgent.prototype.load = function (name, type, fileType) {
 AssetAgent.prototype.unload = function (name) {
     var meta;
     var asset = this._assetHash[name];
-    if(asset){
+    if (asset) {
         meta = this._assetMetaHash[name];
         meta.count--;
         //meta.time = Time.now();
@@ -120,24 +128,24 @@ AssetAgent.prototype.unloadAsset = function (asset) {
 };
 
 AssetAgent.prototype.loadAll = function (assetInfos, preload) {
-    var asset,info,i,len = assetInfos.length;
+    var asset, info, i, len = assetInfos.length;
 
-    for(i=0;i<len;i++){
+    for (i = 0; i < len; i++) {
         info = assetInfos[i];
         asset = this.load(info.name, info.type, info.fileType);
 
-        if(preload){
-            if(asset.ready){
+        if (preload) {
+            if (asset.ready) {
                 //this._onAssetInited(asset);
             }
-            else{
+            else {
                 asset.on("inited", this._onAssetInited.bind(this));
                 this._preloadingAssets.push(asset);
             }
         }
     }
 
-    if(preload){
+    if (preload) {
         this._preloadCount += len;
         //event: progress, total, left
         //var left = this._preloadingAssets.length;
@@ -153,7 +161,7 @@ AssetAgent.prototype._onAssetInited = function (asset) {
     asset.off("inited", this._onAssetInited.bind(this));
 
     var index = this._preloadingAssets.indexOf(asset);
-    if(index === -1) return;
+    if (index === -1) return;
 
     this._preloadingAssets.splice(index, 1);
 
@@ -162,7 +170,7 @@ AssetAgent.prototype._onAssetInited = function (asset) {
 
 AssetAgent.prototype._notifyPreload = function () {
     var left = this._preloadingAssets.length;
-    if(left === 0){
+    if (left === 0) {
         this.preloaded = true;
         this.emit("complete", this._preloadCount);
         this._preloadCount = 0;

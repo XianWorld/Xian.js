@@ -4,7 +4,7 @@ var Transform2D = require("./../components/transform_2d");
 
 
 function Transform2DSystem(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     TransformSystem.call(this, opts);
 

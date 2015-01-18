@@ -12,7 +12,7 @@ var EPSILON = Mathf.EPSILON;
 
 
 function Transform(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
     //opts.sync = opts.sync !== undefined ? opts.sync : true;
 
     Component.call(this, opts);

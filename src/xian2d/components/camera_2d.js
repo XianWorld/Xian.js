@@ -16,7 +16,7 @@ var clamp = Mathf.clamp,
 
 
 function Camera2D(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Camera.call(this, opts);
 
@@ -28,8 +28,10 @@ function Camera2D(opts) {
     this._pv_changed = false;
 
     this.renderer = undefined;
-    this.transparent = opts.transparent !== undefined ? opts.transparent : false;
-    this.clearBeforeRender = opts.clearBeforeRender !== undefined ? opts.clearBeforeRender : true;
+    this.transparent = false;
+    this.clearBeforeRender = true;
+    //this.transparent = opts.transparent !== undefined ? opts.transparent : false;
+    //this.clearBeforeRender = opts.clearBeforeRender !== undefined ? opts.clearBeforeRender : true;
 
     //render target: default(main)/RenderTexture
     this.renderTexture = undefined;
@@ -271,8 +273,8 @@ Camera2D.prototype.fromJSON = function (json) {
     //
     //this.needsUpdate = true;
 
-    this.transparent = json.transparent || false;
-    this.clearBeforeRender = json.clearBeforeRender || true;
+    this.transparent = json.transparent !== undefined ? !!json.transparent : false;
+    this.clearBeforeRender = json.clearBeforeRender !== undefined ?  !!json.clearBeforeRender : true;
 
     return this;
 };

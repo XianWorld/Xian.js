@@ -14,7 +14,7 @@ var EPSILON = Mathf.EPSILON;
 
 
 function Transform2D(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Transform.call(this, opts);
 
@@ -26,11 +26,14 @@ function Transform2D(opts) {
     //
     //this._rotation = opts.rotation !== undefined ? opts.rotation : 0;
     //TODO when identity is true, release all vector and matrix for less memory
-    this.identity = opts.identity !== undefined ? opts.identity : false;
-
-    this._position = opts.position !== undefined ? opts.position : new Vec2;
-    this._rotation = opts.rotation !== undefined ? opts.rotation : 0;
-    this._scale = opts.scale !== undefined ? opts.scale : new Vec2(1, 1);
+    this.identity = false;
+    this._position = new Vec2;
+    this._rotation = 0;
+    this._scale = new Vec2(1, 1);
+    //this.identity = opts.identity !== undefined ? opts.identity : false;
+    //this._position = opts.position !== undefined ? opts.position : new Vec2;
+    //this._rotation = opts.rotation !== undefined ? opts.rotation : 0;
+    //this._scale = opts.scale !== undefined ? opts.scale : new Vec2(1, 1);
 
     this.matrix = new Mat32;
     this.matrixWorld = new Mat32;
@@ -248,7 +251,7 @@ Transform2D.prototype.toJSON = function (json) {
 Transform2D.prototype.fromJSON = function (json) {
     Transform.prototype.fromJSON.call(this, json);
 
-    this.identity = json.identity || false;
+    this.identity = json.identity !== undefined ? !!json.identity : false;
 
     if (json.position) this.position.fromJSON(json.position);
     if (json.scale) this.scale.fromJSON(json.scale);

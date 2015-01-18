@@ -2,7 +2,7 @@ var Component = require("./../core/component");
 "use strict";
 
 function Behaviour(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Component.call(this, opts);
 
@@ -84,19 +84,19 @@ Behaviour.prototype.onClear = function () {
 Behaviour.prototype.onDestory = function () {
 };
 
-Behaviour.prototype.toJSON = function (json) {
-    json = Component.prototype.toJSON.call(this, json);
-
-    //json.enabled = this._enabled;
-    return json;
-};
-
-
-Behaviour.prototype.fromJSON = function (json) {
-    Component.prototype.fromJSON.call(this, json);
-
-    //this._enabled = json.enabled;
-    return this;
-};
+//Behaviour.prototype.toJSON = function (json) {
+//    json = Component.prototype.toJSON.call(this, json);
+//
+//    //json.enabled = this._enabled;
+//    return json;
+//};
+//
+//
+//Behaviour.prototype.fromJSON = function (json) {
+//    Component.prototype.fromJSON.call(this, json);
+//
+//    //this._enabled = json.enabled;
+//    return this;
+//};
 
 module.exports = Behaviour;

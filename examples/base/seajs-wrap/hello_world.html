@@ -19,35 +19,58 @@
     seajs.use(['/Xian/index.js'], function (Xian) {
         Xian.globalize();
 
-        var game, scene;
+        var game, sceneJson;
         var Assets = MainContext.Assets;
         game = Game;
 
-        scene = new Scene({
-            name: "PlayGround",
-            systems: [
-                new Transform2DSystem(),
-                new BehaviourSystem(),
-                new Render2DSystem()
+        sceneJson = {
+            'name': 'PlayGround',
+            'systems': [
+                {'_className': 'Transform2DSystem'},
+                {'_className': 'BehaviourSystem'},
+                {'_className': 'Render2DSystem'}
             ]
-        });
+        };
 
-        var root = new GameObject({
-            name: "root",
-            components: [
-                new Transform2D,
-                new Camera2D,
-                new Sprite2D({
-                    texture: Assets.load("../contents/eggHead.png", "Texture")
-                }),
-                new Renderer2D
+        var rootPrefab = {
+            'name': "root",
+            'components': [
+                {'_className': 'Transform2D'},
+                {
+                    '_className': 'Camera2D',
+                    'transparent': 'true'
+                },
+                {
+                    '_className': 'Sprite2D',
+                    'texture': "../contents/eggHead.png"
+                },
+                {
+                    '_className': 'Text2D',
+                    'text': "Hello World!",
+                    'style': {
+                        'font': "bold 60px Arial",
+                        'fill': "#cc00ff",
+                        'align': "center",
+                        'stroke': "#FFFFFF",
+                        'strokeThickness': 4
+                    }
+                },
+                {
+                    '_className': 'TilingSprite2D',
+                    'texture': "../contents/eggHead.png",
+                    'width': 300,
+                    'height': 300,
+                    'alpha': 0.5
+                },
+                {'_className': 'Renderer2D'}
             ]
-        });
+        };
 
-        game.addScene(scene);
+        game.addScene(sceneJson);
 
         function start() {
             game.setScene("PlayGround");
+            var root = new GameObject().fromJSON(rootPrefab);
             game.scene.addGameObject(root);
         }
 

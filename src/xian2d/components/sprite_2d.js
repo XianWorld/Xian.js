@@ -8,12 +8,12 @@ var Assets = require("../../context/main_context").Assets;
 
 
 function Sprite2D(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Renderable2D.call(this, opts);
 
     this._texture = undefined;
-    this.texture = opts.texture !== undefined ? opts.texture : undefined;
+    //this.texture = opts.texture !== undefined ? opts.texture : undefined;
 
     this.cliped = false;
     this._clip = new Rect;

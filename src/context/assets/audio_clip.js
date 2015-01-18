@@ -11,7 +11,7 @@ var isArray = util.isArray,
 
 
 function AudioClip(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Asset.call(this, opts);
 
