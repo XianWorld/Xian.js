@@ -45,5 +45,8 @@
       "seajs-wrap": "1.0.2"
     },
     "devDependencies": {}
+  },
+  "dependencies": {
+    "seajs": "^2.2.2"
   }
 }

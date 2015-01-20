@@ -39,6 +39,7 @@ function Xian() {
     this.RenderTexture = require("./src/context/assets/render_texture");
     this.JsonData = require("./src/context/assets/json_data");
     this.Prefab = require("./src/context/assets/prefab");
+    this.Module = require("./src/context/assets/module");
     //context/render
     //this.RendererLib = require("./src/context/graphics/renderer_lib");
 
@@ -102,6 +103,7 @@ function Xian() {
     //register asset loaders
     var SpriteSheetLoader = require("./src/xian2d/context/assets/sprite_sheet_loader");
     this.AssetLoaderLib.registerLoader("json", "SpriteSheet", SpriteSheetLoader);
+    this.Phys2D = require("./src/xian2d/context/phys2d/phys2d");
 
     //xian2d/components
     this.Transform2D = require("./src/xian2d/components/transform_2d");
@@ -113,10 +115,12 @@ function Xian() {
     this.TilingSprite2D = require("./src/xian2d/components/tiling_sprite_2d");
     this.Graphics = require("./src/xian2d/components/graphics");
     this.Text2D = require("./src/xian2d/components/text_2d");
+    this.RigidBody2D = require("./src/xian2d/components/rigid_body_2d");
 
     //xian2d systems
     this.Render2DSystem = require("./src/xian2d/systems/render_2d_system");
     this.Transform2DSystem = require("./src/xian2d/systems/transform_2d_system");
+    this.Phys2DSystem = require("./src/xian2d/systems/phys_2d_system");
 
 }
 

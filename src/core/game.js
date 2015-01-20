@@ -1,7 +1,7 @@
 var Class = require("../base/class");
 var EventEmitter = require('../base/event_emitter');
 var Config = require("../base/config");
-var Scene = require("./scene");
+//var Scene = require("./scene");
 var Context = require("../context/main_context");
 var Log = Context.Log;
 var Time = Context.Time;
@@ -119,7 +119,8 @@ Game.prototype.addScene = function (scene) {
 
     if(!id) id = scene._id = this.scenes.length;
     if (!sceneNameHash[name] && !sceneHash[id]) {
-        if (!(scene instanceof Scene)) {
+        //if (!(scene instanceof Scene)) {
+        if (scene._className !== 'Scene') {
             //Log.error("Game.addScene: can't add argument to Game, it's not an instance of Scene");
             //return this;
             json = scene;
