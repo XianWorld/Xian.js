@@ -441,7 +441,6 @@ Scene.prototype.hasGameObject = function (gameObject) {
     return !!~this.gameObjects.indexOf(gameObject);
 };
 
-
 Scene.prototype.findByTag = function (tag, out) {
     out || (out = []);
     var gameObjects = this.gameObjects,

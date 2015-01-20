@@ -23,7 +23,7 @@ function Assets() {
 
     //this.unusedAssets = [];
 
-    this._rootUrl = "";
+    this._rootUrl = '';
 
     //TODO make LoaderManager to manage loaders, update loaders, load asset by strategies(concurrent/frame idle time)
     //TODO let loader send asset event in frame update.
@@ -32,6 +32,8 @@ EventEmitter.extend(Assets);
 
 Assets.prototype.init = function () {
     //TODO init properties and strategies from Config
+    var opts = Config.assets || {};
+    this._rootUrl = opts.rootUrl || '';
 };
 Assets.prototype.update = function () {
     //TODO use some strategies to manage the asset caches

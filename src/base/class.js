@@ -162,6 +162,15 @@ Class.create = function (type) {
     return new Class._classes[type];
 };
 
+Class.Instantiate = function (original) {
+
+    return original.clone();
+};
+
+Class.Destroy = function (obj) {
+
+    return obj.destroy();
+};
 
 Class._classes = {};
 

@@ -1,5 +1,7 @@
 var Class = require("../base/class");
+var Game = require("./game");
 var Component = require("./component");
+var Prefab = require("../context/assets/prefab");
 var Log = require("../context/main_context").Log;
 "use strict";
 
@@ -469,13 +471,13 @@ GameObject.prototype.find = function (name) {
 };
 
 
-GameObject.prototype.findComponentById = function (id) {
+GameObject.prototype.getComponentById = function (id) {
 
     return this._componentHash[id];
 };
 
 
-GameObject.prototype.findComponentByJSONId = function (id) {
+GameObject.prototype.getComponentByJSONId = function (id) {
 
     return this._componentJSONHash[id];
 };
@@ -563,5 +565,43 @@ GameObject.prototype.fromJSON = function (json) {
     return this;
 };
 
+//Unity3D like static functions of GameObject
+
+GameObject.Find = function (name) {
+    var scene = Game.scene;
+    return scene ? scene.find(name) : undefined;
+};
+
+GameObject.FindGameObjectsWithTag = function (tag, out) {
+    var scene = Game.scene;
+    return scene ? scene.findByTag(tag, out) : undefined;
+};
+
+GameObject.FindWithTag = function (tag) {
+    var scene = Game.scene;
+    return scene ? scene.findByTagFirst(tag) : undefined;
+};
+
+GameObject.Instantiate = function (original, position, rotation) {
+    var scene = Game.scene;
+    var gameobject;
+    if(original instanceof GameObject)
+        gameobject =  original.clone();
+    else if(original instanceof Prefab)
+        gameobject =  Class.create('GameObject').fromJSON(original.jsonData);
+    else
+        gameobject =  Class.create('GameObject').fromJSON(original);
+
+    if(position) gameobject.transform.position = position;
+    if(rotation) gameobject.transform.rotation = rotation;
+    if(scene) scene.addGameObject(gameobject);
+
+    return gameobject;
+};
+
+GameObject.Destroy = function (obj) {
+
+    return obj.destroy();
+};
 
 module.exports = GameObject;
