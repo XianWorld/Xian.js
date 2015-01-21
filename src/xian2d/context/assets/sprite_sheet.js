@@ -48,6 +48,7 @@ SpriteSheet.prototype.clear = function () {
     this.frames.length = 0;
     if(this._texture){
         this._texture.release();
+        this._texture = undefined;
     }
     return this;
 };

@@ -2,6 +2,7 @@ var ObjectPools = require("../pool/object_pools");
 var ImageLoader = require("./image_loader");
 var JsonDataLoader = require("./json_data_loader");
 var ModuleLoader = require("./module_loader");
+var BitmapFontLoader = require("./bitmap_font_loader");
 "use strict";
 
 var AssetLoaderLib = {};
@@ -22,6 +23,9 @@ AssetLoaderLib.loaderClassHash = {
     },
     'Module': {
         'js':  ModuleLoader
+    },
+    'BitmapFont': {
+        'fnt':  BitmapFontLoader
     },
     //'BitmapFont': {
     //    'fnt':  BitmapFontLoader

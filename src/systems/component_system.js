@@ -53,12 +53,20 @@ ComponentSystem.prototype.clear = function () {
     if (scene) {
         scene.off(this.addEventName, this.add, this);
         scene.off(this.removeEventName, this.remove, this);
-
-        this.scene = undefined;
     }
+
+    System.prototype.clear.call(this);
 
     this.components.length = 0;
     this._dirty = true;
+};
+
+ComponentSystem.prototype.destroy = function () {
+    System.prototype.destroy.call(this);
+
+    this.componentType = undefined;
+    this.components = undefined;
+    return this;
 };
 
 ComponentSystem.prototype._setDirty = function(){

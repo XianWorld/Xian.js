@@ -2,16 +2,15 @@
  * Created by Dianyan on 2014/12/31.
  */
 //var Component = require("./../core/component");
-var Behaviour = require("../behaviour");
-var MainContext = require("../../context/main_context");
+var Behaviour = require("./behaviour");
+var MainContext = require("../context/main_context");
 var Assets = MainContext.Assets;
 var Time = MainContext.Time;
 "use strict";
 
 //TODO AssetAgent now have two function: manage agent(asset holder) and preload agent
-function AssetAgent(opts) {
-    //opts || (opts = {});
-    Behaviour.call(this, opts);
+function AssetAgent() {
+    Behaviour.call(this);
 
     //{name, type, fileType}
     this.preloads = [];//opts.preloads;
@@ -30,15 +29,26 @@ function AssetAgent(opts) {
 Behaviour.extend(AssetAgent);
 
 AssetAgent.prototype.copy = function (other) {
+    Behaviour.prototype.copy.call(this, other);
+
+    this.preloads.length = 0;
+    var i, len = other.preloads.length;
+    for (i = 0; i < len; i++)
+        this.preloads[i] = other.preloads[i];
 
     return this;
 };
 
 AssetAgent.prototype.clear = function () {
+    Behaviour.prototype.clear.call(this);
 
-    this.preloads = undefined;
-    this._assetHash = {};
-    this._assetMetaHash = {};
+    this.preloads.length = 0;
+    var key;
+    for(key in this._assetHash){
+        this.unload(key);
+    }
+    //this._assetHash = {};
+    //this._assetMetaHash = {};
 
     //event: progress, complete
     this._preloadingAssets.length = 0;
@@ -48,19 +58,24 @@ AssetAgent.prototype.clear = function () {
     return this;
 };
 
-AssetAgent.prototype.onStart = function () {
+AssetAgent.prototype.destroy = function () {
+    Behaviour.prototype.destroy.call(this);
+
+    this.preloads = undefined;
+    this._assetHash = undefined;
+    this._assetMetaHash = undefined;
+    this._preloadingAssets = undefined;
+};
+
+AssetAgent.prototype.start = function () {
 
     if (this.preloads) {
         this.loadAll(this.preloads, true);
     }
 };
 
-AssetAgent.prototype.onUpdate = function () {
+AssetAgent.prototype.update = function () {
     //TODO use some strategy to manage or auto unload those asset cached by this agent
-};
-
-AssetAgent.prototype.onDestroy = function () {
-
 };
 
 AssetAgent.prototype.toJSON = function (json) {

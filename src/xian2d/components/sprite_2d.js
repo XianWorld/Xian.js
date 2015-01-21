@@ -7,13 +7,11 @@ var Assets = require("../../context/main_context").Assets;
 "use strict";
 
 
-function Sprite2D(opts) {
-    //opts || (opts = {});
+function Sprite2D() {
 
-    Renderable2D.call(this, opts);
+    Renderable2D.call(this);
 
     this._texture = undefined;
-    //this.texture = opts.texture !== undefined ? opts.texture : undefined;
 
     this.cliped = false;
     this._clip = new Rect;
@@ -102,6 +100,76 @@ Object.defineProperty(Sprite2D.prototype, "trim", {
     }
 });
 
+Sprite2D.prototype.copy = function (other) {
+    Renderable2D.prototype.copy.call(this, other);
+
+    this.width = other._width;
+    this.height = other._height;
+    this.texture = other.texture;
+    this.clip = other.clip;
+    this.trim = other.trim;
+    this.anchor = other.anchor;
+    this.anchored = other.anchored;
+    this.trimed = other.trimed;
+    this.cliped = other.cliped;
+
+    return this;
+};
+
+Sprite2D.prototype.clear = function () {
+    Renderable2D.prototype.clear.call(this);
+
+    this.width = 0;
+    this.height = 0;
+    this.texture = undefined;
+    this.anchor.clear();
+    this.clip.clear();
+    this.trim.clear();
+    this.anchored = false;
+    this.trimed = false;
+    this.cliped = false;
+
+    return this;
+};
+Sprite2D.prototype.destroy = function () {
+    Renderable2D.prototype.destroy.call(this);
+
+    this._anchor = undefined;
+    this._clip = undefined;
+    this._trim = undefined;
+    return this;
+};
+
+Sprite2D.prototype.toJSON = function (json) {
+    json = Renderable2D.prototype.toJSON.call(this, json);
+
+    json.texture = this.texture ? this.texture.name : undefined;
+    json.cliped = this.cliped;
+    if(this.cliped) json.clip = this._clip.toJSON(json.clip);
+    json.trimed = this.trimed;
+    if(this.trimed) json.trim = this._trim.toJSON(json.trim);
+    json.anchored = this.anchored;
+    if(this.anchored) json.anchor = this._anchor.toJSON(json.anchor);
+
+    return json;
+};
+
+Sprite2D.prototype.fromJSON = function (json) {
+    Renderable2D.prototype.fromJSON.call(this, json);
+
+    this.texture = json.texture ? Assets.load(json.texture, "Texture") : undefined;
+    this.cliped = json.cliped;
+    if(json.clip) this._clip.fromJSON(json.clip);
+    this.trimed = json.trimed;
+    if(json.trim) this._trim.fromJSON(json.trim);
+    this.anchored = json.anchored;
+    if(json.anchor) this._anchor.fromJSON(json.anchor);
+
+    this._dirtyRender = true;
+    this._dirtySize = true;
+    return this;
+};
+
 Sprite2D.prototype._updateRenderSize = function () {
     var texture = this._texture,
         anchor = this._anchor,
@@ -157,75 +225,6 @@ Sprite2D.prototype.getLocalBounds = function () {
     return this._localBounds;
 };
 
-Sprite2D.prototype.copy = function (other) {
-    Renderable2D.prototype.copy.call(this, other);
-
-    this.width = other._width;
-    this.height = other._height;
-    this.texture = other.texture;
-    this.clip = other.clip;
-    this.trim = other.trim;
-    this.anchor = other.anchor;
-    this.anchored = other.anchored;
-    this.trimed = other.trimed;
-    this.cliped = other.cliped;
-
-    return this;
-};
-
-Sprite2D.prototype.clear = function () {
-    Renderable2D.prototype.clear.call(this);
-
-    this.width = 0;
-    this.height = 0;
-    this.texture = undefined;
-    this.anchor.clear();
-    this.clip.clear();
-    this.trim.clear();
-    this.anchored = false;
-    this.trimed = false;
-    this.cliped = false;
-
-    return this;
-};
-Sprite2D.prototype.destroy = function () {
-    Renderable2D.prototype.destroy.call(this);
-
-    this.anchor = undefined;
-    this.clip = undefined;
-    this.trim = undefined;
-    return this;
-};
-
-Sprite2D.prototype.toJSON = function (json) {
-    json = Renderable2D.prototype.toJSON.call(this, json);
-
-    json.texture = this.texture ? this.texture.name : undefined;
-    json.cliped = this.cliped;
-    if(this.cliped) json.clip = this._clip.toJSON(json.clip);
-    json.trimed = this.trimed;
-    if(this.trimed) json.trim = this._trim.toJSON(json.trim);
-    json.anchored = this.anchored;
-    if(this.anchored) json.anchor = this._anchor.toJSON(json.anchor);
-
-    return json;
-};
-
-Sprite2D.prototype.fromJSON = function (json) {
-    Renderable2D.prototype.fromJSON.call(this, json);
-
-    this.texture = json.texture ? Assets.load(json.texture, "Texture") : undefined;
-    this.cliped = json.cliped;
-    if(json.clip) this._clip.fromJSON(json.clip);
-    this.trimed = json.trimed;
-    if(json.trim) this._trim.fromJSON(json.trim);
-    this.anchored = json.anchored;
-    if(json.anchor) this._anchor.fromJSON(json.anchor);
-
-    this._dirtyRender = true;
-    this._dirtySize = true;
-    return this;
-};
 
 Sprite2D.prototype._render = function (renderer) {
     if (!this.texture || !this.texture.ready) return;

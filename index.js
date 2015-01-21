@@ -40,6 +40,7 @@ function Xian() {
     this.JsonData = require("./src/context/assets/json_data");
     this.Prefab = require("./src/context/assets/prefab");
     this.Module = require("./src/context/assets/module");
+    this.BitmapFont = require("./src/context/assets/bitmap_font");
     //context/render
     //this.RendererLib = require("./src/context/graphics/renderer_lib");
 
@@ -52,7 +53,7 @@ function Xian() {
     this.Behaviour = require("./src/components/behaviour");
 
     //behaviours
-    this.AssetAgent = require("./src/components/behaviours/asset_agent");
+    this.AssetAgent = require("./src/components/asset_agent");
 
     //core
     this.Game = require("./src/core/game");

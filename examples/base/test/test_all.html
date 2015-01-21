@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Common Test</title>
     <style>
         body {
@@ -63,17 +64,6 @@
                     'texture': "eggHead.png"
                 },
                 {
-                    '_className': 'Text2D',
-                    'text': "Hello World!",
-                    'style': {
-                        'font': "bold 60px Arial",
-                        'fill': "#cc00ff",
-                        'align': "center",
-                        'stroke': "#FFFFFF",
-                        'strokeThickness': 4
-                    }
-                },
-                {
                     '_className': 'TilingSprite2D',
                     'texture': "eggHead.png",
                     'width': 300,
@@ -104,9 +94,9 @@
                                 'elasticity': 0.5,
                                 vertices: [
                                     {'x': 0, 'y': 0},
-                                    {'x': 23, 'y': 0},
-                                    {'x': 23, 'y': 67},
-                                    {'x': 0, 'y': 67},
+                                    {'x': 26, 'y': 0},
+                                    {'x': 26, 'y': 37},
+                                    {'x': 0, 'y': 37},
                                 ]
                             }
                         ]
@@ -146,16 +136,48 @@
             ]
         };
 
+        var textPrefab = {
+            'name': "text",
+            '_className': 'GameObject',
+            'components': [
+                {'_className': 'Transform2D'},
+                {
+                    '_className': 'Text2D',
+                    'text': "Hello World!",
+                    'style': {
+                        'font': "bold 60px Arial",
+                        'fill': "#cc00ff",
+                        'align': "center",
+                        'stroke': "#FFFFFF",
+                        'strokeThickness': 4
+                    }
+                },
+                {
+                    '_className': 'Text2D',
+                    'text': "江雪\n千山鸟飞绝，万径人踪灭。\n孤舟蓑笠翁，独钓寒江雪。",
+                    'bitmapFont': 'tangshi.fnt',
+                    'style': {
+                        'font': "32px Arial",
+                        'fill': "#ff0000",
+                        'align': "center"
+                    }
+                },
+                {'_className': 'Renderer2D'}
+            ]
+        };
+
         game.addScene(sceneJson);
 
         function start() {
             game.setScene("PlayGround");
             GameObject.Instantiate(rootPrefab);
             GameObject.Instantiate(rootPrefab, new Vec2(100, 100), 0.3);
+            GameObject.Instantiate(textPrefab, new Vec2(400, 0), 0);
             GameObject.Instantiate(phys2dSpritePrefab, new Vec2(200, 0), 1.8);
             GameObject.Instantiate(phys2dGrassPrefab, new Vec2(0, 300), 0);
 
             var test = Assets.load('TestComponent.js', 'Module');
+            var font = Assets.load('tangshi.fnt', 'BitmapFont');
         }
 
         game.on("start", function () {
