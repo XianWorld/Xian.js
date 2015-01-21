@@ -5,25 +5,18 @@ var Rect = require("../../math/rect");
 "use strict";
 
 
-function Renderable2D(opts) {
-    //opts || (opts = {});
+function Renderable2D() {
 
-    Component.call(this, opts);
+    Component.call(this);
 
     this._width = 0;
     this._height = 0;
     this.blendMode = Enums.blendModes.NORMAL;
     this.alpha = 1;
     this.tint = 0xFFFFFF;
-    //this._width = opts.width || 0;
-    //this._height = opts.height || 0;
-    //this.blendMode = opts.blendMode !== undefined ? opts.blendMode : Enums.blendModes.NORMAL;
-    //this.alpha = opts.alpha !== undefined ? opts.alpha : 1;
-    //this.tint = opts.tint !== undefined ? opts.tint : 0xFFFFFF;
 
     this.worldAlpha = 1.0;
     this.worldMatrix = undefined;
-
     this._bounds = new Rect(0, 0, 1, 1);
     this._localBounds = new Rect(0, 0, 1, 1);
     //this._dirtyBounds = true;
@@ -35,7 +28,7 @@ Component.extend(Renderable2D);
 
 Object.defineProperty(Renderable2D.prototype, "width", {
     get: function () {
-        return this._textureClip;
+        return this._width;
     },
     set: function (value) {
         if(this._width === value) return;
@@ -44,9 +37,10 @@ Object.defineProperty(Renderable2D.prototype, "width", {
         this._dirtySize = true;
     }
 });
+
 Object.defineProperty(Renderable2D.prototype, "height", {
     get: function () {
-        return this._textureClip;
+        return this._height;
     },
     set: function (value) {
         if(this._height === value) return;
@@ -56,28 +50,10 @@ Object.defineProperty(Renderable2D.prototype, "height", {
     }
 });
 
-Renderable2D.prototype._setDirty= function() {
-    this._dirtyRender = true;
-};
-Renderable2D.prototype.getDirty = function() {
-    return this._dirtyRender || this._dirtySize;
-};
-Renderable2D.prototype._setSizeDirty = function() {
-    if (this._dirtySize) {
-        return;
-    }
-    this._dirtySize = true;
-    this._setDirty();
-};
-Renderable2D.prototype._clearDirty = function() {
-    this._dirtyRender = false;
-};
-Renderable2D.prototype._clearSizeDirty = function() {
-    this._dirtySize = false;
-};
-
 Renderable2D.prototype.copy = function (other) {
 
+    this.width = other.width;
+    this.height = other.height;
     this.blendMode = other.blendMode;
     this.alpha = other.alpha;
     this.tint = other.tint;
@@ -88,6 +64,8 @@ Renderable2D.prototype.copy = function (other) {
 Renderable2D.prototype.clear = function () {
     Component.prototype.clear.call(this);
 
+    this._width = 0;
+    this._height = 0;
     this.blendMode = Enums.blendModes.NORMAL;
     this.alpha = 1;
     this.tint = 0xFFFFFF;
@@ -99,21 +77,12 @@ Renderable2D.prototype.clear = function () {
     return this;
 };
 
-Renderable2D.prototype.getBounds = function()
-{
-    //if(this._dirtyBounds)
-    {
-        var worldTransform = this.transform.modelView;
-        this.getLocalBounds();
-        this._localBounds.getBounds(worldTransform, this._bounds);
-        //this._dirtyBounds = false;
-    }
-    return this._bounds;
-};
+Renderable2D.prototype.destroy = function () {
+    Component.prototype.destroy.call(this);
 
-Renderable2D.prototype.getLocalBounds = function()
-{
-    return this._localBounds;//this.getBounds(Mat32.Identity);///PIXI.EmptyRectangle();
+    this.worldMatrix = undefined;
+    this._bounds = undefined;
+    this._localBounds = undefined;
 };
 
 Renderable2D.prototype.update = function () {
@@ -121,9 +90,6 @@ Renderable2D.prototype.update = function () {
     //when transform changed, the world bounds will update
     if(this.transform._pvm_changed)
         this._dirtyBounds = true;
-};
-
-Renderable2D.prototype._render = function (renderer) {
 };
 
 Renderable2D.prototype.toJSON = function (json) {
@@ -148,5 +114,47 @@ Renderable2D.prototype.fromJSON = function (json) {
     this.tint = json.tint || 0xFFFFFF;
     return this;
 };
+
+//Renderable2D.prototype._setDirty= function() {
+//    this._dirtyRender = true;
+//};
+//Renderable2D.prototype.getDirty = function() {
+//    return this._dirtyRender || this._dirtySize;
+//};
+//Renderable2D.prototype._setSizeDirty = function() {
+//    if (this._dirtySize) {
+//        return;
+//    }
+//    this._dirtySize = true;
+//    this._setDirty();
+//};
+//Renderable2D.prototype._clearDirty = function() {
+//    this._dirtyRender = false;
+//};
+//Renderable2D.prototype._clearSizeDirty = function() {
+//    this._dirtySize = false;
+//};
+
+Renderable2D.prototype.getBounds = function()
+{
+    //if(this._dirtyBounds)
+    {
+        var worldTransform = this.transform.modelView;
+        this.getLocalBounds();
+        this._localBounds.getBounds(worldTransform, this._bounds);
+        //this._dirtyBounds = false;
+    }
+    return this._bounds;
+};
+
+Renderable2D.prototype.getLocalBounds = function()
+{
+    return this._localBounds;//this.getBounds(Mat32.Identity);///PIXI.EmptyRectangle();
+};
+
+
+Renderable2D.prototype._render = function (renderer) {
+};
+
 
 module.exports = Renderable2D;

@@ -15,26 +15,21 @@ var clamp = Mathf.clamp,
     EPSILON = Mathf.EPSILON;
 
 
-function Camera2D(opts) {
-    //opts || (opts = {});
+function Camera2D() {
 
-    Camera.call(this, opts);
+    Camera.call(this);
+
+    this.transparent = false;
+    this.clearBeforeRender = true;
 
     this.projection = new Mat32;
-
     this.view = new Mat32;
 
     this._projectionView = new Mat32;
     this._pv_changed = false;
 
+    //TODO ???
     this.renderer = undefined;
-    this.transparent = false;
-    this.clearBeforeRender = true;
-    //this.transparent = opts.transparent !== undefined ? opts.transparent : false;
-    //this.clearBeforeRender = opts.clearBeforeRender !== undefined ? opts.clearBeforeRender : true;
-
-    //render target: default(main)/RenderTexture
-    this.renderTexture = undefined;
 }
 
 Camera.extend(Camera2D);
@@ -45,6 +40,33 @@ Camera2D.prototype.copy = function (other) {
 
     this.transparent = other.transparent;
     this.clearBeforeRender = other.clearBeforeRender;
+
+    return this;
+};
+
+Camera2D.prototype.destroy = function () {
+    Camera.prototype.destroy.call(this);
+
+    this.projection = undefined;
+    this.view = undefined;
+    this._projectionView = undefined;
+};
+
+Camera2D.prototype.toJSON = function (json) {
+    json = Camera.prototype.toJSON.call(this, json);
+
+    json.transparent = this.transparent;
+    json.clearBeforeRender = this.clearBeforeRender;
+
+    return json;
+};
+
+
+Camera2D.prototype.fromJSON = function (json) {
+    Camera.prototype.fromJSON.call(this, json);
+
+    this.transparent = json.transparent !== undefined ? !!json.transparent : false;
+    this.clearBeforeRender = json.clearBeforeRender !== undefined ?  !!json.clearBeforeRender : true;
 
     return this;
 };
@@ -78,9 +100,7 @@ Camera2D.prototype.toScreen = function (v, out) {
     return out;
 };
 
-
 Camera2D.prototype.update = function () {
-    //if (!this._active) return;
 
     var transform = this.transform;
 
@@ -238,46 +258,6 @@ Camera2D.prototype._renderTransform = function (renderer, viewMatrix, transform,
     //}
 };
 
-Camera2D.prototype.toJSON = function (json) {
-    json = Camera.prototype.toJSON.call(this, json);
-
-    //json.width = this.width;
-    //json.height = this.height;
-    //
-    //json.autoResize = this.autoResize;
-    //json.background = this.background.toJSON(json.background);
-    //
-    //json.orthographicSize = this.orthographicSize;
-    //json.minOrthographicSize = this.minOrthographicSize;
-    //json.maxOrthographicSize = this.maxOrthographicSize;
-    //
-    json.transparent = this.transparent;
-    json.clearBeforeRender = this.clearBeforeRender;
-
-    return json;
-};
-
-
-Camera2D.prototype.fromJSON = function (json) {
-    Camera.prototype.fromJSON.call(this, json);
-
-    //this.width = json.width;
-    //this.height = json.height;
-    //
-    //this.autoResize = json.autoResize;
-    //this.background.fromJSON(json.background);
-    //
-    //this.orthographicSize = json.orthographicSize;
-    //this.minOrthographicSize = json.minOrthographicSize;
-    //this.maxOrthographicSize = json.maxOrthographicSize;
-    //
-    //this.needsUpdate = true;
-
-    this.transparent = json.transparent !== undefined ? !!json.transparent : false;
-    this.clearBeforeRender = json.clearBeforeRender !== undefined ?  !!json.clearBeforeRender : true;
-
-    return this;
-};
 
 
 module.exports = Camera2D;

@@ -1,13 +1,11 @@
 "use strict";
 
-
 function ObjectPool(constructor) {
 
     this.pooled = [];
     this.objects = [];
     this.object = constructor;
 }
-
 
 ObjectPool.prototype.create = function () {
     var pooled = this.pooled,
@@ -23,6 +21,7 @@ ObjectPool.prototype.create = function () {
         //object.retain = retain;
         var f = object.destroy;
         object.destroy = function(){
+            this.emit("destroy");
             if(this.clear) this.clear();
             this._objectPool.removeObject(this);
         };
@@ -108,11 +107,16 @@ ObjectPool.prototype.clearForEach = function (fn) {
     return this;
 };
 
-
+/**
+ * really destroy all pooled object.
+ * @returns {ObjectPool}
+ */
 ObjectPool.prototype.empty = function () {
+    var i = this.pooled.length;
+    while (i--) this.pooled[i].__destroy();
 
-    this.pooled.length = this.objects.length = 0;
-
+    this.pooled.length = 0;
+    //this.pooled.length = this.objects.length = 0;
     return this;
 };
 
