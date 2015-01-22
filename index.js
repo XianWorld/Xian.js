@@ -94,10 +94,10 @@ function Xian() {
     var CanvasRenderContext2D = require("./src/xian2d/context/graphics/g2d/canvas/canvas_render_context_2d");
     var WebGLRenderContext2D = require("./src/xian2d/context/graphics/g2d/webgl/webgl_render_context_2d");
     this.MainContext.GraphicsContext.setRenderContext("2d", CanvasRenderContext2D, WebGLRenderContext2D);
-    //this.RendererLib.register(CanvasRenderer2D);
-    //this.RendererLib.register(WebGLRenderer2D);
-    //this.RendererLib.register(PIXICanvasRenderer2D);
-    //this.RendererLib.register(PIXIWebGLRenderer2D);
+    this.Sprite2DData = require("./src/xian2d/context/graphics/g2d/sprite_2d_data");
+    this.GraphicsData = require("./src/xian2d/context/graphics/g2d/graphics_data");
+    this.GraphicsShapeData = require("./src/xian2d/context/graphics/g2d/graphics_shape_data");
+
     //xian2d/context/assets
     this.TextureClipData = require("./src/xian2d/context/assets/texture_clip_data");
     this.SpriteSheet = require("./src/xian2d/context/assets/sprite_sheet");

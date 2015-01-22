@@ -22,6 +22,7 @@ function Sprite2DData() {
 
     this.worldMatrix = undefined;
 }
+Sprite2DData.prototype.constructor = Sprite2DData;
 
 Sprite2DData.prototype.destroy = function () {
     this.destTexture = undefined;

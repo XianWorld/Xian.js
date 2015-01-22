@@ -25,6 +25,7 @@ var CanvasBuffer = require("../../context/graphics/canvas_buffer");
 var Texture = require("../../context/assets/texture");
 var Sprite2DData = require("../context/graphics/g2d/sprite_2d_data");
 var Vec2 = require("../../math/vec2");
+var Rect = require("../../math/rect");
 var Color = require("../../math/color");
 var Assets = require("../../context/main_context").Assets;
 

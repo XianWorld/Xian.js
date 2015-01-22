@@ -43,11 +43,6 @@ Class.prototype.copy = function (other) {
     return this;
 };
 
-/**
- * clears data for GC
- * @memberof Xian.Class
- * @return this
- */
 Class.prototype.clear = function () {
     return this;
 };
@@ -57,11 +52,6 @@ Class.prototype.destroy = function () {
     return this;
 };
 
-/**
- * converts this to a JSON object
- * @memberof Xian.Class
- * @return json
- */
 Class.prototype.toJSON = function (json) {
     json || (json = {});
 
@@ -71,11 +61,6 @@ Class.prototype.toJSON = function (json) {
     return json;
 };
 
-/**
- * sets this from JSON object
- * @memberof Xian.Class
- * @return this
- */
 Class.prototype.fromJSON = function (json) {
 
     this._jsonId = json._jsonId;
