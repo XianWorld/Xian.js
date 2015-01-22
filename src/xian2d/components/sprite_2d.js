@@ -17,8 +17,8 @@ function Sprite2D() {
     this._clip = new Rect;
     this.trimed = false;
     this._trim = new Rect;
-    this.anchored = false;
-    this._anchor = new Vec2;
+    //this.anchored = false;
+    //this._anchor = new Vec2;
 
     this.sourceX = 0;
     this.sourceY = 0;
@@ -35,7 +35,7 @@ function Sprite2D() {
 Renderable2D.extend(Sprite2D);
 
 Sprite2D.prototype.onAssetInited = function(asset) {
-    this._dirtyRender = true;
+    this._dirty = true;
     this._dirtySize = true;
 };
 
@@ -48,7 +48,7 @@ Object.defineProperty(Sprite2D.prototype, "texture", {
         if (this._texture) this._texture.release(this);
         this._texture = value;
         if (this._texture) this._texture.retain(this);
-        this._dirtyRender = true;
+        this._dirty = true;
         this._dirtySize = true;
     }
 });
@@ -58,22 +58,11 @@ Object.defineProperty(Sprite2D.prototype, "textureClip", {
         if (!value) return;
         this.cliped = true;
         this._clip.copy(value.clip);
-        this.anchored = value.anchored;
-        if(this.anchored) this._anchor.copy(value.anchor);
+        //this.anchored = value.anchored;
+        if(value.anchored) this._anchor.copy(value.anchor);
         this.trimed = value.trimed;
         if(this.trimed) this._trim.copy(value.trim);
-        this._dirtyRender = true;
-        this._dirtySize = true;
-    }
-});
-
-Object.defineProperty(Sprite2D.prototype, "anchor", {
-    get: function () {
-        return this._anchor;
-    },
-    set: function (value) {
-        if (value) this._anchor.copy(value);
-        this._dirtyRender = true;
+        this._dirty = true;
         this._dirtySize = true;
     }
 });
@@ -84,7 +73,7 @@ Object.defineProperty(Sprite2D.prototype, "clip", {
     },
     set: function (value) {
         if (value) this._clip.copy(value);
-        this._dirtyRender = true;
+        this._dirty = true;
         this._dirtySize = true;
     }
 });
@@ -95,7 +84,7 @@ Object.defineProperty(Sprite2D.prototype, "trim", {
     },
     set: function (value) {
         if (value) this._trim.copy(value);
-        this._dirtyRender = true;
+        this._dirty = true;
         this._dirtySize = true;
     }
 });
@@ -108,8 +97,6 @@ Sprite2D.prototype.copy = function (other) {
     this.texture = other.texture;
     this.clip = other.clip;
     this.trim = other.trim;
-    this.anchor = other.anchor;
-    this.anchored = other.anchored;
     this.trimed = other.trimed;
     this.cliped = other.cliped;
 
@@ -122,10 +109,8 @@ Sprite2D.prototype.clear = function () {
     this.width = 0;
     this.height = 0;
     this.texture = undefined;
-    this.anchor.clear();
     this.clip.clear();
     this.trim.clear();
-    this.anchored = false;
     this.trimed = false;
     this.cliped = false;
 
@@ -134,7 +119,6 @@ Sprite2D.prototype.clear = function () {
 Sprite2D.prototype.destroy = function () {
     Renderable2D.prototype.destroy.call(this);
 
-    this._anchor = undefined;
     this._clip = undefined;
     this._trim = undefined;
     return this;
@@ -148,8 +132,6 @@ Sprite2D.prototype.toJSON = function (json) {
     if(this.cliped) json.clip = this._clip.toJSON(json.clip);
     json.trimed = this.trimed;
     if(this.trimed) json.trim = this._trim.toJSON(json.trim);
-    json.anchored = this.anchored;
-    if(this.anchored) json.anchor = this._anchor.toJSON(json.anchor);
 
     return json;
 };
@@ -162,10 +144,8 @@ Sprite2D.prototype.fromJSON = function (json) {
     if(json.clip) this._clip.fromJSON(json.clip);
     this.trimed = json.trimed;
     if(json.trim) this._trim.fromJSON(json.trim);
-    this.anchored = json.anchored;
-    if(json.anchor) this._anchor.fromJSON(json.anchor);
 
-    this._dirtyRender = true;
+    this._dirty = true;
     this._dirtySize = true;
     return this;
 };
@@ -186,12 +166,12 @@ Sprite2D.prototype._updateRenderSize = function () {
     this.destWidth = this.sourceWidth;
     this.destHeight = this.sourceHeight;
     if (!this.trimed) {
-        this.destX = this.anchored ? -(anchor.x * this.destWidth) : 0;
-        this.destY = this.anchored ? -(anchor.y * this.destHeight) : 0;
+        this.destX = -(anchor.x * this.destWidth);
+        this.destY = -(anchor.y * this.destHeight);
     }
     else {
-        this.destX = this.anchored ? trim.x -(anchor.x * trim.width) : trim.x;
-        this.destY = this.anchored ? trim.y -(anchor.y * trim.height) : trim.y;
+        this.destX = trim.x -(anchor.x * trim.width);
+        this.destY = trim.y -(anchor.y * trim.height);
     }
 
     var sx, sy;
@@ -228,9 +208,9 @@ Sprite2D.prototype.getLocalBounds = function () {
 
 Sprite2D.prototype._render = function (renderer) {
     if (!this.texture || !this.texture.ready) return;
-    if (this._dirtyRender) {
+    if (this._dirty) {
         this._updateRenderSize();
-        this._dirtyRender = false;
+        this._dirty = false;
     }
 
     //renderer.drawImage(texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, this.tint);

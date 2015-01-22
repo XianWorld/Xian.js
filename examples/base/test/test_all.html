@@ -61,6 +61,7 @@
                 {'_className': 'Transform2D'},
                 {
                     '_className': 'Sprite2D',
+                    'anchor': {'x': 0.5, 'y': 0.5},
                     'texture': "eggHead.png"
                 },
                 {
@@ -154,6 +155,7 @@
                 },
                 {
                     '_className': 'Text2D',
+                    'anchor': {'x': 0.5, 'y':0.5},
                     'text': "江雪\n千山鸟飞绝，万径人踪灭。\n孤舟蓑笠翁，独钓寒江雪。",
                     'bitmapFont': 'tangshi.fnt',
                     'style': {
@@ -208,7 +210,7 @@
             game.setScene("PlayGround");
             GameObject.Instantiate(rootPrefab);
             GameObject.Instantiate(rootPrefab, new Vec2(100, 100), 0.3);
-            GameObject.Instantiate(textPrefab, new Vec2(400, 0), 0);
+            GameObject.Instantiate(textPrefab, new Vec2(400, 100), 0);
             GameObject.Instantiate(phys2dSpritePrefab, new Vec2(200, 0), 1.8);
             GameObject.Instantiate(phys2dGrassPrefab, new Vec2(0, 300), 0);
             GameObject.Instantiate(graphicsPrefab, new Vec2(400, 0), 0);

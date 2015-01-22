@@ -1,7 +1,7 @@
 var Enums = require("../../base/enums");
 var Component = require("./../../core/component");
 var Rect = require("../../math/rect");
-//var Mat32 = require("../../math/mat32");
+var Vec2 = require("../../math/vec2");
 "use strict";
 
 
@@ -14,6 +14,8 @@ function Renderable2D() {
     this.blendMode = Enums.blendModes.NORMAL;
     this.alpha = 1;
     this.tint = 0xFFFFFF;
+    this._anchor = new Vec2;
+
 
     this.worldAlpha = 1.0;
     this.worldMatrix = undefined;
@@ -21,7 +23,7 @@ function Renderable2D() {
     this._localBounds = new Rect(0, 0, 1, 1);
     //this._dirtyBounds = true;
     this._dirtySize = true;
-    this._dirtyRender = true;
+    this._dirty = true;
 }
 
 Component.extend(Renderable2D);
@@ -33,7 +35,7 @@ Object.defineProperty(Renderable2D.prototype, "width", {
     set: function (value) {
         if(this._width === value) return;
         this._width = value;
-        this._dirtyRender = true;
+        this._dirty = true;
         this._dirtySize = true;
     }
 });
@@ -45,7 +47,18 @@ Object.defineProperty(Renderable2D.prototype, "height", {
     set: function (value) {
         if(this._height === value) return;
         this._height = value;
-        this._dirtyRender = true;
+        this._dirty = true;
+        this._dirtySize = true;
+    }
+});
+
+Object.defineProperty(Renderable2D.prototype, "anchor", {
+    get: function () {
+        return this._anchor;
+    },
+    set: function (value) {
+        if (value) this._anchor.copy(value);
+        this._dirty = true;
         this._dirtySize = true;
     }
 });
@@ -57,6 +70,7 @@ Renderable2D.prototype.copy = function (other) {
     this.blendMode = other.blendMode;
     this.alpha = other.alpha;
     this.tint = other.tint;
+    this.anchor = other.anchor;
 
     return this;
 };
@@ -69,9 +83,10 @@ Renderable2D.prototype.clear = function () {
     this.blendMode = Enums.blendModes.NORMAL;
     this.alpha = 1;
     this.tint = 0xFFFFFF;
+    this.anchor.clear();
 
     //this._dirtyBounds = true;
-    this._dirtyRender = true;
+    this._dirty = true;
     this._dirtySize = true;
 
     return this;
@@ -80,6 +95,7 @@ Renderable2D.prototype.clear = function () {
 Renderable2D.prototype.destroy = function () {
     Component.prototype.destroy.call(this);
 
+    this.anchor = undefined;
     this.worldMatrix = undefined;
     this._bounds = undefined;
     this._localBounds = undefined;
@@ -101,6 +117,8 @@ Renderable2D.prototype.toJSON = function (json) {
     json.alpha = this.alpha;
     json.tint = this.tint;
 
+    json.anchor = this._anchor.toJSON(json.anchor);
+
     return json;
 };
 
@@ -112,14 +130,16 @@ Renderable2D.prototype.fromJSON = function (json) {
     this.blendMode = json.blendMode || Enums.blendModes.NORMAL;
     this.alpha = json.alpha || 1;
     this.tint = json.tint || 0xFFFFFF;
+
+    json.anchor ? this._anchor.fromJSON(json.anchor) : this._anchor.clear();
     return this;
 };
 
 //Renderable2D.prototype._setDirty= function() {
-//    this._dirtyRender = true;
+//    this._dirty = true;
 //};
 //Renderable2D.prototype.getDirty = function() {
-//    return this._dirtyRender || this._dirtySize;
+//    return this._dirty || this._dirtySize;
 //};
 //Renderable2D.prototype._setSizeDirty = function() {
 //    if (this._dirtySize) {
@@ -129,7 +149,7 @@ Renderable2D.prototype.fromJSON = function (json) {
 //    this._setDirty();
 //};
 //Renderable2D.prototype._clearDirty = function() {
-//    this._dirtyRender = false;
+//    this._dirty = false;
 //};
 //Renderable2D.prototype._clearSizeDirty = function() {
 //    this._dirtySize = false;

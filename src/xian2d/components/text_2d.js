@@ -49,7 +49,7 @@ function Text2D() {
 Renderable2D.extend(Text2D);
 
 Text2D.prototype.onAssetInited = function (asset) {
-    this._dirtyRender = true;
+    this._dirty = true;
     this._dirtySize = true;
 };
 
@@ -62,7 +62,7 @@ Object.defineProperty(Text2D.prototype, "bitmapFont", {
         if (this._bitmapFont) this._bitmapFont.release(this);
         this._bitmapFont = value;
         if (this._bitmapFont) this._bitmapFont.retain(this);
-        this._dirtyRender = true;
+        this._dirty = true;
         this._dirtySize = true;
     }
 });
@@ -75,7 +75,7 @@ Object.defineProperty(Text2D.prototype, "text", {
         value = value || '';
         if (this._text === value) return;
         this._text = value.toString() || ' ';
-        this._dirtyRender = true;
+        this._dirty = true;
         this._dirtySize = true;
     }
 });
@@ -107,7 +107,7 @@ Text2D.prototype.clear = function () {
 
     this._destroyCachedSprite();
 
-    this._dirtyRender = true;
+    this._dirty = true;
     this._dirtySize = true;
 
     return this;
@@ -150,7 +150,7 @@ Text2D.prototype.fromJSON = function (json) {
 //    this.bitmapFont = value;
 //    if (this.bitmapFont) this.bitmapFont.retain(this);
 //
-//    this._dirtyRender = true;
+//    this._dirty = true;
 //    this._dirtySize = true;
 //};
 
@@ -176,7 +176,7 @@ Text2D.prototype.setStyle = function (style) {
     this._fontSize = font.length >= 2 ? parseInt(font[font.length - 2], 10) : 0;
     this._fontColor = Color.string2Hex(style.fill);
 
-    this._dirtyRender = true;
+    this._dirty = true;
     this._dirtySize = true;
 };
 
@@ -184,7 +184,7 @@ Text2D.prototype.setStyle = function (style) {
 //    text = text || "";
 //    if (this.text === text) return;
 //    this.text = text.toString() || ' ';
-//    this._dirtyRender = true;
+//    this._dirty = true;
 //    this._dirtySize = true;
 //};
 
@@ -204,8 +204,9 @@ Text2D.prototype.getLocalBounds = function (matrix) {
 Text2D.prototype._render = function (renderer) {
     if(this.bitmapFont){
         if (!this.bitmapFont.ready) return;
-        if (this._dirtyRender) {
+        if (this._dirty) {
             this._updateBitmapText();
+            this._dirty = false;
         }
         //when use bitmap font, use font color as tint.
         var sprite2DDatas = this._sprite2DDatas;
@@ -222,13 +223,13 @@ Text2D.prototype._render = function (renderer) {
                 renderer.renderSprite2D(sprite2DData);
             }
         }
-        this._dirtyRender = false;
     }
     else{
-        if (this._dirtyRender) {
+        if (this._dirty) {
+            this._dirtyRender = true;
+            this._dirty = false;
         }
         renderer.renderText(this);
-        this._dirtyRender = false;
     }
 };
 
@@ -245,6 +246,7 @@ Text2D.prototype._getBitmapTextBounds = function (bounds) {
     var line = 0;
     var scale = this._fontSize === 0 ? 1 : this._fontSize / data.size;
     var text = this._text;
+    var anchor = this._anchor;
     for (var i = 0; i < text.length; i++) {
         var charCode = text.charCodeAt(i);
 
@@ -274,10 +276,10 @@ Text2D.prototype._getBitmapTextBounds = function (bounds) {
 
     //lineWidths.push(pos.x);
     maxLineWidth = Math.max(maxLineWidth, posX);
-    bounds.x = 0;
-    bounds.y = 0;
     bounds.width = maxLineWidth * scale;
     bounds.height = (posY + data.lineHeight) * scale;
+    bounds.x = -(anchor.x * bounds.width);
+    bounds.y = -(anchor.y * bounds.height);
 
     return bounds;
 };
@@ -353,6 +355,12 @@ Text2D.prototype._updateBitmapText = function () {
     var lenChars = chars.length;
     var tint = this.tint || 0xFFFFFF;
     var c, char;
+    var anchor = this._anchor;
+
+    var textWidth = maxLineWidth * scale;
+    var textHeight = (pos.y + data.lineHeight) * scale;
+    var offsetX = -(anchor.x * textWidth);
+    var offsetY = -(anchor.y * textHeight);
 
     for (i = 0; i < lenChars; i++) {
         char = chars[i];
@@ -366,10 +374,12 @@ Text2D.prototype._updateBitmapText = function () {
         c.sourceWidth = char.textureRect.width;
         c.sourceHeight = char.textureRect.height;
 
-        c.destX = (char.positionX + lineAlignOffsets[char.line]) * scale;
-        c.destY = char.positionY * scale;
+        c.destX = (char.positionX + lineAlignOffsets[char.line]) * scale + offsetX;
+        c.destY = char.positionY * scale + offsetY;
         c.destWidth = c.sourceWidth * scale;
         c.destHeight = c.sourceHeight * scale;
+        //c.destX = (char.positionX + lineAlignOffsets[char.line]) * scale - (anchor.x * c.destWidth);
+        //c.destY = char.positionY * scale - (anchor.y * c.destHeight);
 
         //c.tint = 0xFFFFFF;
         //c.worldAlpha = 1;
@@ -392,8 +402,6 @@ Text2D.prototype._updateBitmapText = function () {
         sprite2DDatas.length = lenChars;
     }
 
-    //this.textWidth = maxLineWidth * scale;
-    //this.textHeight = (pos.y + data.lineHeight) * scale;
 };
 
 Text2D.prototype._generateCachedSprite = function () {
@@ -409,10 +417,18 @@ Text2D.prototype._generateCachedSprite = function () {
     }
 
     var buffer = sprite2D.buffer;
+    var x = this._anchor.x;
+    var y = this._anchor.y;
+    this._anchor.set(0,0);
     CanvasText.renderText(this, buffer.context, buffer.canvas);
+    this._anchor.set(x,y);
     var bounds = this._localBounds;
+    bounds.x = -(x * bounds.width);
+    bounds.y = -(y * bounds.height);
     sprite2D.sourceWidth = bounds.width;
     sprite2D.sourceHeight = bounds.height;
+    sprite2D.destX = bounds.x;
+    sprite2D.destY = bounds.y;
     sprite2D.destWidth = bounds.width;
     sprite2D.destHeight = bounds.height;
     sprite2D.destTexture.width = bounds.width;

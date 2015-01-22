@@ -78,8 +78,8 @@ Camera.prototype.clear = function () {
 
     this.needsUpdate = true;
 
-    this.on('addToScene', this._onAddToScene, this);
-    this.on('removeFromScene', this._onRemoveFromScene, this);
+    this.on('init', this._onAddToScene, this);
+    this.on('remove', this._onRemoveFromScene, this);
 
     return this;
 };
@@ -89,8 +89,8 @@ Camera.prototype.destroy = function () {
     this.viewportRect = undefined;
     this.background = undefined;
 
-    this.off('addToScene', this._onAddToScene, this);
-    this.off('removeFromScene', this._onRemoveFromScene, this);
+    this.off('init', this._onAddToScene, this);
+    this.off('remove', this._onRemoveFromScene, this);
     this._onAddToScene = undefined;
     this._onRemoveFromScene = undefined;
 };
