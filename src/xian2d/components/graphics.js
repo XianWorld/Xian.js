@@ -9,44 +9,28 @@ var CanvasBuffer = require("../../context/graphics/canvas_buffer");
 var CanvasGraphics = require("../context/graphics/g2d/canvas/utils/canvas_graphics");
 var Texture = require("../../context/assets/texture");
 var Sprite2DData = require("../context/graphics/g2d/sprite_2d_data");
+var GraphicsData = require("../context/graphics/g2d/graphics_data");
+var GraphicsShapeData = require("../context/graphics/g2d/graphics_shape_data");
 
-function Graphics(opts) {
-    //opts || (opts = {});
+function Graphics() {
 
-    Renderable2D.call(this, opts);
-
-    //this.renderable = true;
-
-    this.fillAlpha = 1;
-
-    this.lineWidth = 0;
-
-    this.lineColor = 0;
+    Renderable2D.call(this);
 
     this.graphicsData = [];
 
-    //this.tint = 0xFFFFFF;
-
+    this.fillAlpha = 1;
+    this.lineWidth = 0;
+    this.lineColor = 0;
     this.currentPath = null;
-
     this._webGL = [];
-
     this.isMask = false;
-
     this.boundsPadding = 0;
-
-    //this._localBounds = new Rect(0,0,1,1);
-
     //use for WebGLGraphics to update gl data, will be set to false in WebGLGraphics renders
     this.dirty = true;
 
-    //this.webGLDirty = false;
-
-    //this.cachedSpriteDirty = false;
-
     this._cachedSprite = undefined;
     this._cacheAsBitmap = false;
-};
+}
 
 Renderable2D.extend(Graphics);
 
@@ -55,7 +39,7 @@ Object.defineProperty(Graphics.prototype, "cacheAsBitmap", {
         return this._cacheAsBitmap;
     },
     set: function (value) {
-        if(this._cacheAsBitmap === value) return;
+        if (this._cacheAsBitmap === value) return;
         this._cacheAsBitmap = value;
 
         //this.cachedSpriteDirty = true;
@@ -66,9 +50,77 @@ Object.defineProperty(Graphics.prototype, "cacheAsBitmap", {
         //    this.destroyCachedSprite();
         //    this._dirtyRender = true;
         //}
-
     }
 });
+
+Graphics.prototype.copy = function (other) {
+    Renderable2D.ptototype.copy.call(this, other);
+
+    var i, len = other.graphicsData.length;
+    for (i = 0; i < len; i++) {
+        this.graphicsData[i] = other.graphicsData[i].clone();
+    }
+    return this;
+};
+
+Graphics.prototype.clear = function () {
+    Renderable2D.ptototype.clear.call(this);
+
+    var i = this.graphicsData.length;
+    while (i--) {
+        this.graphicsData[i].destroy();
+        this.graphicsData[i] = undefined;
+    }
+    this.graphicsData.length = 0;
+
+    this.lineWidth = 0;
+    this.filling = false;
+    this.cacheAsBitmap = false;
+    this._destroyCachedSprite();
+
+    this._dirtyRender = true;
+    this.clearDirty = true;
+
+    this._webGL.length = 0;
+    return this;
+};
+
+Graphics.prototype.destroy = function () {
+    Renderable2D.ptototype.destroy.call(this);
+    this.graphicsData = undefined;
+    this._webGL = undefined;
+};
+
+Graphics.prototype.toJSON = function (json) {
+    json = Renderable2D.prototype.toJSON.call(this, json);
+
+    json.graphicsDatas || (json.graphicsDatas = []);
+    var i, len = this.graphicsData.length;
+    for (i = 0; i < len; i++) {
+        json.graphicsData[i] = this.graphicsData[i].toJSON(json.graphicsData[i]);
+    }
+
+    return json;
+};
+
+Graphics.prototype.fromJSON = function (json) {
+    Renderable2D.prototype.fromJSON.call(this, json);
+
+    var i = this.graphicsData.length;
+    while (i--) {
+        this.graphicsData[i].destroy();
+        this.graphicsData[i] = undefined;
+    }
+    this.graphicsData.length = 0;
+
+    if (json.graphicsDatas) {
+        var len = json.graphicsDatas.length;
+        for (i = 0; i < len; i++) {
+            this.graphicsData.push(GraphicsData.create().fromJSON(json.graphicsDatas[i]));
+        }
+    }
+    return this;
+};
 
 /**
  * Specifies the line style used for subsequent calls to Graphics methods such as the lineTo() method or the drawCircleShape() method.
@@ -87,7 +139,7 @@ Graphics.prototype.lineStyle = function (lineWidth, color, alpha) {
     if (this.currentPath) {
         if (this.currentPath.shape.points.length) {
             // halfway through a line? start a new one!
-            this.drawShape(new PolygonShape(this.currentPath.shape.points.slice(-2)));
+            this.drawShape(new GraphicsShapeData.PolygonShape().init(this.currentPath.shape.points.slice(-2)));
             return this;
         }
 
@@ -110,7 +162,7 @@ Graphics.prototype.lineStyle = function (lineWidth, color, alpha) {
  * @return {Graphics}
  */
 Graphics.prototype.moveTo = function (x, y) {
-    this.drawShape(new PolygonShape([x, y]));
+    this.drawShape(new GraphicsShapeData.PolygonShape().init([x, y]));
 
     return this;
 };
@@ -400,257 +452,34 @@ Graphics.prototype.endFill = function () {
 };
 
 Graphics.prototype.drawRect = function (x, y, width, height) {
-    this.drawShape(new RectangleShape(x, y, width, height));
+    this.drawShape(new GraphicsShapeData.RectangleShape().init(x, y, width, height));
 
     return this;
 };
 
 Graphics.prototype.drawRoundedRect = function (x, y, width, height, radius) {
-    this.drawShape(new RoundedRectangleShape(x, y, width, height, radius));
+    this.drawShape(new GraphicsShapeData.RoundedRectangleShape().init(x, y, width, height, radius));
 
     return this;
 };
 
-/**
- * Draws a CircleShape.
- *
- * @method drawCircleShape
- * @param x {Number} The X coordinate of the center of the CircleShape
- * @param y {Number} The Y coordinate of the center of the CircleShape
- * @param radius {Number} The radius of the CircleShape
- * @return {Graphics}
- */
 Graphics.prototype.drawCircle = function (x, y, radius) {
-    this.drawShape(new CircleShape(x, y, radius));
+    this.drawShape(new GraphicsShapeData.CircleShape().init(x, y, radius));
 
     return this;
 };
 
 Graphics.prototype.drawEllipse = function (x, y, width, height) {
-    this.drawShape(new EllipseShape(x, y, width, height));
+    this.drawShape(new GraphicsShapeData.EllipseShape().init(x, y, width, height));
 
     return this;
 };
 
 Graphics.prototype.drawPolygon = function (path) {
     if (!(path instanceof Array))path = Array.prototype.slice.call(arguments);
-    this.drawShape(new PolygonShape(path));
+    this.drawShape(new GraphicsShapeData.PolygonShape().init(path));
     return this;
 };
-
-/**
- * Clears the graphics that were drawn to this Graphics object, and resets fill and line style settings.
- *
- * @method clear
- * @return {Graphics}
- */
-Graphics.prototype.clear = function () {
-    this.lineWidth = 0;
-    this.filling = false;
-
-    this._dirtyRender = true;
-    this.clearDirty = true;
-    this.graphicsData = [];
-
-    return this;
-};
-
-///**
-// * Useful function that returns a texture of the graphics object that can then be used to create sprites
-// * This can be quite useful if your geometry is complicated and needs to be reused multiple times.
-// *
-// * @method generateTexture
-// * @param resolution {Number} The resolution of the texture being generated
-// * @param scaleMode {Number} Should be one of the PIXI.scaleMode consts
-// * @return {Texture} a texture of the graphics object
-// */
-//Graphics.prototype.generateTexture = function(resolution, scaleMode)
-//{
-//    resolution = resolution || 1;
-//
-//    var bounds = this.getBounds();
-//
-//    var canvasBuffer = new PIXI.CanvasBuffer(bounds.width * resolution, bounds.height * resolution);
-//
-//    var texture = PIXI.Texture.fromCanvas(canvasBuffer.canvas, scaleMode);
-//    texture.baseTexture.resolution = resolution;
-//
-//    canvasBuffer.context.scale(resolution, resolution);
-//
-//    canvasBuffer.context.translate(-bounds.x,-bounds.y);
-//
-//    PIXI.CanvasGraphics.renderGraphics(this, canvasBuffer.context);
-//
-//    return texture;
-//};
-//
-///**
-// * Renders the object using the WebGL renderer
-// *
-// * @method _renderWebGL
-// * @param renderSession {RenderSession}
-// * @private
-// */
-//Graphics.prototype._renderWebGL = function(renderSession)
-//{
-//    // if the sprite is not visible or the alpha is 0 then no need to render this element
-//    if(this.visible === false || this.alpha === 0 || this.isMask === true)return;
-//
-//    if(this._cacheAsBitmap)
-//    {
-//
-//        if(this._dirtyRender || this.cachedSpriteDirty)
-//        {
-//
-//            this._generateCachedSprite();
-//
-//            // we will also need to update the texture on the gpu too!
-//            this.updateCachedSpriteTexture();
-//
-//            this.cachedSpriteDirty = false;
-//            this._dirtyRender = false;
-//        }
-//
-//        this._cachedSprite.worldAlpha = this.worldAlpha;
-//        PIXI.Sprite.prototype._renderWebGL.call(this._cachedSprite, renderSession);
-//
-//        return;
-//    }
-//    else
-//    {
-//        renderSession.spriteBatch.stop();
-//        renderSession.blendModeManager.setBlendMode(this.blendMode);
-//
-//        if(this._mask)renderSession.maskManager.pushMask(this._mask, renderSession);
-//        if(this._filters)renderSession.filterManager.pushFilter(this._filterBlock);
-//
-//        // check blend mode
-//        if(this.blendMode !== renderSession.spriteBatch.currentBlendMode)
-//        {
-//            renderSession.spriteBatch.currentBlendMode = this.blendMode;
-//            var blendModeWebGL = PIXI.blendModesWebGL[renderSession.spriteBatch.currentBlendMode];
-//            renderSession.spriteBatch.gl.blendFunc(blendModeWebGL[0], blendModeWebGL[1]);
-//        }
-//
-//        // check if the webgl graphic needs to be updated
-//        if(this.webGLDirty)
-//        {
-//            this._dirtyRender = true;
-//            this.webGLDirty = false;
-//        }
-//
-//        PIXI.WebGLGraphics.renderGraphics(this, renderSession);
-//
-//        // only render if it has children!
-//        if(this.children.length)
-//        {
-//            renderSession.spriteBatch.start();
-//
-//            // simple render children!
-//            for(var i=0, j=this.children.length; i<j; i++)
-//            {
-//                this.children[i]._renderWebGL(renderSession);
-//            }
-//
-//            renderSession.spriteBatch.stop();
-//        }
-//
-//        if(this._filters)renderSession.filterManager.popFilter();
-//        if(this._mask)renderSession.maskManager.popMask(this.mask, renderSession);
-//
-//        renderSession.drawCount++;
-//
-//        renderSession.spriteBatch.start();
-//    }
-//};
-//
-///**
-// * Renders the object using the Canvas renderer
-// *
-// * @method _renderCanvas
-// * @param renderSession {RenderSession}
-// * @private
-// */
-//Graphics.prototype._renderCanvas = function(renderSession)
-//{
-//    // if the sprite is not visible or the alpha is 0 then no need to render this element
-//    if(this.visible === false || this.alpha === 0 || this.isMask === true)return;
-//
-//    if(this._cacheAsBitmap)
-//    {
-//        if(this._dirtyRender || this.cachedSpriteDirty)
-//        {
-//            this._generateCachedSprite();
-//
-//            // we will also need to update the texture
-//            this.updateCachedSpriteTexture();
-//
-//            this.cachedSpriteDirty = false;
-//            this._dirtyRender = false;
-//        }
-//
-//        this._cachedSprite.alpha = this.alpha;
-//        PIXI.Sprite.prototype._renderCanvas.call(this._cachedSprite, renderSession);
-//
-//        return;
-//    }
-//    else
-//    {
-//        var context = renderSession.context;
-//        var transform = this.worldTransform;
-//
-//        if(this.blendMode !== renderSession.currentBlendMode)
-//        {
-//            renderSession.currentBlendMode = this.blendMode;
-//            context.globalCompositeOperation = PIXI.blendModesCanvas[renderSession.currentBlendMode];
-//        }
-//
-//        if(this._mask)
-//        {
-//            renderSession.maskManager.pushMask(this._mask, renderSession);
-//        }
-//
-//        var resolution = renderSession.resolution;
-//        context.setTransform(transform.a * resolution,
-//            transform.b * resolution,
-//            transform.c * resolution,
-//            transform.d * resolution,
-//            transform.tx * resolution,
-//            transform.ty * resolution);
-//
-//        PIXI.CanvasGraphics.renderGraphics(this, context);
-//
-//        // simple render children!
-//        for(var i=0, j=this.children.length; i<j; i++)
-//        {
-//            this.children[i]._renderCanvas(renderSession);
-//        }
-//
-//        if(this._mask)
-//        {
-//            renderSession.maskManager.popMask(renderSession);
-//        }
-//    }
-//};
-
-//Graphics.prototype.startRender = function (renderer) {
-//    if (!this.visible) {
-//        return;
-//    }
-//    var transform = this.transform;
-//    this.worldMatrix = transform.modelView;
-//    if (this.isMask) {
-//        renderer.pushMask(this);
-//        //renderer.renderGraphicsMask(transform.modelView, this.graphicsData, this.worldAlpha, this.tint);
-//    }
-//    //else{
-//    //    renderer.setAlpha(this.worldAlpha, this.blendMode);
-//    //    renderer.renderGraphics(transform.modelView, this.graphicsData, this.worldAlpha, this.tint);
-//    //}
-//    //renderer.setTransform(transform.modelView);
-//
-//    this._render(renderer);
-//};
 
 Graphics.prototype._render = function (renderer) {
     //this.worldMatrix = this.transform.modelView;
@@ -661,16 +490,16 @@ Graphics.prototype._render = function (renderer) {
             this.dirty = true;
             this._dirtyRender = false;
         }
-        if(this._cacheAsBitmap){
-            if(!this._cachedSprite){
+        if (this._cacheAsBitmap) {
+            if (!this._cachedSprite) {
                 this._generateCachedSprite();
             }
             this._cachedSprite.worldMatrix = this.worldMatrix;
             this._cachedSprite.worldAlpha = this.worldAlpha;
             renderer.renderSprite2D(this._cachedSprite);
         }
-        else{
-            if(this._cachedSprite){
+        else {
+            if (this._cachedSprite) {
                 this._destroyCachedSprite();
             }
             renderer.renderGraphics(this);
@@ -683,38 +512,6 @@ Graphics.prototype._render = function (renderer) {
     }
 };
 
-//Graphics.prototype.finishRender = function (renderer) {
-//    if (this.isMask) {
-//        var transform = this.transform;
-//        renderer.popMask(this);
-//    }
-//};
-
-
-//Graphics.prototype.getBounds = function (matrix) {
-//    // return an empty object if the item is a mask!
-//    if(this.isMask)return Rect.Empty;
-//
-//    this._updateLocalBounds();
-//    //if(this._dirtyRender)
-//    //{
-//    //    this._updateLocalBounds();
-//    //    this.webGLDirty = true;
-//    //    this.cachedSpriteDirty = true;
-//    //    this._dirtyRender = false;
-//    //}
-//
-//    var bounds = this._localBounds;
-//
-//    var w0 = bounds.x;
-//    var w1 = bounds.width + bounds.x;
-//
-//    var h0 = bounds.y;
-//    var h1 = bounds.height + bounds.y;
-//
-//    return this._getBounds(w1, h1, w0, h0, matrix);
-//};
-//
 Graphics.prototype._updateLocalBounds = function () {
     var minX = Infinity;
     var maxX = -Infinity;
@@ -731,7 +528,7 @@ Graphics.prototype._updateLocalBounds = function () {
             var lineWidth = data.lineWidth;
             shape = data.shape;
 
-
+            //TODO should provide as getBounds interface in GraphicsShapeData.
             if (type === Enums2D.ShapeTypes.RECT || type === Enums2D.ShapeTypes.RREC) {
                 x = shape.x - lineWidth / 2;
                 y = shape.y - lineWidth / 2;
@@ -801,12 +598,10 @@ Graphics.prototype._updateLocalBounds = function () {
     this._localBounds.height = (maxY - minY) + padding * 2;
 };
 
-Graphics.prototype._generateCachedSprite = function()
-{
+Graphics.prototype._generateCachedSprite = function () {
     var bounds = this.getLocalBounds();
 
-    if(!this._cachedSprite)
-    {
+    if (!this._cachedSprite) {
         var canvasBuffer = new CanvasBuffer(bounds.width, bounds.height);
         var texture = Texture.fromCanvas(canvasBuffer.canvas);//new Texture();//(canvasBuffer.canvas);
         //texture.parse(canvasBuffer.canvas);
@@ -815,8 +610,7 @@ Graphics.prototype._generateCachedSprite = function()
         this._cachedSprite.buffer = canvasBuffer;
         this._cachedSprite.destTexture = texture;
     }
-    else
-    {
+    else {
         this._cachedSprite.buffer.resize(bounds.width, bounds.height);
     }
 
@@ -833,7 +627,7 @@ Graphics.prototype._generateCachedSprite = function()
 
 
     // this._cachedSprite.buffer.context.save();
-    this._cachedSprite.buffer.context.translate(-bounds.x,-bounds.y);
+    this._cachedSprite.buffer.context.translate(-bounds.x, -bounds.y);
 
     // make sure we set the alpha of the graphics to 1 for the render..
     this.worldAlpha = 1;
@@ -843,26 +637,8 @@ Graphics.prototype._generateCachedSprite = function()
     this._cachedSprite.worldAlpha = this.alpha;
 };
 
-//Graphics.prototype.updateCachedSpriteTexture = function()
-//{
-//    var cachedSprite = this._cachedSprite;
-//    var texture = cachedSprite.texture;
-//    var canvas = cachedSprite.buffer.canvas;
-//
-//    texture.baseTexture.width = canvas.width;
-//    texture.baseTexture.height = canvas.height;
-//    texture.crop.width = texture.frame.width = canvas.width;
-//    texture.crop.height = texture.frame.height = canvas.height;
-//
-//    cachedSprite._width = canvas.width;
-//    cachedSprite._height = canvas.height;
-//
-//    // update the dirty base textures
-//    texture.baseTexture.dirty();
-//};
-Graphics.prototype._destroyCachedSprite = function()
-{
-    if(!this._cachedSprite) return;
+Graphics.prototype._destroyCachedSprite = function () {
+    if (!this._cachedSprite) return;
     this._cachedSprite.buffer.destroy();
     this._cachedSprite.destroy();
 
@@ -879,7 +655,7 @@ Graphics.prototype.drawShape = function (shape) {
 
     this.currentPath = null;
 
-    var data = new GraphicsData(this.lineWidth, this.lineColor, this.lineAlpha, this.fillColor, this.fillAlpha, this.filling, shape);
+    var data = GraphicsData.create().init(this.lineWidth, this.lineColor, this.lineAlpha, this.fillColor, this.fillAlpha, this.filling, shape);
 
     this.graphicsData.push(data);
 
@@ -893,235 +669,217 @@ Graphics.prototype.drawShape = function (shape) {
     return data;
 };
 
-Graphics.prototype.toJSON = function (json) {
-    json = Renderable2D.prototype.toJSON.call(this, json);
 
-    //json.texture = this.texture ? this.texture.name : undefined;
-    //json.cacheAsBitmap = this._cacheAsBitmap;
-
-    return json;
-};
-
-
-Graphics.prototype.fromJSON = function (json) {
-    Renderable2D.prototype.fromJSON.call(this, json);
-
-    //this.texture = json.texture ? Assets.get(json.texture) : undefined;
-    //this.isMask = json.isMask;
-    return this;
-};
-
-
-var GraphicsData = function (lineWidth, lineColor, lineAlpha, fillColor, fillAlpha, fill, shape) {
-    this.lineWidth = lineWidth;
-    this.lineColor = lineColor;
-    this.lineAlpha = lineAlpha;
-
-    this.fillColor = fillColor;
-    this.fillAlpha = fillAlpha;
-    this.fill = fill;
-
-    this.shape = shape;
-    this.type = shape.type;
-};
-//GraphicsData.prototype.constructor = GraphicsData;
-
-
-//// SOME TYPES:
-//Graphics.POLY = 0;
-//Graphics.RECT = 1;
-//Graphics.CIRC = 2;
-//Graphics.ELIP = 3;
-//Graphics.RREC = 4;
-
-//PolygonShape.prototype.type = Graphics.POLY;
-//RectangleShape.prototype.type = Graphics.RECT;
-//CircleShape.prototype.type = Graphics.CIRC;
-//EllipseShape.prototype.type = Graphics.ELIP;
-//RoundedRectangleShape.prototype.type = Graphics.RREC;
-
-function CircleShape(x, y, radius) {
-    this.x = x || 0;
-    this.y = y || 0;
-    this.radius = radius || 0;
-
-    this.type = Enums2D.ShapeTypes.CIRC;
-};
-
-CircleShape.prototype.clone = function () {
-    return new CircleShape(this.x, this.y, this.radius);
-};
-
-CircleShape.prototype.contains = function (x, y) {
-    if (this.radius <= 0)
-        return false;
-
-    var dx = (this.x - x),
-        dy = (this.y - y),
-        r2 = this.radius * this.radius;
-
-    dx *= dx;
-    dy *= dy;
-
-    return (dx + dy <= r2);
-};
-
-CircleShape.prototype.getBounds = function () {
-    return new Rect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
-};
-
-// constructor
-CircleShape.prototype.constructor = CircleShape;
-Graphics.CircleShape = CircleShape;
-
-function RectangleShape(x, y, width, height) {
-    this.x = x || 0;
-    this.y = y || 0;
-    this.width = width || 0;
-    this.height = height || 0;
-
-    this.type = Enums2D.ShapeTypes.RECT;
-};
-
-RectangleShape.prototype.clone = function () {
-    return new RectangleShape(this.x, this.y, this.width, this.height);
-};
-
-RectangleShape.prototype.contains = function (x, y) {
-    if (this.width <= 0 || this.height <= 0)
-        return false;
-
-    var x1 = this.x;
-    if (x >= x1 && x <= x1 + this.width) {
-        var y1 = this.y;
-
-        if (y >= y1 && y <= y1 + this.height) {
-            return true;
-        }
-    }
-
-    return false;
-};
-
-// constructor
-RectangleShape.prototype.constructor = RectangleShape;
-//PIXI.EmptyRectangleShape = new RectangleShape(0,0,0,0);
-Graphics.RectangleShape = RectangleShape;
-
-
-function EllipseShape(x, y, width, height) {
-    this.x = x || 0;
-    this.y = y || 0;
-    this.width = width || 0;
-    this.height = height || 0;
-    this.type = Enums2D.ShapeTypes.ELIP;
-};
-
-EllipseShape.prototype.clone = function () {
-    return new EllipseShape(this.x, this.y, this.width, this.height);
-};
-
-EllipseShape.prototype.contains = function (x, y) {
-    if (this.width <= 0 || this.height <= 0)
-        return false;
-
-    //normalize the coords to an EllipseShape with center 0,0
-    var normx = ((x - this.x) / this.width),
-        normy = ((y - this.y) / this.height);
-
-    normx *= normx;
-    normy *= normy;
-
-    return (normx + normy <= 1);
-};
-
-EllipseShape.prototype.getBounds = function () {
-    return new Rect(this.x - this.width, this.y - this.height, this.width, this.height);
-};
-
-// constructor
-EllipseShape.prototype.constructor = EllipseShape;
-Graphics.EllipseShape = EllipseShape;
-
-function PolygonShape(points) {
-    //if points isn't an array, use arguments as the array
-    if (!(points instanceof Array))points = Array.prototype.slice.call(arguments);
-
-    //if this is a flat array of numbers, convert it to points
-    if (points[0] instanceof Vec2) {
-        var p = [];
-        for (var i = 0, il = points.length; i < il; i++) {
-            p.push(points[i].x, points[i].y);
-        }
-
-        points = p;
-    }
-
-    this.closed = true;
-    this.points = points;
-
-    this.type = Enums2D.ShapeTypes.POLY;
-};
-
-PolygonShape.prototype.clone = function () {
-    var points = this.points.slice();
-    return new PolygonShape(points);
-};
-
-PolygonShape.prototype.contains = function (x, y) {
-    var inside = false;
-
-    // use some raycasting to test hits
-    // https://github.com/substack/point-in-PolygonShape/blob/master/index.js
-    var length = this.points.length / 2;
-
-    for (var i = 0, j = length - 1; i < length; j = i++) {
-        var xi = this.points[i * 2], yi = this.points[i * 2 + 1],
-            xj = this.points[j * 2], yj = this.points[j * 2 + 1],
-            intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-
-        if (intersect) inside = !inside;
-    }
-
-    return inside;
-};
-
-// constructor
-PolygonShape.prototype.constructor = PolygonShape;
-Graphics.PolygonShape = PolygonShape;
-
-
-function RoundedRectangleShape(x, y, width, height, radius) {
-    this.x = x || 0;
-    this.y = y || 0;
-    this.width = width || 0;
-    this.height = height || 0;
-    this.radius = radius || 20;
-    this.type = Enums2D.ShapeTypes.RREC;
-};
-
-RoundedRectangleShape.prototype.clone = function () {
-    return new RoundedRectangleShape(this.x, this.y, this.width, this.height, this.radius);
-};
-
-RoundedRectangleShape.prototype.contains = function (x, y) {
-    if (this.width <= 0 || this.height <= 0)
-        return false;
-
-    var x1 = this.x;
-    if (x >= x1 && x <= x1 + this.width) {
-        var y1 = this.y;
-
-        if (y >= y1 && y <= y1 + this.height) {
-            return true;
-        }
-    }
-
-    return false;
-};
-
-// constructor
-RoundedRectangleShape.prototype.constructor = RoundedRectangleShape;
-Graphics.RoundedRectangleShape = RoundedRectangleShape;
+//var GraphicsData = function (lineWidth, lineColor, lineAlpha, fillColor, fillAlpha, fill, shape) {
+//    this.lineWidth = lineWidth;
+//    this.lineColor = lineColor;
+//    this.lineAlpha = lineAlpha;
+//
+//    this.fillColor = fillColor;
+//    this.fillAlpha = fillAlpha;
+//    this.fill = fill;
+//
+//    this.shape = shape;
+//    this.type = shape.type;
+//};
+////GraphicsData.prototype.constructor = GraphicsData;
+//
+//
+////// SOME TYPES:
+////Graphics.POLY = 0;
+////Graphics.RECT = 1;
+////Graphics.CIRC = 2;
+////Graphics.ELIP = 3;
+////Graphics.RREC = 4;
+//
+////PolygonShape.prototype.type = Graphics.POLY;
+////RectangleShape.prototype.type = Graphics.RECT;
+////CircleShape.prototype.type = Graphics.CIRC;
+////EllipseShape.prototype.type = Graphics.ELIP;
+////RoundedRectangleShape.prototype.type = Graphics.RREC;
+//
+//function CircleShape(x, y, radius) {
+//    this.x = x || 0;
+//    this.y = y || 0;
+//    this.radius = radius || 0;
+//
+//    this.type = Enums2D.ShapeTypes.CIRC;
+//}
+//
+//CircleShape.prototype.clone = function () {
+//    return new CircleShape(this.x, this.y, this.radius);
+//};
+//
+//CircleShape.prototype.contains = function (x, y) {
+//    if (this.radius <= 0)
+//        return false;
+//
+//    var dx = (this.x - x),
+//        dy = (this.y - y),
+//        r2 = this.radius * this.radius;
+//
+//    dx *= dx;
+//    dy *= dy;
+//
+//    return (dx + dy <= r2);
+//};
+//
+//CircleShape.prototype.getBounds = function () {
+//    return new Rect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+//};
+//
+//// constructor
+//CircleShape.prototype.constructor = CircleShape;
+//Graphics.CircleShape = CircleShape;
+//
+//function RectangleShape(x, y, width, height) {
+//    this.x = x || 0;
+//    this.y = y || 0;
+//    this.width = width || 0;
+//    this.height = height || 0;
+//
+//    this.type = Enums2D.ShapeTypes.RECT;
+//};
+//
+//RectangleShape.prototype.clone = function () {
+//    return new RectangleShape(this.x, this.y, this.width, this.height);
+//};
+//
+//RectangleShape.prototype.contains = function (x, y) {
+//    if (this.width <= 0 || this.height <= 0)
+//        return false;
+//
+//    var x1 = this.x;
+//    if (x >= x1 && x <= x1 + this.width) {
+//        var y1 = this.y;
+//
+//        if (y >= y1 && y <= y1 + this.height) {
+//            return true;
+//        }
+//    }
+//
+//    return false;
+//};
+//
+//// constructor
+//RectangleShape.prototype.constructor = RectangleShape;
+////PIXI.EmptyRectangleShape = new RectangleShape(0,0,0,0);
+//Graphics.RectangleShape = RectangleShape;
+//
+//
+//function EllipseShape(x, y, width, height) {
+//    this.x = x || 0;
+//    this.y = y || 0;
+//    this.width = width || 0;
+//    this.height = height || 0;
+//    this.type = Enums2D.ShapeTypes.ELIP;
+//};
+//
+//EllipseShape.prototype.clone = function () {
+//    return new EllipseShape(this.x, this.y, this.width, this.height);
+//};
+//
+//EllipseShape.prototype.contains = function (x, y) {
+//    if (this.width <= 0 || this.height <= 0)
+//        return false;
+//
+//    //normalize the coords to an EllipseShape with center 0,0
+//    var normx = ((x - this.x) / this.width),
+//        normy = ((y - this.y) / this.height);
+//
+//    normx *= normx;
+//    normy *= normy;
+//
+//    return (normx + normy <= 1);
+//};
+//
+//EllipseShape.prototype.getBounds = function () {
+//    return new Rect(this.x - this.width, this.y - this.height, this.width, this.height);
+//};
+//
+//// constructor
+//EllipseShape.prototype.constructor = EllipseShape;
+//Graphics.EllipseShape = EllipseShape;
+//
+//function PolygonShape(points) {
+//    //if points isn't an array, use arguments as the array
+//    if (!(points instanceof Array))points = Array.prototype.slice.call(arguments);
+//
+//    //if this is a flat array of numbers, convert it to points
+//    if (points[0] instanceof Vec2) {
+//        var p = [];
+//        for (var i = 0, il = points.length; i < il; i++) {
+//            p.push(points[i].x, points[i].y);
+//        }
+//
+//        points = p;
+//    }
+//
+//    this.closed = true;
+//    this.points = points;
+//
+//    this.type = Enums2D.ShapeTypes.POLY;
+//};
+//
+//PolygonShape.prototype.clone = function () {
+//    var points = this.points.slice();
+//    return new PolygonShape(points);
+//};
+//
+//PolygonShape.prototype.contains = function (x, y) {
+//    var inside = false;
+//
+//    // use some raycasting to test hits
+//    // https://github.com/substack/point-in-PolygonShape/blob/master/index.js
+//    var length = this.points.length / 2;
+//
+//    for (var i = 0, j = length - 1; i < length; j = i++) {
+//        var xi = this.points[i * 2], yi = this.points[i * 2 + 1],
+//            xj = this.points[j * 2], yj = this.points[j * 2 + 1],
+//            intersect = ((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+//
+//        if (intersect) inside = !inside;
+//    }
+//
+//    return inside;
+//};
+//
+//// constructor
+//PolygonShape.prototype.constructor = PolygonShape;
+//Graphics.PolygonShape = PolygonShape;
+//
+//
+//function RoundedRectangleShape(x, y, width, height, radius) {
+//    this.x = x || 0;
+//    this.y = y || 0;
+//    this.width = width || 0;
+//    this.height = height || 0;
+//    this.radius = radius || 20;
+//    this.type = Enums2D.ShapeTypes.RREC;
+//};
+//
+//RoundedRectangleShape.prototype.clone = function () {
+//    return new RoundedRectangleShape(this.x, this.y, this.width, this.height, this.radius);
+//};
+//
+//RoundedRectangleShape.prototype.contains = function (x, y) {
+//    if (this.width <= 0 || this.height <= 0)
+//        return false;
+//
+//    var x1 = this.x;
+//    if (x >= x1 && x <= x1 + this.width) {
+//        var y1 = this.y;
+//
+//        if (y >= y1 && y <= y1 + this.height) {
+//            return true;
+//        }
+//    }
+//
+//    return false;
+//};
+//
+//// constructor
+//RoundedRectangleShape.prototype.constructor = RoundedRectangleShape;
+//Graphics.RoundedRectangleShape = RoundedRectangleShape;
 
 module.exports = Graphics;

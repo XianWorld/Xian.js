@@ -5,23 +5,22 @@ var Component = require("./../../core/component");
 var Phys2D = require("../context/phys2d/phys2d");
 "use strict";
 
-function RigidBody2D(opts) {
-    //opts || (opts = {});
+function RigidBody2D() {
+    Component.call(this);
 
-    Component.call(this, opts);
-
-    this.body = new Phys2D.P2Rigidbody(opts);
+    this.body = new Phys2D.P2Rigidbody();
 }
 
 Component.extend(RigidBody2D);
 
 RigidBody2D.prototype.copy = function (other) {
+    //this.body.off("collide", onCollide, this);
+    //this.body.off("colliding", onColliding, this);
+    //this.body = other.body.clone();
+    //this.body.on("collide", onCollide, this);
+    //this.body.on("colliding", onColliding, this);
 
-    this.body.off("collide", onCollide, this);
-    this.body.off("colliding", onColliding, this);
-    this.body = other.body.clone();
-    this.body.on("collide", onCollide, this);
-    this.body.on("colliding", onColliding, this);
+    this.body.copy(other.body);
 
     return this;
 };
@@ -32,7 +31,27 @@ RigidBody2D.prototype.clear = function () {
     this.body.off("collide", onCollide, this);
     this.body.off("colliding", onColliding, this);
     this.body.userData = undefined;
+    return this;
 };
+RigidBody2D.prototype.destroy = function () {
+    Component.prototype.destroy.call(this);
+    this.body.destroy();
+};
+RigidBody2D.prototype.toJSON = function (json) {
+    json = Component.prototype.toJSON.call(this, json);
+
+    json.body = this.body.toJSON(json.body);
+    return json;
+};
+
+
+RigidBody2D.prototype.fromJSON = function (json) {
+    Component.prototype.fromJSON.call(this, json);
+
+    if(json.body) this.body.fromJSON(json.body);
+    return this;
+};
+
 
 RigidBody2D.prototype.start = function () {
     var body = this.body,
@@ -103,25 +122,6 @@ RigidBody2D.prototype.applyAngularVelocity = function (angularVelocity) {
 
     this.body.applyAngularVelocity(angularVelocity);
 };
-
-
-RigidBody2D.prototype.toJSON = function (json) {
-    json = Component.prototype.toJSON.call(this, json);
-
-    json.body = this.body.toJSON(json.body);
-
-    return json;
-};
-
-
-RigidBody2D.prototype.fromJSON = function (json) {
-    Component.prototype.fromJSON.call(this, json);
-
-    if(json.body) this.body.fromJSON(json.body);
-
-    return this;
-};
-
 
 function onCollide(body, si, sj) {
     if (!body.userData) return;

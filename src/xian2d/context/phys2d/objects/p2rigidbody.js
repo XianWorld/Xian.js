@@ -102,6 +102,91 @@ P2Rigidbody.prototype.copy = function (other) {
     return this;
 };
 
+P2Rigidbody.prototype.clear = function () {
+    Class.prototype.clear.call(this);
+    var shapes = this.shapes,
+        i = shapes.length;
+
+    while (i--) this.removeShape(shapes[i]);
+
+    this.userData = undefined;
+
+    return this;
+};
+P2Rigidbody.prototype.destroy = function () {
+    Class.prototype.destroy.call(this);
+
+    this.position = undefined;
+    this.velocity = undefined;
+    this.force = undefined;
+
+    this.matrix = undefined;
+    this.aabb = undefined;
+    this.vlambda = undefined;
+
+    this.shapes = undefined;
+
+};
+
+P2Rigidbody.prototype.toJSON = function (json) {
+    json = Class.prototype.toJSON.call(this, json);
+    var shapes = this.shapes,
+        jsonShapes = json.shapes || (json.shapes = []),
+        i = shapes.length;
+
+    json.position = this.position.toJSON(json.position);
+    json.velocity = this.velocity.toJSON(json.velocity);
+    json.force = this.force.toJSON(json.force);
+
+    json.rotation = this.rotation;
+    json.angularVelocity = this.angularVelocity;
+    json.torque = this.torque;
+
+    json.motionState = this.motionState;
+
+    json.linearDamping = this.linearDamping;
+
+    json.mass = this.mass;
+    json.invMass = this.invMass;
+
+    json.allowSleep = this.allowSleep;
+    json.sleepState = this.sleepState;
+
+    json.angularDamping = this.angularDamping;
+
+    while (i--) jsonShapes[i] = shapes[i].toJSON(jsonShapes[i]);
+
+    return json;
+};
+
+
+P2Rigidbody.prototype.fromJSON = function (json) {
+    Class.prototype.fromJSON.call(this, json);
+    var jsonShapes = json.shapes || (json.shapes = []),
+        i = jsonShapes.length;
+
+    if(json.position) this.position.fromJSON(json.position);
+    if(json.velocity) this.velocity.fromJSON(json.velocity);
+    if(json.force) this.force.fromJSON(json.force);
+
+    this.rotation = json.rotation || 0;
+    this.angularVelocity = json.angularVelocity || 0;
+    this.torque = json.torque || 0;
+
+    this.linearDamping = json.linearDamping || 0.001;
+    this.angularDamping = json.angularDamping || TWO_PI * 0.001;
+
+    this.mass = json.mass || 0.0;
+    this.invMass = this.mass > 0.0 ? 1.0 / this.mass : 0.0;
+
+    this.motionState = json.motionState || MotionState.Static;
+    this.allowSleep = json.allowSleep != undefined ? !!json.allowSleep : true;
+    this.sleepState = json.sleepState || SleepState.Awake;
+
+    while (i--) this.addShape(Class.fromJSON(jsonShapes[i]));
+
+    return this;
+};
 
 var VEC2_SCALE = new Vec2(1.0, 1.0);
 P2Rigidbody.prototype.init = function () {
@@ -166,17 +251,6 @@ P2Rigidbody.prototype.update = function (dt) {
         }
     }
 };
-
-
-P2Rigidbody.prototype.clear = function () {
-    var shapes = this.shapes,
-        i = shapes.length;
-
-    while (i--) this.removeShape(shapes[i]);
-
-    return this;
-};
-
 
 P2Rigidbody.prototype.applyForce = function (force, worldPoint) {
     if (this.motionState === MotionState.Static) return;
@@ -448,65 +522,5 @@ P2Rigidbody.prototype.sleepTick = function (time) {
     }
 };
 
-
-P2Rigidbody.prototype.toJSON = function (json) {
-    json = Class.prototype.toJSON.call(this, json);
-    var shapes = this.shapes,
-        jsonShapes = json.shapes || (json.shapes = []),
-        i = shapes.length;
-
-    json.position = this.position.toJSON(json.position);
-    json.velocity = this.velocity.toJSON(json.velocity);
-    json.force = this.force.toJSON(json.force);
-
-    json.rotation = this.rotation;
-    json.angularVelocity = this.angularVelocity;
-    json.torque = this.torque;
-
-    json.motionState = this.motionState;
-
-    json.linearDamping = this.linearDamping;
-
-    json.mass = this.mass;
-    json.invMass = this.invMass;
-
-    json.allowSleep = this.allowSleep;
-    json.sleepState = this.sleepState;
-
-    json.angularDamping = this.angularDamping;
-
-    while (i--) jsonShapes[i] = shapes[i].toJSON(jsonShapes[i]);
-
-    return json;
-};
-
-
-P2Rigidbody.prototype.fromJSON = function (json) {
-    Class.prototype.fromJSON.call(this, json);
-    var jsonShapes = json.shapes || (json.shapes = []),
-        i = jsonShapes.length;
-
-    if(json.position) this.position.fromJSON(json.position);
-    if(json.velocity) this.velocity.fromJSON(json.velocity);
-    if(json.force) this.force.fromJSON(json.force);
-
-    this.rotation = json.rotation || 0;
-    this.angularVelocity = json.angularVelocity || 0;
-    this.torque = json.torque || 0;
-
-    this.linearDamping = json.linearDamping || 0.001;
-    this.angularDamping = json.angularDamping || TWO_PI * 0.001;
-
-    this.mass = json.mass || 0.0;
-    this.invMass = this.mass > 0.0 ? 1.0 / this.mass : 0.0;
-
-    this.motionState = json.motionState || MotionState.Static;
-    this.allowSleep = json.allowSleep != undefined ? !!json.allowSleep : true;
-    this.sleepState = json.sleepState || SleepState.Awake;
-
-    while (i--) this.addShape(Class.fromJSON(jsonShapes[i]));
-
-    return this;
-};
 
 module.exports = P2Rigidbody;
