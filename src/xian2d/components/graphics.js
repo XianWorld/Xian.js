@@ -39,7 +39,7 @@ Object.defineProperty(Graphics.prototype, "cacheAsBitmap", {
         return this._cacheAsBitmap;
     },
     set: function (value) {
-        if (this._cacheAsBitmap === value) return;
+        if(this._cacheAsBitmap === value) return;
         this._cacheAsBitmap = value;
 
         //this.cachedSpriteDirty = true;
@@ -48,7 +48,7 @@ Object.defineProperty(Graphics.prototype, "cacheAsBitmap", {
         //}
         //else {
         //    this.destroyCachedSprite();
-        //    this._dirtyRender = true;
+        //    this._dirty = true;
         //}
     }
 });
@@ -57,7 +57,7 @@ Graphics.prototype.copy = function (other) {
     Renderable2D.ptototype.copy.call(this, other);
 
     var i, len = other.graphicsData.length;
-    for (i = 0; i < len; i++) {
+    for(i = 0;i<len;i++){
         this.graphicsData[i] = other.graphicsData[i].clone();
     }
     return this;
@@ -67,7 +67,7 @@ Graphics.prototype.clear = function () {
     Renderable2D.ptototype.clear.call(this);
 
     var i = this.graphicsData.length;
-    while (i--) {
+    while(i--) {
         this.graphicsData[i].destroy();
         this.graphicsData[i] = undefined;
     }
@@ -78,7 +78,7 @@ Graphics.prototype.clear = function () {
     this.cacheAsBitmap = false;
     this._destroyCachedSprite();
 
-    this._dirtyRender = true;
+    this._dirty = true;
     this.clearDirty = true;
 
     this._webGL.length = 0;
@@ -96,7 +96,7 @@ Graphics.prototype.toJSON = function (json) {
 
     json.graphicsDatas || (json.graphicsDatas = []);
     var i, len = this.graphicsData.length;
-    for (i = 0; i < len; i++) {
+    for(i = 0;i<len;i++){
         json.graphicsData[i] = this.graphicsData[i].toJSON(json.graphicsData[i]);
     }
 
@@ -107,15 +107,15 @@ Graphics.prototype.fromJSON = function (json) {
     Renderable2D.prototype.fromJSON.call(this, json);
 
     var i = this.graphicsData.length;
-    while (i--) {
+    while(i--) {
         this.graphicsData[i].destroy();
         this.graphicsData[i] = undefined;
     }
     this.graphicsData.length = 0;
 
-    if (json.graphicsDatas) {
+    if(json.graphicsDatas){
         var len = json.graphicsDatas.length;
-        for (i = 0; i < len; i++) {
+        for(i = 0;i<len;i++) {
             this.graphicsData.push(GraphicsData.create().fromJSON(json.graphicsDatas[i]));
         }
     }
@@ -178,7 +178,7 @@ Graphics.prototype.moveTo = function (x, y) {
  */
 Graphics.prototype.lineTo = function (x, y) {
     this.currentPath.shape.points.push(x, y);
-    this._dirtyRender = true;
+    this._dirty = true;
 
     return this;
 };
@@ -224,7 +224,7 @@ Graphics.prototype.quadraticCurveTo = function (cpX, cpY, toX, toY) {
     }
 
 
-    this._dirtyRender = true;
+    this._dirty = true;
 
     return this;
 };
@@ -276,7 +276,7 @@ Graphics.prototype.bezierCurveTo = function (cpX, cpY, cpX2, cpY2, toX, toY) {
             dt3 * fromY + 3 * dt2 * j * cpY + 3 * dt * t2 * cpY2 + t3 * toY);
     }
 
-    this._dirtyRender = true;
+    this._dirty = true;
 
     return this;
 };
@@ -340,7 +340,7 @@ Graphics.prototype.arcTo = function (x1, y1, x2, y2, radius) {
         this.arc(cx + x1, cy + y1, radius, startAngle, endAngle, b1 * a2 > b2 * a1);
     }
 
-    this._dirtyRender = true;
+    this._dirty = true;
 
     return this;
 };
@@ -408,7 +408,7 @@ Graphics.prototype.arc = function (cx, cy, radius, startAngle, endAngle, anticlo
             ( (cTheta * -s) + (sTheta * c) ) * radius + cy);
     }
 
-    this._dirtyRender = true;
+    this._dirty = true;
 
     return this;
 };
@@ -484,22 +484,22 @@ Graphics.prototype.drawPolygon = function (path) {
 Graphics.prototype._render = function (renderer) {
     //this.worldMatrix = this.transform.modelView;
     if (!this.isMask) {
-        if (this._dirtyRender) {
+        if (this._dirty) {
             //TODO should set local bounds dirty flag, and update when necessary??
             this._updateLocalBounds();
-            this.dirty = true;
-            this._dirtyRender = false;
+            this._dirtyRender = true;
+            this._dirty = false;
         }
-        if (this._cacheAsBitmap) {
-            if (!this._cachedSprite) {
+        if(this._cacheAsBitmap){
+            if(!this._cachedSprite){
                 this._generateCachedSprite();
             }
             this._cachedSprite.worldMatrix = this.worldMatrix;
             this._cachedSprite.worldAlpha = this.worldAlpha;
             renderer.renderSprite2D(this._cachedSprite);
         }
-        else {
-            if (this._cachedSprite) {
+        else{
+            if(this._cachedSprite){
                 this._destroyCachedSprite();
             }
             renderer.renderGraphics(this);
@@ -598,10 +598,12 @@ Graphics.prototype._updateLocalBounds = function () {
     this._localBounds.height = (maxY - minY) + padding * 2;
 };
 
-Graphics.prototype._generateCachedSprite = function () {
+Graphics.prototype._generateCachedSprite = function()
+{
     var bounds = this.getLocalBounds();
 
-    if (!this._cachedSprite) {
+    if(!this._cachedSprite)
+    {
         var canvasBuffer = new CanvasBuffer(bounds.width, bounds.height);
         var texture = Texture.fromCanvas(canvasBuffer.canvas);//new Texture();//(canvasBuffer.canvas);
         //texture.parse(canvasBuffer.canvas);
@@ -610,7 +612,8 @@ Graphics.prototype._generateCachedSprite = function () {
         this._cachedSprite.buffer = canvasBuffer;
         this._cachedSprite.destTexture = texture;
     }
-    else {
+    else
+    {
         this._cachedSprite.buffer.resize(bounds.width, bounds.height);
     }
 
@@ -627,7 +630,7 @@ Graphics.prototype._generateCachedSprite = function () {
 
 
     // this._cachedSprite.buffer.context.save();
-    this._cachedSprite.buffer.context.translate(-bounds.x, -bounds.y);
+    this._cachedSprite.buffer.context.translate(-bounds.x,-bounds.y);
 
     // make sure we set the alpha of the graphics to 1 for the render..
     this.worldAlpha = 1;
@@ -637,8 +640,9 @@ Graphics.prototype._generateCachedSprite = function () {
     this._cachedSprite.worldAlpha = this.alpha;
 };
 
-Graphics.prototype._destroyCachedSprite = function () {
-    if (!this._cachedSprite) return;
+Graphics.prototype._destroyCachedSprite = function()
+{
+    if(!this._cachedSprite) return;
     this._cachedSprite.buffer.destroy();
     this._cachedSprite.destroy();
 
@@ -664,7 +668,7 @@ Graphics.prototype.drawShape = function (shape) {
         this.currentPath = data;
     }
 
-    this._dirtyRender = true;
+    this._dirty = true;
 
     return data;
 };

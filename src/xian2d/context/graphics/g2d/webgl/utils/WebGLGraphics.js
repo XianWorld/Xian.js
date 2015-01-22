@@ -18,7 +18,7 @@ WebGLGraphics.renderGraphics = function(renderer, graphics)//projection, offset)
         shader = renderer.shaderManager.primitiveShader,
         webGLData;
 
-    if(graphics.dirty)
+    if(graphics._dirtyRender)
     {
         WebGLGraphics.updateGraphics(graphics, gl);
     }
@@ -80,7 +80,7 @@ WebGLGraphics.updateGraphics = function(graphics, gl)
     if(!webGL)webGL = graphics._webGL[gl.id] = {lastIndex:0, data:[], gl:gl};
 
     // flag the graphics as not dirty as we are about to update it...
-    graphics.dirty = false;
+    graphics._dirtyRender = false;
 
     var i;
 

@@ -49,6 +49,7 @@ GameObject.prototype.updateActive = function() {
 
     var parentActive = transform.parent ? transform.parent.gameObject.activeInHierarchy : true;
     this.activeInHierarchy = parentActive && this._activeSelf;
+    this.activeInHierarchy ? this.emit('active', this) : this.emit('deactive', this);
 
     children = transform.children;
     i = children.length;
@@ -376,6 +377,7 @@ GameObject.prototype.getComponent = function (type, inherit) {
     }
 };
 
+//var ARRAY_RESULTS = [];
 GameObject.prototype.getComponents = function (type, inherit, results) {
     var components, len, i, component;
 

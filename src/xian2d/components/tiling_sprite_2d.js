@@ -161,7 +161,7 @@ TilingSprite2D.prototype._generateTilingTexture = function (forcePowerOfTwo) {
     this.destX = this.textureClip ? -(this.textureClip.offsetX * this.destWidth) : 0;//-sourceX;
     this.destY = this.textureClip ? -(this.textureClip.offsetY * this.destHeight) : 0;//-sourceY;
 
-    //this._dirtyRender = false;
+    //this._dirty = false;
 
 };
 
@@ -183,10 +183,10 @@ TilingSprite2D.prototype.getLocalBounds = function () {
 TilingSprite2D.prototype._render = function (renderer) {
     if(!this.texture || !this.texture.ready) return;
 
-    if (!this.destTexture || this._dirtyRender) {
+    if (!this.destTexture || this._dirty) {
         this._generateTilingTexture(GraphicsContext.isWebgl);
 
-        this._dirtyRender = false;
+        this._dirty = false;
     }
     renderer.renderTilingSprite2D(this);
 };

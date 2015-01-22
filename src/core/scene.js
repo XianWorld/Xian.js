@@ -522,7 +522,7 @@ Scene.prototype._addComponent = function (component) {
 
     this.emit("add" + type, component);
     this.emit("addComponent", component);
-    component.emit("addToScene");
+    //component.emit("addToScene");
 
     if (this.game) {
         component.init();
@@ -557,7 +557,8 @@ Scene.prototype._removeComponent = function (component, clear) {
 
     this.emit("remove" + type, component);
     this.emit("removeComponent", component);
-    component.emit("removeFromScene");
+    //component.emit("removeFromScene");
+    component.emit("remove");
 
     if (clear) component.destroy();
 };
