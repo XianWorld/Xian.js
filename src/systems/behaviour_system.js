@@ -4,7 +4,7 @@ var Behaviour = require("./../components/behaviour");
 
 
 function BehaviourSystem(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     ComponentSystem.call(this, opts);
 

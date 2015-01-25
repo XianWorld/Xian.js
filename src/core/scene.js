@@ -12,13 +12,14 @@ var Log = require("../context/main_context").Log;
  * @param Object options
  */
 function Scene(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Class.call(this);
 
     this.game = undefined;
 
-    this.name = opts.name !== undefined ? opts.name : "Scene_" + this._id;
+    //this.name = opts.name !== undefined ? opts.name : "Scene_" + this._id;
+    this.name = "Scene_" + this._id;
 
     //this.world = undefined;
 
@@ -41,15 +42,15 @@ function Scene(opts) {
 
     //this._newComponents = [];
 
+    //this.mainCamera = undefined;
     //add systems
-    if (opts.systems) {
-        this.addSystems.apply(this, opts.systems);
-    }
-    if (opts.gameObjects) this.addGameObjects.apply(this, opts.gameObjects);
+    //if (opts.systems) {
+    //    this.addSystems.apply(this, opts.systems);
+    //}
+    //if (opts.gameObjects) this.addGameObjects.apply(this, opts.gameObjects);
 }
 
 Class.extend(Scene);
-
 
 Scene.prototype.copy = function (other) {
       var otherGameObjects = other.gameObjects,
@@ -385,8 +386,6 @@ Scene.prototype.removeGameObject = function (gameObject, clear) {
         this._gameObjectHash[gameObject._id] = undefined;
         if (gameObject._jsonId !== -1) this._gameObjectJSONHash[gameObject._jsonId] = undefined;
 
-        gameObject.scene = undefined;
-
         components = gameObject.components;
         i = components.length;
         while (i--) this._removeComponent(components[i], clear);
@@ -419,6 +418,7 @@ Scene.prototype.removeGameObject = function (gameObject, clear) {
         this.emit("removeGameObject", gameObject);
         gameObject.emit("remove", gameObject);
         if (clear) gameObject.destroy();
+        gameObject.scene = undefined;
     } else {
         Log.error("Scene.removeGameObject: GameObject is not a member of Scene");
     }
@@ -439,7 +439,6 @@ Scene.prototype.hasGameObject = function (gameObject) {
 
     return !!~this.gameObjects.indexOf(gameObject);
 };
-
 
 Scene.prototype.findByTag = function (tag, out) {
     out || (out = []);
@@ -523,7 +522,7 @@ Scene.prototype._addComponent = function (component) {
 
     this.emit("add" + type, component);
     this.emit("addComponent", component);
-    component.emit("addToScene");
+    //component.emit("addToScene");
 
     if (this.game) {
         component.init();
@@ -558,9 +557,10 @@ Scene.prototype._removeComponent = function (component, clear) {
 
     this.emit("remove" + type, component);
     this.emit("removeComponent", component);
-    component.emit("removeFromScene");
+    //component.emit("removeFromScene");
+    component.emit("remove");
 
-    if (clear) component.clear();
+    if (clear) component.destroy();
 };
 
 Scene.prototype.findComponentById = function (id) {
@@ -624,13 +624,13 @@ Scene.prototype.removeSystem = function (system, clear) {
     if (index !== -1) {
         systemTypeHash[system._className] = undefined;
         systems.splice(index, 1);
-        system.scene = undefined;
 
         //index = this._newSystems.indexOf(system);
         //if (index !== -1) this._newSystems.splice(index, 1);
 
         this.emit("removeSystem", system);
         if (clear) system.destroy();
+        system.scene = undefined;
     } else {
         Log.error("Scene.removeSystem: System is not a member of Scene");
     }

@@ -1,25 +1,18 @@
 var Class = require("../base/class");
+var Game = require("./game");
 var Component = require("./component");
+var Prefab = require("../context/assets/prefab");
 var Log = require("../context/main_context").Log;
 "use strict";
 
-/**
- * @class GameObject
- * @extends Class
- * @memberof Odin
- * @brief Base class for entities in scenes
- * @param Object options
- */
-function GameObject(opts) {
-    opts || (opts = {});
+function GameObject() {
 
     Class.call(this);
 
-    this.name = opts.name !== undefined ? opts.name : "GameObject_" + this._id;
+    this.name = "GameObject_" + this._id;
 
-    this._activeSelf = opts.active !== undefined ? opts.active : true;
+    this._activeSelf = true;
     this.activeInHierarchy = true;
-    //this._activeParent = true;
 
     this.scene = undefined;
 
@@ -30,11 +23,6 @@ function GameObject(opts) {
     this._componentHash = {};
     this._componentJSONHash = {};
     this._componentClassTypes = {};
-
-    if (opts.tag) this.addTag(opts.tag);
-    if (opts.tags) this.addTags.apply(this, opts.tags);
-
-    if (opts.components) this.addComponents.apply(this, opts.components);
 }
 
 Class.extend(GameObject);
@@ -49,9 +37,7 @@ GameObject.prototype.setActive = function (active) {
     if(this._activeSelf === active) return;
 
     this._activeSelf = active;
-
     this.updateActive();
-
 };
 
 GameObject.prototype.updateActive = function() {
@@ -63,6 +49,7 @@ GameObject.prototype.updateActive = function() {
 
     var parentActive = transform.parent ? transform.parent.gameObject.activeInHierarchy : true;
     this.activeInHierarchy = parentActive && this._activeSelf;
+    this.activeInHierarchy ? this.emit('active', this) : this.emit('deactive', this);
 
     children = transform.children;
     i = children.length;
@@ -82,21 +69,6 @@ GameObject.prototype.copy = function (other) {
         otherComponent, component,
         i = components.length;
 
-    //while (i--) {
-    //    component = components[i];
-    //    if (!other.hasComponent(component._className)) this.removeComponent(component);
-    //}
-    //
-    //i = otherComponents.length;
-    //while (i--) {
-    //    otherComponent = otherComponents[i];
-    //
-    //    if ((component = this.getComponent(otherComponent._type))) {
-    //        component.copy(otherComponent);
-    //    } else {
-    //        this.addComponent(otherComponent.clone());
-    //    }
-    //}
     while (i--) {
         component = components[i];
         this.removeComponent(component);
@@ -108,6 +80,9 @@ GameObject.prototype.copy = function (other) {
 
         this.addComponent(otherComponent.clone());
     }
+
+    i = this.tags.length;
+    while (i--) this.removeTag(tags[i]);
 
     i = tags.length;
     while (i--) this.addTag(tags[i]);
@@ -122,61 +97,54 @@ GameObject.prototype.clear = function () {
         componentLength = components.length,
         i;
 
+    if(this.scene){
+        this.scene.removeGameObject(this);
+        this.scene = undefined;
+    }
     i = componentLength;
-    while (i--) components[i].clear();
+    while (i--) components[i].destroy();
 
     i = tags.length;
     while (i--) this.removeTag(tags[i]);
 
-    i = componentLength;
-    while (i--) this.removeComponent(components[i]);
+    //i = componentLength;
+    //while (i--) this.removeComponent(components[i]);
 
     this.off();
 
     return this;
 };
 
-
 GameObject.prototype.destroy = function () {
-    //if (!this.scene) {
-    //    Log.error("GameObject.destroy: can't destroy GameObject if it's not added to a Scene");
-    //    return this;
-    //}
-
-    if(this.scene){
-        this.scene.removeGameObject(this);
-    }
     this.emit("destroy");
-
     this.clear();
-
+    this.tags = undefined;
+    this.components = undefined;
+    this._componentHash = undefined;
+    this._componentJSONHash = undefined;
+    this._componentClassTypes = undefined;
     return this;
 };
-
 
 GameObject.prototype.remove = function () {
     if (!this.scene) {
         Log.error("GameObject.remove: can't remove GameObject if it's not added to a Scene");
         return this;
     }
-
     this.scene.removeGameObject(this);
+    this.scene = undefined;
     return this;
 };
 
-
 GameObject.prototype.addTag = function (tag) {
     var tags = this.tags;
-
     if (tags.indexOf(tag) === -1) tags.push(tag);
-
     return this;
 };
 
 
 GameObject.prototype.addTags = function () {
     var i = arguments.length;
-
     while (i--) this.addTag(arguments[i]);
     return this;
 };
@@ -185,26 +153,19 @@ GameObject.prototype.addTags = function () {
 GameObject.prototype.removeTag = function (tag) {
     var tags = this.tags,
         index = tags.indexOf(tag);
-
     if (index !== -1) tags.splice(index, 1);
-
     return this;
 };
 
-
 GameObject.prototype.removeTags = function () {
     var i = arguments.length;
-
     while (i--) this.removeTag(arguments[i]);
     return this;
 };
 
-
 GameObject.prototype.hasTag = function (tag) {
-
     return this.tags.indexOf(tag) !== -1;
 };
-
 
 GameObject.prototype.addComponent = function (component, others) {
     if (typeof(component) === "string") component = Class.create(component);
@@ -217,6 +178,16 @@ GameObject.prototype.addComponent = function (component, others) {
         components = this.components,
         comp, i, j;
 
+    //if component existed, try to find a unique name by ascending key.
+    if (this[name]) {
+        var tempName = name;
+        var tempNum = 0;
+        while (this[tempName]) {
+            tempName = name + "_" + tempNum;
+            tempNum++;
+        }
+        name = component._name = tempName;
+    }
 
     if (!this[name]) {
         if (component.gameObject) component = component.clone();
@@ -237,7 +208,6 @@ GameObject.prototype.addComponent = function (component, others) {
         this[name] = component;
 
         //if (!others) {
-        //    //TODO one loop will ok!
         //    i = components.length;
         //    while (i--) {
         //        comp = components[i];
@@ -275,7 +245,6 @@ GameObject.prototype.addComponents = function () {
     //i = length;
     for (i = 0; i < length; i++) this.addComponent(arguments[i], true);
 
-    //TODO one loop will be ok!
     //i = components.length;
     //while (i--) {
     //    component = components[i];
@@ -298,8 +267,7 @@ GameObject.prototype.addComponents = function () {
     return this;
 };
 
-
-GameObject.prototype.removeComponent = function (component, clear, others) {
+GameObject.prototype.removeComponent = function (component, clear) {
     if (typeof(component) === "string") component = this.getComponent(component);
     if (!(component instanceof Component)) {
         Log.error("GameObject.removeComponent: can't remove passed argument, it is not an instance of Component");
@@ -344,11 +312,11 @@ GameObject.prototype.removeComponent = function (component, clear, others) {
             }
         }
 
-        component.gameObject = undefined;
         this[name] = undefined;
 
         if (this.scene) this.scene._removeComponent(component);
-        if (clear) component.clear();
+        if (clear) component.destroy();
+        component.gameObject = undefined;
     } else {
         Log.error("GameObject.removeComponent: GameObject does not have a(n) " + type + " Component");
     }
@@ -357,7 +325,7 @@ GameObject.prototype.removeComponent = function (component, clear, others) {
 };
 
 
-GameObject.prototype.removeComponents = function () {
+GameObject.prototype.removeComponents = function (clear) {
     var length = arguments.length,
         components = this.components,
         toRemove = arguments,
@@ -365,7 +333,7 @@ GameObject.prototype.removeComponents = function () {
         i, j;
 
     i = length;
-    while (i--) this.removeComponent(arguments[i], null, true);
+    while (i--) this.removeComponent(arguments[i], clear);
 
     //i = components.length;
     //while (i--) {
@@ -409,6 +377,7 @@ GameObject.prototype.getComponent = function (type, inherit) {
     }
 };
 
+//var ARRAY_RESULTS = [];
 GameObject.prototype.getComponents = function (type, inherit, results) {
     var components, len, i, component;
 
@@ -432,7 +401,6 @@ GameObject.prototype.getComponents = function (type, inherit, results) {
     }
 };
 
-
 GameObject.prototype.hasComponent = function (type, inherit) {
     //var components = this.components,
     //    i = components.length;
@@ -445,7 +413,6 @@ GameObject.prototype.hasComponent = function (type, inherit) {
 
     return this.getComponent(type, inherit) !== undefined;
 };
-
 
 GameObject.prototype.find = function (name) {
     var transform = this.transform,// || this.transform2d,
@@ -467,17 +434,16 @@ GameObject.prototype.find = function (name) {
 };
 
 
-GameObject.prototype.findComponentById = function (id) {
+GameObject.prototype.getComponentById = function (id) {
 
     return this._componentHash[id];
 };
 
 
-GameObject.prototype.findComponentByJSONId = function (id) {
+GameObject.prototype.getComponentByJSONId = function (id) {
 
     return this._componentJSONHash[id];
 };
-
 
 GameObject.prototype.toJSON = function (json) {
     json = Class.prototype.toJSON.call(this, json);
@@ -512,38 +478,15 @@ GameObject.prototype.fromJSON = function (json) {
         i = components.length,
         has, type, j;
 
-    //while (i--) {
-    //    component = components[i];
-    //    type = component._type;
-    //    has = false;
-    //
-    //    j = jsonComponents.length;
-    //    while (j--) {
-    //        jsonComponent = jsonComponents[i];
-    //        if (type === jsonComponent._type) has = true;
-    //    }
-    //
-    //    if (!has) this.removeComponent(component);
-    //}
-    //
-    //i = jsonComponents.length;
-    //while (i--) {
-    //    if (!(jsonComponent = jsonComponents[i])) continue;
-    //
-    //    if ((component = this.findComponentByJSONId(jsonComponent._id)) || (component = this.getComponent(jsonComponent._type))) {
-    //        component.fromJSON(jsonComponent);
-    //    } else {
-    //        this.addComponent(Class.fromJSON(jsonComponent));
-    //    }
-    //}
-
     this.name = json.name || "GameObject_" + this._id;
     this._activeSelf = json.active || true;
     this.activeInHierarchy = this._activeSelf;
 
+    //destroy all exist components
     while (i--) {
         component = components[i];
-        this.removeComponent(component);
+        component.destroy();
+        //this.removeComponent(component);
     }
 
     var len = jsonComponents.length;
@@ -553,6 +496,9 @@ GameObject.prototype.fromJSON = function (json) {
         this.addComponent(Class.fromJSON(jsonComponent));
     }
 
+    i = tags.length;
+    while (i--) this.removeTag(tags[i]);
+
     i = jsonTags.length;
     while (i--) {
         if (tags.indexOf((tag = jsonTags[i])) === -1) tags.push(tag);
@@ -561,5 +507,42 @@ GameObject.prototype.fromJSON = function (json) {
     return this;
 };
 
+//Unity3D like static functions of GameObject
+GameObject.Find = function (name) {
+    var scene = Game.scene;
+    return scene ? scene.find(name) : undefined;
+};
+
+GameObject.FindGameObjectsWithTag = function (tag, out) {
+    var scene = Game.scene;
+    return scene ? scene.findByTag(tag, out) : undefined;
+};
+
+GameObject.FindWithTag = function (tag) {
+    var scene = Game.scene;
+    return scene ? scene.findByTagFirst(tag) : undefined;
+};
+
+GameObject.Instantiate = function (original, position, rotation) {
+    var scene = Game.scene;
+    var gameobject;
+    if(original instanceof GameObject)
+        gameobject =  original.clone();
+    else if(original instanceof Prefab)
+        gameobject =  Class.create('GameObject').fromJSON(original.jsonData);
+    else
+        gameobject =  Class.create('GameObject').fromJSON(original);
+
+    if(position) gameobject.transform.position = position;
+    if(rotation) gameobject.transform.rotation = rotation;
+    if(scene) scene.addGameObject(gameobject);
+
+    return gameobject;
+};
+
+GameObject.Destroy = function (obj) {
+
+    return obj.destroy();
+};
 
 module.exports = GameObject;

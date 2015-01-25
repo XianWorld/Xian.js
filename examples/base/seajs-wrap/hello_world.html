@@ -19,36 +19,143 @@
     seajs.use(['/Xian/index.js'], function (Xian) {
         Xian.globalize();
 
-        var game, scene;
+        var game, sceneJson;
         var Assets = MainContext.Assets;
+        Assets._rootUrl = '/Xian/examples/base/contents/';
         game = Game;
+        Phys2D.P2Space.DefaultBroadPhase = Phys2D.P2BroadphaseSpatialHash;
 
-        scene = new Scene({
-            name: "PlayGround",
-            systems: [
-                new Transform2DSystem(),
-                new BehaviourSystem(),
-                new Render2DSystem()
+        sceneJson = {
+            'name': 'PlayGround',
+            'systems': [
+                {'_className': 'Transform2DSystem'},
+                {'_className': 'BehaviourSystem'},
+                {'_className': 'Render2DSystem'},
+                {
+                    '_className': 'Phys2DSystem',
+                    'space': {
+                        'gravity': {'x': 0.0, 'y': 300}
+                    }
+                }
+            ],
+            'gameObjects': [
+                {
+                    'name': "camera",
+                    '_className': 'GameObject',
+                    'components': [
+                        {'_className': 'Transform2D'},
+                        {
+                            '_className': 'Camera2D',
+                            'transparent': 'true'
+                        }
+                    ]
+                }
             ]
-        });
+        };
 
-        var root = new GameObject({
-            name: "root",
-            components: [
-                new Transform2D,
-                new Camera2D,
-                new Sprite2D({
-                    texture: Assets.load("../contents/eggHead.png", "Texture")
-                }),
-                new Renderer2D
+        var rootPrefab = {
+            'name': "root",
+            '_className': 'GameObject',
+            'components': [
+                {'_className': 'Transform2D'},
+                {
+                    '_className': 'Sprite2D',
+                    'texture': "eggHead.png"
+                },
+                {
+                    '_className': 'Text2D',
+                    'text': "Hello World!",
+                    'style': {
+                        'font': "bold 60px Arial",
+                        'fill': "#cc00ff",
+                        'align': "center",
+                        'stroke': "#FFFFFF",
+                        'strokeThickness': 4
+                    }
+                },
+                {
+                    '_className': 'TilingSprite2D',
+                    'texture': "eggHead.png",
+                    'width': 300,
+                    'height': 300,
+                    'alpha': 0.5
+                },
+                {'_className': 'Renderer2D'}
             ]
-        });
+        };
 
-        game.addScene(scene);
+        var phys2dSpritePrefab = {
+            'name': "phys2d_sprite",
+            '_className': 'GameObject',
+            'components': [
+                {'_className': 'Transform2D'},
+                {
+                    '_className': 'Sprite2D',
+                    'texture': "bunny.png"
+                },
+                {
+                    '_className': 'RigidBody2D',
+                    'body': {
+                        'motionState': 'Dynamic',
+//                        'mass': 100,
+                        'shapes': [
+                            {
+                                '_className': 'P2Rect',
+                                'elasticity': 0.5,
+                                vertices: [
+                                    {'x': 0, 'y': 0},
+                                    {'x': 23, 'y': 0},
+                                    {'x': 23, 'y': 67},
+                                    {'x': 0, 'y': 67},
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {'_className': 'Renderer2D'}
+            ]
+        };
+        var phys2dGrassPrefab = {
+            'name': "phys2d_grass",
+            '_className': 'GameObject',
+            'components': [
+                {'_className': 'Transform2D'},
+                {
+                    '_className': 'Sprite2D',
+                    'texture': "grass.png"
+                },
+                {
+                    '_className': 'RigidBody2D',
+                    'body': {
+                        'motionState': 'Static',
+                        'shapes': [
+                            {
+                                '_className': 'P2Rect',
+                                'elasticity': 0.5,
+                                vertices: [
+                                    {'x': 0, 'y': 0},
+                                    {'x': 400, 'y': 0},
+                                    {'x': 400, 'y': 20},
+                                    {'x': 0, 'y': 20},
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {'_className': 'Renderer2D'}
+            ]
+        };
+
+        game.addScene(sceneJson);
 
         function start() {
             game.setScene("PlayGround");
-            game.scene.addGameObject(root);
+            GameObject.Instantiate(rootPrefab);
+            GameObject.Instantiate(rootPrefab, new Vec2(100, 100), 0.3);
+            GameObject.Instantiate(phys2dSpritePrefab, new Vec2(200, 0), 1.8);
+            GameObject.Instantiate(phys2dGrassPrefab, new Vec2(0, 300), 0);
+
+            var test = Assets.load('TestComponent.js', 'Module');
         }
 
         game.on("start", function () {

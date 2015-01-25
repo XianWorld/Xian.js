@@ -3,11 +3,11 @@ var Asset = require("./asset");
 "use strict";
 
 function JsonData(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Asset.call(this, opts);
 
-    this.jsonData = opts.jsonData;
+    this.jsonData = undefined;
 }
 
 Asset.extend(JsonData);

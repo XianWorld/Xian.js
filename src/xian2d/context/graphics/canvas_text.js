@@ -20,6 +20,7 @@ CanvasText.getBounds = function (text2d, context, bounds) {
     var text = text2d.text;
     var style = text2d.style;
     var resolution = text2d.resolution || 1;
+    var anchor = text2d.anchor;
     context.font = style.font;
 
     var outputText = text;
@@ -54,6 +55,10 @@ CanvasText.getBounds = function (text2d, context, bounds) {
 
     bounds.height = height * resolution;
 
+    bounds.x = -(anchor.x * bounds.width);
+    bounds.y = -(anchor.y * bounds.height);
+
+
     return bounds;
 };
 
@@ -66,6 +71,7 @@ CanvasText.renderText = function (text2d, context, canvas) {
     var text = text2d.text;
     var style = text2d.style;
     var resolution = text2d.resolution || 1;
+    var anchor = text2d.anchor;
     context.font = style.font;
 
     var outputText = text;
@@ -100,9 +106,9 @@ CanvasText.renderText = function (text2d, context, canvas) {
         canvas.height = height;
     }
 
-    //anchor??
-    //offsetX -= width/2;
-    //offsetY -= height/2;
+    //anchor
+    offsetX = -(anchor.x * width);
+    offsetY = -(anchor.y * height);
 
     context.scale(resolution, resolution);
     //if(navigator.isCocoonJS) context.clearRect(0,0,this.canvas.width,this.canvas.height);

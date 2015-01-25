@@ -12,28 +12,24 @@ var Renderable2D = require("./renderable_2d");
 var RenderTexture = require("../../context/assets/render_texture");
 var Sprite2dData = require("../context/graphics/g2d/sprite_2d_data");
 
-function Renderer2D(opts) {
-    opts || (opts = {});
+function Renderer2D() {
 
-    Component.call(this, opts);
+    Component.call(this);
 
     //this.worldMatrix = undefined;
-    this.alpha = opts.alpha !== undefined ? opts.alpha : 1.0;
-    this.worldAlpha = 1.0;
+    this.alpha = 1.0;
 
-    this._mask = opts.mask !== undefined ? opts.mask : undefined;
+    this._mask = undefined;
 
     this.filterArea = undefined;
     this._filters = undefined;
     this._filterBlock = undefined;
-    if (opts.filters) this.filters = opts.filters;
 
+    this.worldAlpha = 1.0;
     this._boundsSelf = new Rect;
     this._boundsAll = new Rect;
-
     this._cachedSprite = undefined;
     this._cacheAsBitmap = false;
-
     this.renderables = undefined;
 }
 
@@ -107,30 +103,94 @@ function _onComponentChange(component){
 Renderer2D.prototype.copy = function (other) {
     this.alpha = other.alpha;
     this.mask = other._mask;
-    this.filterArea = other.filterArea;
+    if(other.filterArea) this.filterArea = other.filterArea.clone();
     this.filters = other._filters;
 
     return this;
 };
 
 Renderer2D.prototype.clear = function () {
+    var gameObject = this.gameObject;
+    if(gameObject){
+        gameObject.off("addComponent", _onComponentChange, this);
+        gameObject.off("removeComponent", _onComponentChange, this);
+    }
     Component.prototype.clear.call(this);
     this.alpha = 1;
     this.mask = undefined;
     this.filterArea = undefined;
     this.filters = undefined;
 
+    this.cacheAsBitmap = false;
+    this._cachedSprite = undefined;
+    this.renderables = undefined;
+
     return this;
 };
 
 Renderer2D.prototype.destroy = function () {
-    var gameObject = this.gameObject;
-    if(gameObject){
-        gameObject.off("addComponent", _onComponentChange, this);
-        gameObject.off("removeComponent", _onComponentChange, this);
-    }
     Component.prototype.destroy.call(this);
 
+    this._boundsSelf = undefined;
+    this._boundsAll = undefined;
+    return this;
+};
+
+Renderer2D.prototype.toJSON = function (json) {
+    json = Component.prototype.toJSON.call(this, json);
+
+    json.alpha = this.alpha;
+
+    if (this._mask)
+        json.mask = this._mask._id;
+
+    if (this._filters) {
+        json.filters = [];
+
+        var len = this._filters.length;
+        var i;
+        for (i = 0; i < len; i++) {
+            //TODO the filter would be null or undefined
+            json.filters.push(this._filters[i].toJSON());
+        }
+    }
+
+    return json;
+};
+
+
+Renderer2D.prototype.fromJSON = function (json) {
+    Component.prototype.fromJSON.call(this, json);
+
+    this.alpha = json.alpha || 1;
+
+    //TODO how to confirm the unique id for the component
+    if (json.mask) {
+        var scene;
+        if (this.gameObject && (scene = this.gameObject.scene)) {
+            this.mask = scene.findComponentByJSONId(json.mask);
+        } else {
+            this.once("init", function () {
+                scene = this.gameObject.scene;
+                this.mask = scene.findComponentByJSONId(json.mask);
+            });
+        }
+    }
+    else {
+        this.mask = undefined;
+    }
+
+    if (json.filters) {
+        var filters = [];
+
+        var len = json.filters.length;
+        var i;
+        for (i = 0; i < len; i++) {
+            //TODO the filter would be null or undefined
+            filters.push(FilterLib.fromJSON(json.filters[i]));
+        }
+        this.filters = filters;
+    }
     return this;
 };
 
@@ -312,63 +372,6 @@ Renderer2D.prototype._destroyCachedSprite = function () {
         children[i].gameObject.setActive(true);
 };
 
-Renderer2D.prototype.toJSON = function (json) {
-    json = Component.prototype.toJSON.call(this, json);
-
-    json.alpha = this.alpha;
-
-    if (this._mask)
-        json.mask = this._mask._id;
-
-    if (this._filters) {
-        json.filters = [];
-
-        var len = this._filters.length;
-        var i;
-        for (i = 0; i < len; i++) {
-            //TODO the filter would be null or undefined
-            json.filters.push(this._filters[i].toJSON());
-        }
-    }
-
-    return json;
-};
-
-
-Renderer2D.prototype.fromJSON = function (json) {
-    Component.prototype.fromJSON.call(this, json);
-
-    this.alpha = json.alpha || 1;
-
-    //TODO how to confirm the unique id for the component
-    if (json.mask) {
-        var scene;
-        if (this.gameObject && (scene = this.gameObject.scene)) {
-            this.mask = scene.findComponentByJSONId(json.mask);
-        } else {
-            this.once("init", function () {
-                scene = this.gameObject.scene;
-                this.mask = scene.findComponentByJSONId(json.mask);
-            });
-        }
-    }
-    else {
-        this.mask = undefined;
-    }
-
-    if (json.filters) {
-        var filters = [];
-
-        var len = json.filters.length;
-        var i;
-        for (i = 0; i < len; i++) {
-            //TODO the filter would be null or undefined
-            filters.push(FilterLib.fromJSON(json.filters[i]));
-        }
-        this.filters = filters;
-    }
-    return this;
-};
 
 
 module.exports = Renderer2D;

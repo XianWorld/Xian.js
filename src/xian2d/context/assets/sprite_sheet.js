@@ -5,7 +5,7 @@ var TextureClipData = require("./texture_clip_data");
 
 
 function SpriteSheet(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Asset.call(this, opts);
 
@@ -48,6 +48,7 @@ SpriteSheet.prototype.clear = function () {
     this.frames.length = 0;
     if(this._texture){
         this._texture.release();
+        this._texture = undefined;
     }
     return this;
 };

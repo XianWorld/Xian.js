@@ -4,11 +4,11 @@ var Transform = require("./../components/transform");
 
 
 function TransformSystem(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     ComponentSystem.call(this, opts);
 
-    this.order = -99998;
+    this.order = -80000;
 
     //this.addEventName = "startComponent";
     //this.removeEventName = "removeComponent";

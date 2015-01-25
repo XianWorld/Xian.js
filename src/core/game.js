@@ -1,7 +1,7 @@
-//var Class = require("../base/class");
+var Class = require("../base/class");
 var EventEmitter = require('../base/event_emitter');
 var Config = require("../base/config");
-var Scene = require("./scene");
+//var Scene = require("./scene");
 var Context = require("../context/main_context");
 var Log = Context.Log;
 var Time = Context.Time;
@@ -111,23 +111,29 @@ Game.prototype.loop = function () {
 
 
 Game.prototype.addScene = function (scene) {
-    if (!(scene instanceof Scene)) {
-        Log.error("Game.addScene: can't add argument to Game, it's not an instance of Scene");
-        return this;
-    }
     var sceneHash = this._sceneHash,
         sceneNameHash = this._sceneNameHash,
         name = scene.name,
         id = scene._id,
         json;
 
+    if(!id) id = scene._id = this.scenes.length;
     if (!sceneNameHash[name] && !sceneHash[id]) {
-        json = scene.toJSON();
+        //if (!(scene instanceof Scene)) {
+        if (scene._className !== 'Scene') {
+            //Log.error("Game.addScene: can't add argument to Game, it's not an instance of Scene");
+            //return this;
+            json = scene;
+            //if(!json._className) json._className = 'Scene';
+        }
+        else{
+            json = scene.toJSON();
+        }
 
         sceneNameHash[name] = json;
         sceneHash[id] = json;
         this.scenes.push(json);
-        if (scene._jsonId !== -1) this._sceneJSONHash[scene._jsonId] = json;
+        if (scene._jsonId && scene._jsonId !== -1) this._sceneJSONHash[scene._jsonId] = json;
 
         this.emit("addScene", name);
     } else {
@@ -185,7 +191,8 @@ Game.prototype.setScene = function (scene) {
     if (this._sceneNameHash[scene.name] && this._sceneHash[scene._id]) {
         if (this.scene) this.scene.destroy();
 
-        scene = Class.fromJSON(scene);
+        //scene = Class.fromJSON(scene);
+        scene = Class.create('Scene').fromJSON(scene);
         this.scene = scene;
 
         scene.game = this;

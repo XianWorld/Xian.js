@@ -9,30 +9,77 @@ var Texture = require("../../context/assets/texture");
 var MainContext = require("../../context/main_context");
 var GraphicsContext = MainContext.GraphicsContext;
 
-function TilingSprite2D(opts) {
-    opts || (opts = {});
+function TilingSprite2D() {
 
-    Sprite2D.call(this, opts);
+    Sprite2D.call(this);
 
-    this.tileScale = opts.tileScale || new Vec2(1, 1);
-    this.tilePosition = opts.tilePosition || new Vec2(0, 0);
-
+    this.tileScale = new Vec2(1, 1);
+    this.tilePosition = new Vec2(0, 0);
     this.tileScaleOffset = new Vec2(1, 1);
+
     this.destTexture = undefined;
-    //this.refreshTexture = false;
-};
+}
 
 Sprite2D.extend(TilingSprite2D);
+
+TilingSprite2D.prototype.copy = function (other) {
+    Sprite2D.prototype.copy.call(this, other);
+
+    this.tileScale.copy(other.tileScale);
+    this.tilePosition.copy(other.tilePosition);
+    this.tileScaleOffset.copy(other.tileScaleOffset);
+
+    return this;
+};
+
+TilingSprite2D.prototype.clear = function () {
+    Sprite2D.prototype.clear.call(this);
+
+    this.tileScale.set(1, 1);
+    this.tilePosition.set(0, 0);
+    this.tileScaleOffset.set(1, 1);
+
+    if(this.destTexture) this.destTexture.destroy();
+    this.destTexture = undefined;
+    return this;
+};
+TilingSprite2D.prototype.destroy = function () {
+    Sprite2D.prototype.destroy.call(this);
+
+    this.tileScale = undefined;
+    this.tilePosition = undefined;
+    this.tileScaleOffset = undefined;
+    return this;
+};
+
+TilingSprite2D.prototype.toJSON = function (json) {
+    json = Sprite2D.prototype.toJSON.call(this, json);
+
+    json.tileScale = this.tileScale.toJSON(json.tileScale);
+    json.tilePosition = this.tilePosition.toJSON(json.tilePosition);
+
+    return json;
+};
+
+TilingSprite2D.prototype.fromJSON = function (json) {
+    Sprite2D.prototype.fromJSON.call(this, json);
+
+    json.tileScale ? this.tileScale.fromJSON(json.tileScale) : this.tileScale.set(1, 1);
+    json.tilePosition ? this.tilePosition.fromJSON(json.tilePosition) : this.tilePosition.set(0, 0);
+
+    return this;
+};
 
 TilingSprite2D.prototype._generateTilingTexture = function (forcePowerOfTwo) {
     if (!this._texture.ready) return;
 
     var texture = this._texture;
+    var clip = this._clip;
 
-    var sourceX = this.textureClip ? this.textureClip.clipX : 0;
-    var sourceY = this.textureClip ? this.textureClip.clipY : 0;
-    var sourceWidth = this.textureClip ? this.textureClip.clipWidth : texture.width;
-    var sourceHeight = this.textureClip ? this.textureClip.clipHeight : texture.height;
+    var sourceX = this.cliped ? clip.x : 0;
+    var sourceY = this.cliped ? clip.y : 0;
+    var sourceWidth = this.cliped ? clip.width : texture.width;
+    var sourceHeight = this.cliped ? clip.height : texture.height;
 
     //var frame = this._textureClip;
     var targetWidth, targetHeight;
@@ -76,7 +123,7 @@ TilingSprite2D.prototype._generateTilingTexture = function (forcePowerOfTwo) {
             this.destTexture.isTiling = true;
         }
 
-        canvasBuffer.drawImage(texture.raw,
+        canvasBuffer.drawImage(texture.image,
             sourceX,
             sourceY,
             sourceWidth,
@@ -114,7 +161,7 @@ TilingSprite2D.prototype._generateTilingTexture = function (forcePowerOfTwo) {
     this.destX = this.textureClip ? -(this.textureClip.offsetX * this.destWidth) : 0;//-sourceX;
     this.destY = this.textureClip ? -(this.textureClip.offsetY * this.destHeight) : 0;//-sourceY;
 
-    //this._dirtyRender = false;
+    //this._dirty = false;
 
 };
 
@@ -136,31 +183,12 @@ TilingSprite2D.prototype.getLocalBounds = function () {
 TilingSprite2D.prototype._render = function (renderer) {
     if(!this.texture || !this.texture.ready) return;
 
-    if (!this.destTexture || this._dirtyRender) {
+    if (!this.destTexture || this._dirty) {
         this._generateTilingTexture(GraphicsContext.isWebgl);
 
-        this._dirtyRender = false;
+        this._dirty = false;
     }
     renderer.renderTilingSprite2D(this);
-};
-
-TilingSprite2D.prototype.toJSON = function (json) {
-    json = Sprite2D.prototype.toJSON.call(this, json);
-
-    json.tileScale = this.tileScale.toJSON(json.tileScale);
-    json.tilePosition = this.tilePosition.toJSON(json.tilePosition);
-
-    return json;
-};
-
-
-TilingSprite2D.prototype.fromJSON = function (json) {
-    Sprite2D.prototype.fromJSON.call(this, json);
-
-    this.tileScale.fromJSON(json.tileScale);
-    this.tilePosition.fromJSON(json.tilePosition);
-
-    return this;
 };
 
 module.exports = TilingSprite2D;

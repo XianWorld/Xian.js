@@ -5,41 +5,40 @@ var Mathf = require("../math/mathf");
 var Vec2 = require("../math/vec2");
 var Vec3 = require("../math/vec3");
 var Assets = require("../context/main_context").Assets;
-var Component = require("./../core/component");
+var Behaviour = require("./../components/behaviour");
+var Camera = require("./../components/camera");
 "use strict";
-
 
 var now = Time.now,
     clamp01 = Mathf.clamp01,
     defineProperty = Object.defineProperty;
 
-function AudioSource(opts) {
-    opts || (opts = {});
+function AudioSource() {
 
-    Component.call(this, opts);
+    Behaviour.call(this);
 
-    this.clip = opts.clip;
+    this._clip = undefined;
 
     this._source = undefined;
     this._gain = undefined;
     this._panner = undefined;
 
-    this.dopplerLevel = opts.dopplerLevel !== undefined ? opts.dopplerLevel : 1;
-    this._loop = opts.loop !== undefined ? !!opts.loop : false;
+    this.dopplerLevel = 1;
+    this._loop = false;
 
-    this.maxDistance = opts.maxDistance !== undefined ? opts.maxDistance : 15;
-    this.minDistance = opts.minDistance !== undefined ? opts.minDistance : 1;
+    this.maxDistance = 15;
+    this.minDistance = 1;
 
-    this.offset = opts.offset !== undefined ? opts.offset : new Vec3;
+    this.offset = new Vec3;
 
-    this.pitch = opts.pitch !== undefined ? opts.pitch : 0;
+    this.pitch = 0;
 
-    this.playOnStart = opts.playOnStart !== undefined ? !!opts.playOnStart : false;
+    this.playOnStart = false;
 
-    this.spread = opts.spread !== undefined ? opts.spread : 0;
+    this.spread = 0;
 
-    this.time = opts.time !== undefined ? opts.time : 0;
-    this._volume = opts.volume !== undefined ? opts.volume : 1;
+    this.time = 0;
+    this._volume = 1;
 
     this.playing = false;
     this.stopped = false;
@@ -56,8 +55,7 @@ function AudioSource(opts) {
     };
 }
 
-Component.extend(AudioSource);
-
+Behaviour.extend(AudioSource);
 
 defineProperty(AudioSource.prototype, "volume", {
     get: function () {
@@ -69,7 +67,6 @@ defineProperty(AudioSource.prototype, "volume", {
     }
 });
 
-
 defineProperty(AudioSource.prototype, "loop", {
     get: function () {
         return this._loop;
@@ -80,8 +77,20 @@ defineProperty(AudioSource.prototype, "loop", {
     }
 });
 
+Object.defineProperty(AudioSource.prototype, "clip", {
+    get: function () {
+        return this._clip;
+    },
+    set: function (value) {
+        if (this._clip === value) return;
+        if (this._clip) this._clip.release(this);
+        this._clip = value;
+        if (this._clip) this._clip.retain(this);
+    }
+});
 
 AudioSource.prototype.copy = function (other) {
+    Behaviour.prototype.copy.call(this, other);
 
     this.clip = other.clip;
 
@@ -110,23 +119,39 @@ AudioSource.prototype.copy = function (other) {
     return this;
 };
 
-
 AudioSource.prototype.clear = function () {
-    Component.prototype.clear.call(this);
+    Behaviour.prototype.clear.call(this);
     if (this.playing) this.stop();
 
     this.clip = undefined;
     this._source = undefined;
     this._gain = undefined;
     this._panner = undefined;
+
+    this.dopplerLevel = 1;
+    this._loop = false;
+    this.maxDistance = 15;
+    this.minDistance = 1;
+    this.offset.set(0,0,0);
+    this.pitch = 0;
+    this.playOnStart = false;
+    this.spread = 0;
+    this.time = 0;
+    this._volume = 1;
+    this.playing = false;
+    this.stopped = false;
+    this.paused = false;
+    this._startTime = 0;
 };
 
+AudioSource.prototype.destroy = function () {
+    Behaviour.prototype.destroy.call(this);
+    this.offset = undefined;
+};
 
 AudioSource.prototype.start = function () {
-
     if (this.playOnStart) this.play();
 };
-
 
 var VEC2 = new Vec2,
     VEC3 = new Vec3;
@@ -134,20 +159,20 @@ AudioSource.prototype.update = function () {
     if (this.dopplerLevel === 0 || !this.playing) return;
     var transform2d, transform, camera, cameraTransform, panner;
 
-    if (!(camera = this.gameObject.scene.game.camera)) return;
+    if (!(camera = Camera.main)) return;
     if (!(panner = this._panner)) return;
 
     transform = this.transform;
-    transform2d = this.transform2d;
+    //transform2d = this.transform2d;
 
-    cameraTransform = camera.transform || camera.transform2d;
+    cameraTransform = camera.transform;
 
-    if (transform2d) {
-        VEC2.vadd(transform2d.position, this.offset);
+    if (transform._type === 'Transform2D') {
+        VEC2.vadd(transform.position, this.offset);
         VEC2.sub(cameraTransform.position);
         VEC2.smul(this.dopplerLevel);
 
-        panner.setPosition(VEC2.x, VEC2.y, camera.orthographicSize * 0.5);
+        panner.setPosition(VEC2.x, VEC2.y, camera.orthographicSizeX * 0.5);
     } else {
         VEC3.vadd(transform.position, this.offset);
         VEC3.sub(cameraTransform.position);
@@ -156,7 +181,6 @@ AudioSource.prototype.update = function () {
         panner.setPosition(VEC3.x, VEC3.y, VEC3.z || 0);
     }
 };
-
 
 AudioSource.prototype.play = function (delay, offset, duration) {
     if (!AudioCtx) return this;
@@ -248,7 +272,7 @@ AudioSource.prototype._refresh = function () {
 
 
 AudioSource.prototype.toJSON = function (json) {
-    json = Component.prototype.toJSON.call(this, json);
+    json = Behaviour.prototype.toJSON.call(this, json);
 
     json.clip = this.clip ? this.clip.name : undefined;
 
@@ -275,27 +299,27 @@ AudioSource.prototype.toJSON = function (json) {
 
 
 AudioSource.prototype.fromJSON = function (json) {
-    Component.prototype.fromJSON.call(this, json);
+    Behaviour.prototype.fromJSON.call(this, json);
 
     this.clip = json.clip ? Assets.load(json.clip, "AudioClip") : undefined;
 
-    this.dopplerLevel = json.dopplerLevel;
-    this.loop = json.loop;
+    this.dopplerLevel = json.dopplerLevel || 1;
+    this.loop = json.loop !== undefined ? !!json.loop : false;
 
-    this.maxDistance = json.maxDistance;
-    this.minDistance = json.minDistance;
+    this.maxDistance = json.maxDistance || 15;
+    this.minDistance = json.minDistance || 1;
 
-    this.offset.fromJSON(json.offset);
-    this.panLevel = json.panLevel;
+    if(json.offset) this.offset.fromJSON(json.offset);
+    this.panLevel = json.panLevel || 0;
 
-    this.pitch = json.pitch;
+    this.pitch = json.pitch || 0;
 
-    this.playOnStart = json.playOnStart;
+    this.playOnStart = json.playOnStart !== undefined ? !!json.playOnStart : false;
 
-    this.spread = json.spread;
+    this.spread = json.spread || 0;
 
-    this.time = json.time;
-    this.volume = json.volume;
+    this.time = json.time || 0;
+    this.volume = json.volume || 1;
 
     return this;
 };

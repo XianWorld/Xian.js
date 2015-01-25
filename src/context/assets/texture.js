@@ -4,7 +4,7 @@ var Asset = require("./asset");
 
 
 function Texture(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Asset.call(this, opts);
 
@@ -16,15 +16,24 @@ function Texture(opts) {
     //this.invWidth = 0;
     //this.invHeight = 0;
 
-    this.generateMipmap = opts.generateMipmap !== undefined ? !!opts.generateMipmap : true;
-    this.flipY = opts.flipY !== undefined ? !!opts.flipY : true;
-    this.premultiplyAlpha = opts.premultiplyAlpha !== undefined ? !!opts.premultiplyAlpha : true;
+    this.generateMipmap = true;
+    this.flipY = true;
+    this.premultiplyAlpha = true;
 
-    this.anisotropy = opts.anisotropy !== undefined ? opts.anisotropy : 1;
+    this.anisotropy = 1;
 
-    this.filter = opts.filter !== undefined ? opts.filter : Enums.filterMode.LINEAR;
-    this.format = opts.format !== undefined ? opts.format : Enums.TextureFormat.RGBA;
-    this.wrap = opts.wrap !== undefined ? opts.wrap : Enums.TextureWrap.Repeat;
+    this.filter = Enums.filterMode.LINEAR;
+    this.format = Enums.TextureFormat.RGBA;
+    this.wrap = Enums.TextureWrap.Repeat;
+    //this.generateMipmap = opts.generateMipmap !== undefined ? !!opts.generateMipmap : true;
+    //this.flipY = opts.flipY !== undefined ? !!opts.flipY : true;
+    //this.premultiplyAlpha = opts.premultiplyAlpha !== undefined ? !!opts.premultiplyAlpha : true;
+    //
+    //this.anisotropy = opts.anisotropy !== undefined ? opts.anisotropy : 1;
+    //
+    //this.filter = opts.filter !== undefined ? opts.filter : Enums.filterMode.LINEAR;
+    //this.format = opts.format !== undefined ? opts.format : Enums.TextureFormat.RGBA;
+    //this.wrap = opts.wrap !== undefined ? opts.wrap : Enums.TextureWrap.Repeat;
 
     this.resolution = 1;
 
@@ -51,6 +60,7 @@ Object.defineProperty(Texture.prototype, "image", {
 });
 Texture.prototype.clear = function () {
 
+    //TODO
     this._image = undefined;
 
     return this;
@@ -178,21 +188,31 @@ Texture.prototype.fromJSON = function (json) {
         }
     }
 
-    this.width = json.width;
-    this.height = json.height;
+    this.width = json.width || 0;
+    this.height = json.height || 0;
 
     //this.invWidth = json.invWidth;
     //this.invHeight = json.invHeight;
 
-    this.generateMipmap = json.generateMipmap;
-    this.flipY = json.flipY;
-    this.premultiplyAlpha = json.premultiplyAlpha;
+    this.generateMipmap = json.generateMipmap !== undefined ? !!json.generateMipmap : true;
+    this.flipY = json.flipY !== undefined ? !!json.flipY : true;
+    this.premultiplyAlpha = json.premultiplyAlpha !== undefined ? !!json.premultiplyAlpha : true;
 
-    this.anisotropy = json.anisotropy;
+    this.anisotropy = json.anisotropy !== undefined ? json.anisotropy : 1;
 
-    this.filter = json.filter;
-    this.format = json.format;
-    this.wrap = json.wrap;
+    this.filter = json.filter !== undefined ? json.filter : Enums.filterMode.LINEAR;
+    this.format = json.format !== undefined ? json.format : Enums.TextureFormat.RGBA;
+    this.wrap = json.wrap !== undefined ? json.wrap : Enums.TextureWrap.Repeat;
+
+    //this.generateMipmap = json.generateMipmap;
+    //this.flipY = json.flipY;
+    //this.premultiplyAlpha = json.premultiplyAlpha;
+    //
+    //this.anisotropy = json.anisotropy;
+    //
+    //this.filter = json.filter;
+    //this.format = json.format;
+    //this.wrap = json.wrap;
 
     return this;
 };

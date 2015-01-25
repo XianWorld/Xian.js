@@ -5,33 +5,49 @@ var Rect = require("../math/rect");
 var Component = require("./../core/component");
 "use strict";
 
-
 var degsToRads = Mathf.degsToRads,
     clamp = Mathf.clamp,
     EPSILON = Mathf.EPSILON;
 
 
-function Camera(opts) {
-    opts || (opts = {});
+function Camera() {
 
-    Component.call(this, opts);
+    Component.call(this);
 
-    this.viewportRect = opts.viewportRect !== undefined ? opts.viewportRect : new Rect(0,0,1,1);
-    this.background = opts.background !== undefined ? opts.background : new Color(0.5, 0.5, 0.5);
+    this.viewportRect = new Rect(0,0,1,1);
+    this.background = new Color(0.5, 0.5, 0.5);
 
-    this.orthographicSizeX = opts.orthographicSizeX !== undefined ? opts.orthographicSizeX : 1;
-    this.orthographicSizeY = opts.orthographicSizeY !== undefined ? opts.orthographicSizeY : 1;
+    this.orthographicSizeX = 1;
+    this.orthographicSizeY = 1;
 
-    this.minOrthographicSize = opts.minOrthographicSize !== undefined ? opts.minOrthographicSize : EPSILON;
-    this.maxOrthographicSize = opts.maxOrthographicSize !== undefined ? opts.maxOrthographicSize : 1024;
+    this.minOrthographicSize = EPSILON;
+    this.maxOrthographicSize = 1024;
+
+    //render target: default(main)/RenderTexture
+    this.renderTexture = undefined;
+
+    this.isMain = false;
 
     this.needsUpdate = true;
+
+    //temporary solution for Camera.main
+    this._onAddToScene = function(){
+        if(this.isMain)
+            if(Camera.main !== undefined) Camera.main = this;
+    };
+    this._onRemoveFromScene = function(){
+        if(this.isMain)
+            if(Camera.main === this) Camera.main = undefined;
+    };
+    this.on('addToScene', this._onAddToScene, this);
+    this.on('removeFromScene', this._onRemoveFromScene, this);
 }
 
 Component.extend(Camera);
 
-
 Camera.prototype.copy = function (other) {
+    Component.prototype.copy.call(this, other);
+
     this.viewportRect.copy(other.viewportRect);
     this.background.copy(other.background);
 
@@ -40,9 +56,43 @@ Camera.prototype.copy = function (other) {
     this.minOrthographicSize = other.minOrthographicSize;
     this.maxOrthographicSize = other.maxOrthographicSize;
 
+    this.isMain = other.isMain;
     this.needsUpdate = true;
 
     return this;
+};
+
+Camera.prototype.clear = function () {
+    Component.prototype.clear.call(this);
+
+    this.viewportRect.set(0,0,1,1);
+    this.background.set(0.5, 0.5, 0.5);
+
+    this.orthographicSizeX = 1;
+    this.orthographicSizeY = 1;
+
+    this.minOrthographicSize = EPSILON;
+    this.maxOrthographicSize = 1024;
+
+    this.renderTexture = undefined;
+
+    this.needsUpdate = true;
+
+    this.on('init', this._onAddToScene, this);
+    this.on('remove', this._onRemoveFromScene, this);
+
+    return this;
+};
+
+Camera.prototype.destroy = function () {
+    Component.prototype.destroy.call(this);
+    this.viewportRect = undefined;
+    this.background = undefined;
+
+    this.off('init', this._onAddToScene, this);
+    this.off('remove', this._onRemoveFromScene, this);
+    this._onAddToScene = undefined;
+    this._onRemoveFromScene = undefined;
 };
 
 Camera.prototype.setOrthographicSizeX = function (size) {
@@ -72,21 +122,24 @@ Camera.prototype.toJSON = function (json) {
     return json;
 };
 
-
 Camera.prototype.fromJSON = function (json) {
     Component.prototype.fromJSON.call(this, json);
 
-    this.viewportRect.fromJSON(json.viewportRect);
-    this.background.fromJSON(json.background);
+    json.viewportRect ? this.viewportRect.fromJSON(json.viewportRect) : this.viewportRect.set(0,0,1,1);
+    json.background ? this.background.fromJSON(json.background) : this.background.set(0.5, 0.5, 0.5);
 
-    this.orthographicSizeX = json.orthographicSizeX;
-    this.orthographicSizeY = json.orthographicSizeY;
-    this.minOrthographicSize = json.minOrthographicSize;
-    this.maxOrthographicSize = json.maxOrthographicSize;
+    this.orthographicSizeX = json.orthographicSizeX || 1;
+    this.orthographicSizeY = json.orthographicSizeY || 1;
+    this.minOrthographicSize = json.minOrthographicSize || EPSILON;
+    this.maxOrthographicSize = json.maxOrthographicSize || 1024;
 
     this.needsUpdate = true;
 
     return this;
 };
+
+Camera.main = undefined;
+//no implements
+Camera.allCameras = undefined;
 
 module.exports = Camera;

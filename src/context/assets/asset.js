@@ -14,11 +14,17 @@ Asset.AssetState = {
 };
 
 function Asset(opts) {
-    opts || (opts = {});
+    //opts || (opts = {});
 
     Class.call(this);
 
-    this.name = opts.name !== undefined ? opts.name : "Asset_" + this._id;
+    this.name = "Asset_" + this._id;
+    //this.name = opts.name !== undefined ? opts.name : "Asset_" + this._id;
+    this.src = undefined;
+    this.fileType = undefined;
+    //this.src = opts.src;
+    //this.fileType = opts.fileType;
+
     this._state = Asset.AssetState.NONE;
     //this._scopes = [];
     this._ref_asset = 0;
@@ -27,8 +33,6 @@ function Asset(opts) {
     //this.json = opts.json !== undefined ? !!opts.json : true;
     this.assets = undefined;
     //this.load = opts.load !== undefined ? !!opts.load : !!opts.src;
-    this.src = opts.src;
-    this.fileType = opts.fileType;
 
     //this.raw = opts.raw;
 }
@@ -123,16 +127,18 @@ Asset.prototype.toJSON = function (json, pack) {
 
     json.name = this.name;
     if (!pack) json.src = this.src;
+    json.fileType = this.fileType;
 
     return json;
 };
 
 
-Asset.prototype.fromJSON = function (json) {
+Asset.prototype.fromJSON = function (json, pack) {
     Class.prototype.fromJSON.call(this, json);
 
-    this.name = json.name;
+    this.name = json.name || "Asset_" + this._id;
     this.src = json.src;
+    this.fileType = json.fileType;
 
     return this;
 };

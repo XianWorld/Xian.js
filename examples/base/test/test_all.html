@@ -1,0 +1,231 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Common Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+        }
+    </style>
+
+    <!--<script src="../../bin/pixi.dev.js"></script>-->
+    <script src="../../../spm_modules/seajs/2.3.0/dist/sea.js"></script>
+    <script src="../../../spm_modules/seajs-wrap/1.0.2/dist/seajs-wrap.js"></script>
+</head>
+<body>
+<script>
+    seajs.use(['/Xian/index.js'], function (Xian) {
+        Xian.globalize();
+
+        var game, sceneJson;
+        var Assets = MainContext.Assets;
+        Assets._rootUrl = '/Xian/examples/base/contents/';
+        game = Game;
+        Phys2D.P2Space.DefaultBroadPhase = Phys2D.P2BroadphaseSpatialHash;
+
+        sceneJson = {
+            'name': 'PlayGround',
+            'systems': [
+                {'_className': 'Transform2DSystem'},
+                {'_className': 'BehaviourSystem'},
+                {'_className': 'Render2DSystem'},
+                {
+                    '_className': 'Phys2DSystem',
+                    'space': {
+                        'gravity': {'x': 0.0, 'y': 300}
+                    }
+                }
+            ],
+            'gameObjects': [
+                {
+                    'name': "camera",
+                    '_className': 'GameObject',
+                    'components': [
+                        {'_className': 'Transform2D'},
+                        {
+                            '_className': 'Camera2D',
+                            'transparent': 'true'
+                        }
+                    ]
+                }
+            ]
+        };
+
+        var rootPrefab = {
+            'name': "root",
+            '_className': 'GameObject',
+            'components': [
+                {'_className': 'Transform2D'},
+                {
+                    '_className': 'Sprite2D',
+                    'anchor': {'x': 0.5, 'y': 0.5},
+                    'texture': "eggHead.png"
+                },
+                {
+                    '_className': 'TilingSprite2D',
+                    'texture': "eggHead.png",
+                    'width': 300,
+                    'height': 300,
+                    'alpha': 0.5
+                },
+                {'_className': 'Renderer2D'}
+            ]
+        };
+
+        var phys2dSpritePrefab = {
+            'name': "phys2d_sprite",
+            '_className': 'GameObject',
+            'components': [
+                {'_className': 'Transform2D'},
+                {
+                    '_className': 'Sprite2D',
+                    'texture': "bunny.png"
+                },
+                {
+                    '_className': 'RigidBody2D',
+                    'body': {
+                        'motionState': 'Dynamic',
+//                        'mass': 100,
+                        'shapes': [
+                            {
+                                '_className': 'P2Rect',
+                                'elasticity': 0.5,
+                                vertices: [
+                                    {'x': 0, 'y': 0},
+                                    {'x': 26, 'y': 0},
+                                    {'x': 26, 'y': 37},
+                                    {'x': 0, 'y': 37},
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {'_className': 'Renderer2D'}
+            ]
+        };
+        var phys2dGrassPrefab = {
+            'name': "phys2d_grass",
+            '_className': 'GameObject',
+            'components': [
+                {'_className': 'Transform2D'},
+                {
+                    '_className': 'Sprite2D',
+                    'texture': "grass.png"
+                },
+                {
+                    '_className': 'RigidBody2D',
+                    'body': {
+                        'motionState': 'Static',
+                        'shapes': [
+                            {
+                                '_className': 'P2Rect',
+                                'elasticity': 0.5,
+                                vertices: [
+                                    {'x': 0, 'y': 0},
+                                    {'x': 400, 'y': 0},
+                                    {'x': 400, 'y': 20},
+                                    {'x': 0, 'y': 20},
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {'_className': 'Renderer2D'}
+            ]
+        };
+
+        var textPrefab = {
+            'name': "text",
+            '_className': 'GameObject',
+            'components': [
+                {'_className': 'Transform2D'},
+                {
+                    '_className': 'Text2D',
+                    'text': "Hello World!",
+                    'style': {
+                        'font': "bold 60px Arial",
+                        'fill': "#cc00ff",
+                        'align': "center",
+                        'stroke': "#FFFFFF",
+                        'strokeThickness': 4
+                    }
+                },
+                {
+                    '_className': 'Text2D',
+                    'anchor': {'x': 0.5, 'y':0.5},
+                    'text': "江雪\n千山鸟飞绝，万径人踪灭。\n孤舟蓑笠翁，独钓寒江雪。",
+                    'bitmapFont': 'tangshi.fnt',
+                    'style': {
+                        'font': "32px Arial",
+                        'fill': "#ff0000",
+                        'align': "center"
+                    }
+                },
+                {'_className': 'Renderer2D'}
+            ]
+        };
+        var graphicsPrefab = {
+            'name': "graphics",
+            '_className': 'GameObject',
+            'components': [
+                {'_className': 'Transform2D'},
+                {
+                    '_className': 'Graphics',
+                    'graphicsDatas': [
+                        {
+                            'lineWidth': 2,
+                            'lineColor': 0x0000FF,
+                            'shape': {
+                                '_className': 'RectangleShape',
+                                'x': 50,
+                                'y': 50,
+                                'width': 100,
+                                'height': 100
+                            }
+                        },
+                        {
+                            'lineWidth': 0,
+                            'fillColor': 0xFFFF0B,
+                            'fillAlpha': 0.5,
+                            'fill': true,
+                            'shape': {
+                                '_className': 'CircleShape',
+                                'x': 50,
+                                'y': 150,
+                                'radius': 100
+                            }
+                        }
+                    ]
+                },
+                {'_className': 'Renderer2D'},
+            ]
+        };
+
+        game.addScene(sceneJson);
+
+        function start() {
+            game.setScene("PlayGround");
+            GameObject.Instantiate(rootPrefab);
+            GameObject.Instantiate(rootPrefab, new Vec2(100, 100), 0.3);
+            GameObject.Instantiate(textPrefab, new Vec2(400, 100), 0);
+            GameObject.Instantiate(phys2dSpritePrefab, new Vec2(200, 0), 1.8);
+            GameObject.Instantiate(phys2dGrassPrefab, new Vec2(0, 300), 0);
+            GameObject.Instantiate(graphicsPrefab, new Vec2(400, 0), 0);
+
+            var test = Assets.load('TestComponent.js', 'Module');
+            var font = Assets.load('tangshi.fnt', 'BitmapFont');
+        }
+
+        game.on("start", function () {
+            start();
+        });
+
+        game.start();
+    });
+</script>
+
+</body>
+</html>

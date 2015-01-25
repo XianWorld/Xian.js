@@ -21,15 +21,6 @@ function Class() {
 //TODO in order to let Class be the root Object, EventEmitter should be removed from this root Object and mixed in child Object when required. Refer to PIXI's EventTarget
 EventEmitter.extend(Class);
 
-//Object.defineProperty(Class.prototype, 'json', {
-//    get: function() {
-//        return this._json = this.toJSON();
-//    },
-//    set: function(value){
-//        this._json = value;
-//    }
-//});
-
 /**
  * returns new copy of this
  * @memberof Xian.Class
@@ -47,52 +38,32 @@ Class.prototype.clone = function () {
  * @param {Xian.Class} other
  * @return this
  */
-Class.prototype.copy = function () {
+Class.prototype.copy = function (other) {
 
     return this;
 };
 
-/**
- * clears data for GC
- * @memberof Xian.Class
- * @return this
- */
 Class.prototype.clear = function () {
-    //this._json = undefined;
-
     return this;
 };
 
 Class.prototype.destroy = function () {
-
     this.clear();
     return this;
 };
 
-/**
- * converts this to a JSON object
- * @memberof Xian.Class
- * @return json
- */
 Class.prototype.toJSON = function (json) {
     json || (json = {});
 
     json._id = this._id;
     json._jsonId = this._id;
     json._className = this._className;
-
     return json;
 };
 
-/**
- * sets this from JSON object
- * @memberof Xian.Class
- * @return this
- */
 Class.prototype.fromJSON = function (json) {
 
     this._jsonId = json._jsonId;
-
     return this;
 };
 
@@ -102,7 +73,6 @@ Class.prototype.fromJSON = function (json) {
  * @return string
  */
 Class.prototype.toString = function () {
-
     return this._name;
 };
 
@@ -162,6 +132,15 @@ Class.create = function (type) {
     return new Class._classes[type];
 };
 
+Class.Instantiate = function (original) {
+
+    return original.clone();
+};
+
+Class.Destroy = function (obj) {
+
+    return obj.destroy();
+};
 
 Class._classes = {};
 

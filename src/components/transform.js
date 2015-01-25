@@ -11,15 +11,12 @@ var Log = require("../context/main_context").Log;
 var EPSILON = Mathf.EPSILON;
 
 
-function Transform(opts) {
-    opts || (opts = {});
-    //opts.sync = opts.sync !== undefined ? opts.sync : true;
+function Transform() {
 
-    Component.call(this, opts);
+    Component.call(this);
 
-    //only one transform allowed
+    //only one 'transform' named component allowed
     this._name = "transform";
-
 
     this.root = this;
     this.depth = 0;
@@ -27,17 +24,6 @@ function Transform(opts) {
     this.parent = undefined;
     this.children = [];
 
-    //this._position = undefined;//opts.position !== undefined ? opts.position : new Vec3;
-    //this._rotation = undefined;//opts.rotation !== undefined ? opts.rotation : new Quat;
-    //this._scale = undefined;//opts.scale !== undefined ? opts.scale : new Vec3(1, 1, 1);
-    //
-    //this.matrix = new Mat4;
-    //this.matrixWorld = new Mat4;
-    //
-    //this.modelView = new Mat4;
-    //this.normalMatrix = new Mat3;
-    //
-    //this._dirty = true;
 }
 
 Component.extend(Transform);
@@ -45,10 +31,6 @@ Component.extend(Transform);
 Transform.prototype.copy = function (other) {
     var children = other.children,
         i = children.length;
-
-    //this.position.copy(other.position);
-    //this.scale.copy(other.scale);
-    //this.rotation.copy(other.rotation);
 
     while (i--) this.addChild(children[i].gameObject.clone().transform);
     if (other.parent) other.parent.addChild(this);
@@ -63,96 +45,19 @@ Transform.prototype.clear = function () {
 
     while (i--) this.removeChild(children[i]);
 
-    //this.position.set(0, 0, 0);
-    //this.scale.set(1, 1, 1);
-    //this.rotation.set(0, 0, 0, 1);
-
     this.root = this;
     this.depth = 0;
 
     return this;
 };
 
+Transform.prototype.destroy = function () {
+    Component.prototype.destroy.call(this);
+    this.root = undefined;
+    return this;
+};
 
-//Transform.prototype.translate = function () {
-//    var vec = new Vec3;
-//
-//    return function (translation, relativeTo) {
-//        vec.copy(translation);
-//
-//        if (relativeTo instanceof Transform) {
-//            vec.transformQuat(relativeTo.rotation);
-//        } else if (relativeTo instanceof Quat) {
-//            vec.transformQuat(relativeTo);
-//        }
-//
-//        this.position.add(vec);
-//
-//        return this;
-//    };
-//}();
-//
-//
-//Transform.prototype.rotate = function () {
-//    var vec = new Vec3;
-//
-//    return function (rotation, relativeTo) {
-//        vec.copy(rotation);
-//
-//        if (relativeTo instanceof Transform) {
-//            vec.transformQuat(relativeTo.rotation);
-//        } else if (relativeTo instanceof Quat) {
-//            vec.transformQuat(relativeTo);
-//        }
-//
-//        this.rotation.rotate(vec.x, vec.y, vec.z);
-//
-//        return this;
-//    };
-//}();
-//
-//
-//Transform.prototype.lookAt = function () {
-//    var mat = new Mat4,
-//        vec = new Vec3,
-//        dup = new Vec3(0.0, 0.0, 1.0);
-//
-//    return function (target, up) {
-//        up = up || dup;
-//
-//        if (target instanceof Transform) {
-//            vec.set(0.0, 0.0, 0.0).transformMat4(target.matrixWorld);
-//        } else {
-//            vec.copy(target);
-//        }
-//
-//        mat.lookAt(this.position, vec, up);
-//        this.rotation.fromMat4(mat);
-//
-//        return this;
-//    };
-//}();
-//
-//
-//Transform.prototype.follow = function () {
-//    var target = new Vec3,
-//        position = new Vec3,
-//        delta = new Vec3;
-//
-//    return function (transform, speed) {
-//        position.set(0.0, 0.0, 0.0).transformMat4(this.matrixWorld);
-//        target.set(0.0, 0.0, 0.0).transformMat4(transform.matrixWorld);
-//
-//        delta.vsub(target, position);
-//
-//        if (delta.lengthSq() > EPSILON) this.position.add(delta.smul(speed));
-//
-//        return this;
-//    };
-//}();
-
-
-Transform.prototype.addChild = function (child, others) {
+Transform.prototype.addChild = function (child) {
     if (!(child instanceof Transform)) {
         Log.error("Transform.add: can\'t add passed argument, it is not an instance of Transform");
         return this;
@@ -216,7 +121,7 @@ Transform.prototype.addChild = function (child, others) {
 Transform.prototype.addChildren = function () {
     var i, il, scene;
 
-    for (i = 0, il = arguments.length; i < il; i++) this.addChild(arguments[i], true);
+    for (i = 0, il = arguments.length; i < il; i++) this.addChild(arguments[i]);
     //if (this.gameObject && (scene = this.gameObject.scene)) {
     //    scene.componentManagers.Transform.sort();
     //}
@@ -224,7 +129,7 @@ Transform.prototype.addChildren = function () {
 };
 
 
-Transform.prototype.removeChild = function (child, others) {
+Transform.prototype.removeChild = function (child) {
     var children = this.children,
         index = children.indexOf(child),
         root, depth, scene;
@@ -265,7 +170,7 @@ Transform.prototype.removeChild = function (child, others) {
 Transform.prototype.removeChildren = function () {
     var i, il, scene;
 
-    for (i = 0, il = arguments.length; i < il; i++) this.removeChild(arguments[i], true);
+    for (i = 0, il = arguments.length; i < il; i++) this.removeChild(arguments[i]);
     //if (this.gameObject && (scene = this.gameObject.scene)) {
     //    scene.componentManagers.Transform.sort();
     //}
@@ -303,37 +208,6 @@ Transform.prototype.find = function (name) {
     return undefined;
 };
 
-
-//Transform.prototype.toWorld = function (v) {
-//
-//    return v.transformMat4(this.matrixWorld);
-//};
-//
-//
-//Transform.prototype.toLocal = function () {
-//    var mat = new Mat4;
-//
-//    return function (v) {
-//
-//        return v.transformMat4(mat.inverseMat(this.matrixWorld));
-//    };
-//}();
-//
-//
-//Transform.prototype.update = function () {
-//    var matrix = this.matrix,
-//        parent = this.parent;
-//
-//    //TODO use get/set for position/scale/rotation to assign dirty flag for recalculations.
-//    matrix.compose(this.position, this.scale, this.rotation);
-//
-//    if (parent) {
-//        this.matrixWorld.mmul(parent.matrixWorld, matrix);
-//    } else {
-//        this.matrixWorld.copy(matrix);
-//    }
-//};
-
 Transform.prototype._setDepth = function (depth) {
     if(this.depth === depth) return;
 
@@ -348,12 +222,6 @@ Transform.prototype._setParent = function (parent) {
     this.emit("parentChanged", this, parent);
 };
 
-//Transform.prototype.updateMatrices = function (viewMatrix) {
-//
-//    this.modelView.mmul(viewMatrix, this.matrixWorld);
-//    //this.normalMatrix.inverseMat4(this.modelView).transpose();
-//};
-
 Transform.prototype.toJSON = function (json) {
     json = Component.prototype.toJSON.call(this, json);
     var children = this.children,
@@ -361,10 +229,6 @@ Transform.prototype.toJSON = function (json) {
         i = children.length;
 
     while (i--) jsonChildren[i] = children[i]._id;
-
-    //json.position = this.position.toJSON(json.position);
-    //json.scale = this.scale.toJSON(json.scale);
-    //json.rotation = this.rotation.toJSON(json.rotation);
 
     return json;
 };
@@ -401,10 +265,6 @@ Transform.prototype.fromJSON = function (json) {
             });
         }
     }
-
-    //this.position.fromJSON(json.position);
-    //this.scale.fromJSON(json.scale);
-    //this.rotation.fromJSON(json.rotation);
 
     return this;
 };
