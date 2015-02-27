@@ -101,9 +101,13 @@ function Xian() {
     //xian2d/context/assets
     this.TextureClipData = require("./src/xian2d/context/assets/texture_clip_data");
     this.SpriteSheet = require("./src/xian2d/context/assets/sprite_sheet");
-    //register asset loaders
     var SpriteSheetLoader = require("./src/xian2d/context/assets/sprite_sheet_loader");
     this.AssetLoaderLib.registerLoader("json", "SpriteSheet", SpriteSheetLoader);
+
+    this.Skeleton2DData = require("./src/xian2d/context/assets/skeleton_2d_data");
+    var Skeleton2DDataLoader = require("./src/xian2d/context/assets/skeleton_2d_data_loader");
+    this.AssetLoaderLib.registerLoader("json", "Skeleton2DData", Skeleton2DDataLoader);
+
     this.Phys2D = require("./src/xian2d/context/phys2d/phys2d");
 
     //xian2d/components
@@ -117,6 +121,7 @@ function Xian() {
     this.Graphics = require("./src/xian2d/components/graphics");
     this.Text2D = require("./src/xian2d/components/text_2d");
     this.RigidBody2D = require("./src/xian2d/components/rigid_body_2d");
+    this.SkeletonAnimation2D = require("./src/xian2d/components/skeleton_animation_2d");
 
     //xian2d systems
     this.Render2DSystem = require("./src/xian2d/systems/render_2d_system");

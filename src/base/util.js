@@ -452,7 +452,10 @@ function getNextPowerOfTwo(number)
         while (result < number) result <<= 1;
         return result;
     }
-};
+}
 util.getNextPowerOfTwo = getNextPowerOfTwo;
+
+util.Float32Array = (typeof(Float32Array) === 'undefined') ? Array : Float32Array;
+util.Uint16Array = (typeof(Uint16Array) === 'undefined') ? Array : Uint16Array;
 
 module.exports = util;

@@ -22,9 +22,24 @@
 
         var game, sceneJson;
         var Assets = MainContext.Assets;
+        var Input = MainContext.Input;
         Assets._rootUrl = '/Xian/examples/base/contents/';
         game = Game;
         Phys2D.P2Space.DefaultBroadPhase = Phys2D.P2BroadphaseSpatialHash;
+
+        function InputBehaviour(){
+            Behaviour.call(this);
+        }
+        Behaviour.extend(InputBehaviour);
+        InputBehaviour.prototype.update = function(){
+            var gameObject = GameObject.Find('skeletonAnimation');
+            if(!gameObject) return;
+
+            if(Input.mouseButtonDown(0)){
+                console.log(gameObject);
+                gameObject.skeletonAnimation2d.animationState.setAnimationByName(0, "walk", true);
+            }
+        };
 
         sceneJson = {
             'name': 'PlayGround',
@@ -48,7 +63,8 @@
                         {
                             '_className': 'Camera2D',
                             'transparent': 'true'
-                        }
+                        },
+                        {'_className': 'InputBehaviour'}
                     ]
                 }
             ]
@@ -153,17 +169,17 @@
                         'strokeThickness': 4
                     }
                 },
-                {
-                    '_className': 'Text2D',
-                    'anchor': {'x': 0.5, 'y':0.5},
-                    'text': "江雪\n千山鸟飞绝，万径人踪灭。\n孤舟蓑笠翁，独钓寒江雪。",
-                    'bitmapFont': 'tangshi.fnt',
-                    'style': {
-                        'font': "32px Arial",
-                        'fill': "#ff0000",
-                        'align': "center"
-                    }
-                },
+//                {
+//                    '_className': 'Text2D',
+//                    'anchor': {'x': 0.5, 'y':0.5},
+//                    'text': "江雪\n千山鸟飞绝，万径人踪灭。\n孤舟蓑笠翁，独钓寒江雪。",
+//                    'bitmapFont': 'tangshi.fnt',
+//                    'style': {
+//                        'font': "32px Arial",
+//                        'fill': "#ff0000",
+//                        'align': "center"
+//                    }
+//                },
                 {'_className': 'Renderer2D'}
             ]
         };
@@ -204,19 +220,42 @@
             ]
         };
 
+        var skeletonAnimationPrefab = {
+            'name': "skeletonAnimation",
+            '_className': 'GameObject',
+            'components': [
+                {'_className': 'Transform2D'},
+                {
+                    '_className': 'SkeletonAnimation2D',
+                    'skin': {
+                        'skinParts':{
+                            'default': 'spineboy.json'
+                        }
+                    },
+                    'skeleton': {
+                        'skeletonData': "spineboySpineData2.json"
+                    }
+                }
+            ]
+        };
+
         game.addScene(sceneJson);
 
         function start() {
             game.setScene("PlayGround");
-            GameObject.Instantiate(rootPrefab);
-            GameObject.Instantiate(rootPrefab, new Vec2(100, 100), 0.3);
-            GameObject.Instantiate(textPrefab, new Vec2(400, 100), 0);
-            GameObject.Instantiate(phys2dSpritePrefab, new Vec2(200, 0), 1.8);
-            GameObject.Instantiate(phys2dGrassPrefab, new Vec2(0, 300), 0);
-            GameObject.Instantiate(graphicsPrefab, new Vec2(400, 0), 0);
+//            GameObject.Instantiate(rootPrefab);
+//            GameObject.Instantiate(rootPrefab, new Vec2(100, 100), 0.3);
+//            GameObject.Instantiate(textPrefab, new Vec2(400, 100), 0);
+//            GameObject.Instantiate(textPrefab, new Vec2(400, 200), 0);
+//            GameObject.Instantiate(phys2dSpritePrefab, new Vec2(200, 0), 1.8);
+//            GameObject.Instantiate(phys2dGrassPrefab, new Vec2(0, 300), 0);
+//            GameObject.Instantiate(graphicsPrefab, new Vec2(400, 0), 0);
 
-            var test = Assets.load('TestComponent.js', 'Module');
-            var font = Assets.load('tangshi.fnt', 'BitmapFont');
+//            var test = Assets.load('TestComponent.js', 'Module');
+//            var font = Assets.load('tangshi.fnt', 'BitmapFont');
+//            var skeletonData = Assets.load('spineboySpineData.json','Skeleton2DData');
+
+            GameObject.Instantiate(skeletonAnimationPrefab, new Vec2(300, 400), 0);
         }
 
         game.on("start", function () {

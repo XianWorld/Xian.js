@@ -1,8 +1,8 @@
 var EventEmitter = require("../../base/event_emitter");
-var Dom = require("../dom");
-var ObjectPool = require("../../base/object_pool");
+var Dom = require("../utils/dom");
+var ObjectPool = require("../pool/object_pool");
 var Vec2 = require("../../math/vec2");
-var Input = require("../input");
+var Input = require("./input");
 "use strict";
 
 

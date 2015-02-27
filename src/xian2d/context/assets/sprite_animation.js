@@ -1,13 +1,14 @@
+/**
+ * Created by Dianyan on 2015/1/22.
+ */
 //var Enums = require("../../core/enums");
 var Asset = require("../../../context/assets/asset");
 var TextureClipData = require("./texture_clip_data");
 "use strict";
 
+function SpriteAnimationAsset() {
 
-function SpriteSheet(opts) {
-    //opts || (opts = {});
-
-    Asset.call(this, opts);
+    Asset.call(this);
 
     //name, texture_clip
     this.frameHash = {};
@@ -18,9 +19,9 @@ function SpriteSheet(opts) {
     //if(opts.texture) this.texture = opts.texture;
 }
 
-Asset.extend(SpriteSheet);
+Asset.extend(SpriteAnimationAsset);
 
-Object.defineProperty(SpriteSheet.prototype, "texture", {
+Object.defineProperty(SpriteAnimationAsset.prototype, "texture", {
     get: function () {
         return this._texture;
     },
@@ -34,12 +35,12 @@ Object.defineProperty(SpriteSheet.prototype, "texture", {
         if(this._texture) {
             this._texture.retain();
             //if(!this._texture.ready)
-                //this._texture.on("inited", this._onTextureInited.bind(this));
+            //this._texture.on("inited", this._onTextureInited.bind(this));
         }
     }
 });
 
-SpriteSheet.prototype.clear = function () {
+SpriteAnimationAsset.prototype.clear = function () {
     var key;
     for(key in this.frameHash){
         this.frameHash[key].destroy();
@@ -53,33 +54,27 @@ SpriteSheet.prototype.clear = function () {
     return this;
 };
 
-SpriteSheet.prototype.copy = function (other) {
+SpriteAnimationAsset.prototype.copy = function (other) {
     Asset.prototype.copy.call(this, other);
     //TODO
     return this;
 };
 
-SpriteSheet.prototype.toJSON = function (json, pack) {
+SpriteAnimationAsset.prototype.toJSON = function (json, pack) {
     json = Asset.prototype.toJSON.call(this, json);
     //TODO
 
     return json;
 };
 
-SpriteSheet.prototype.fromJSON = function (json) {
+SpriteAnimationAsset.prototype.fromJSON = function (json) {
     Asset.prototype.fromJSON.call(this, json);
     //TODO
 
     return this;
 };
 
-SpriteSheet.prototype.getFrameByName = function (frameName) {
-    return this.frameHash[frameName];
-};
-SpriteSheet.prototype.getFrameByIndex = function (index) {
-    return this.frames[index];
-};
-SpriteSheet.prototype.addFrame = function (frame) {
+SpriteAnimationAsset.prototype.addFrame = function (frame) {
     var frames = this.frames;
     var frameHash = this.frameHash;
     var clip = frame;
@@ -95,11 +90,33 @@ SpriteSheet.prototype.addFrame = function (frame) {
     return this;
 };
 
-//SpriteSheet.prototype.addFrames = function (frames) {
+//SpriteAnimationAsset.prototype.addFrames = function (frames) {
 //    var i,len = frames.length;
 //    for(i = 0;i < len;i++){
 //        this.addFrame(frames[i]);
 //    }
 //};
 
-module.exports = SpriteSheet;
+function AnimFrameData(){
+    this.frameDataIndex = 0;
+}
+
+function SpriteFrameData(){
+    this.frameClipData = new SpriteFrameClipData();
+    this.position = new Vec2;
+    this.scale = new Vec2(1,1);
+    this.rotation = 0;
+
+    this.flipX = false;
+    this.flipY = false;
+}
+
+function SpriteFrameClipData(){
+    this.spriteSheetIndex = 0;
+    this.clipIndex = 0;
+    this.clipId = undefined;
+
+    this.clipData = undefined;
+}
+
+module.exports = SpriteAnimationAsset;
