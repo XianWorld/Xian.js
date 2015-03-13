@@ -42,8 +42,14 @@ Transform.prototype.clear = function () {
     Component.prototype.clear.call(this);
     var children = this.children,
         i = children.length;
+    var child;
 
-    while (i--) this.removeChild(children[i]);
+    while (i--) {
+        child = children[i];
+        this.removeChild(child);
+        //If a transform is cleared, it's children will be destroyed.
+        if(child.gameObject) child.gameObject.destroy();
+    }
 
     this.root = this;
     this.depth = 0;

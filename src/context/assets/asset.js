@@ -151,6 +151,7 @@ Asset.prototype.setReady = function () {
 Asset.prototype.retain = function (handler) {
     if (!this.ready && handler){
         if(handler.onAssetInited) this.on("inited", handler.onAssetInited, handler);
+        //if(handler.onAssetInitedError) this.on("errorInit", handler.onAssetInited, handler);
         //if(handler.onAssetInited) this.on("inited", handler.onAssetInited, handler);
     }
 

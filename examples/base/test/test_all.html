@@ -22,9 +22,66 @@
 
         var game, sceneJson;
         var Assets = MainContext.Assets;
+        var Input = MainContext.Input;
         Assets._rootUrl = '/Xian/examples/base/contents/';
         game = Game;
+//        Config.graphics.type = 'canvas';
         Phys2D.P2Space.DefaultBroadPhase = Phys2D.P2BroadphaseSpatialHash;
+
+        function InputBehaviour(){
+            Behaviour.call(this);
+        }
+        Behaviour.extend(InputBehaviour);
+        InputBehaviour.prototype.update = function(){
+            var gameObject = GameObject.Find('skeletonAnimation');
+            if(!gameObject) return;
+
+            var state = gameObject.skeletonAnimation2d.animationState;
+            if(Input.keyDown('right')){
+//            if(Input.mouseButtonDown(0)){
+//                console.log(gameObject);
+                // set up the mixes!
+//                state.setMixByName("walk", "jump", 0.2);
+//                state.setMixByName("jump", "walk", 0.4);
+
+                state.setAnimationByName(0, "Marche_2", true);
+            }
+            else if(Input.keyDown('up')){
+                state.setAnimationByName(0, "jump", false);
+                state.addAnimationByName(0, "walk", true, 0);
+//                spineBoy.state.setAnimationByName(0, "jump", false);
+//                spineBoy.state.addAnimationByName(0, "walk", true, 0);
+            }
+
+//            var gameObject = GameObject.Find('root');
+//            if(!gameObject) return;
+//
+//            if(Input.keyDown('right')){
+//                gameObject.transform.skewX += 0.1;
+//            }
+//            else if(Input.keyDown('left')){
+//                gameObject.transform.skewX -= 0.1;
+//            }
+//            else if(Input.keyDown('down')){
+//                gameObject.transform.skewY += 0.1;
+//            }
+//            else if(Input.keyDown('up')){
+//                gameObject.transform.skewY -= 0.1;
+//            }
+//            else if(Input.keyDown('a')){
+//                gameObject.transform.scale.x += 0.1;
+//            }
+//            else if(Input.keyDown('d')){
+//                gameObject.transform.scale.x -= 0.1;
+//            }
+//            else if(Input.keyDown('s')){
+//                gameObject.transform.scale.y += 0.1;
+//            }
+//            else if(Input.keyDown('w')){
+//                gameObject.transform.scale.y -= 0.1;
+//            }
+//
+        };
 
         sceneJson = {
             'name': 'PlayGround',
@@ -47,8 +104,10 @@
                         {'_className': 'Transform2D'},
                         {
                             '_className': 'Camera2D',
+//                            'background': {'r':1,'g':0,'b':0},
                             'transparent': 'true'
-                        }
+                        },
+                        {'_className': 'InputBehaviour'}
                     ]
                 }
             ]
@@ -58,19 +117,24 @@
             'name': "root",
             '_className': 'GameObject',
             'components': [
-                {'_className': 'Transform2D'},
+                {
+                    '_className': 'Transform2D',
+//                    'scale': {'x': 2, 'y': 2}
+                },
                 {
                     '_className': 'Sprite2D',
                     'anchor': {'x': 0.5, 'y': 0.5},
-                    'texture': "eggHead.png"
-                },
-                {
-                    '_className': 'TilingSprite2D',
                     'texture': "eggHead.png",
-                    'width': 300,
-                    'height': 300,
+                    'tint': 0x88FFFFFF,
                     'alpha': 0.5
                 },
+//                {
+//                    '_className': 'TilingSprite2D',
+//                    'texture': "eggHead.png",
+//                    'width': 300,
+//                    'height': 300,
+//                    'alpha': 0.5
+//                },
                 {'_className': 'Renderer2D'}
             ]
         };
@@ -153,17 +217,17 @@
                         'strokeThickness': 4
                     }
                 },
-                {
-                    '_className': 'Text2D',
-                    'anchor': {'x': 0.5, 'y':0.5},
-                    'text': "江雪\n千山鸟飞绝，万径人踪灭。\n孤舟蓑笠翁，独钓寒江雪。",
-                    'bitmapFont': 'tangshi.fnt',
-                    'style': {
-                        'font': "32px Arial",
-                        'fill': "#ff0000",
-                        'align': "center"
-                    }
-                },
+//                {
+//                    '_className': 'Text2D',
+//                    'anchor': {'x': 0.5, 'y':0.5},
+//                    'text': "江雪\n千山鸟飞绝，万径人踪灭。\n孤舟蓑笠翁，独钓寒江雪。",
+//                    'bitmapFont': 'tangshi.fnt',
+//                    'style': {
+//                        'font': "32px Arial",
+//                        'fill': "#ff0000",
+//                        'align': "center"
+//                    }
+//                },
                 {'_className': 'Renderer2D'}
             ]
         };
@@ -204,19 +268,64 @@
             ]
         };
 
+        var skeletonAnimationPrefab = {
+            'name': "skeletonAnimation",
+            '_className': 'GameObject',
+            'components': [
+                {'_className': 'Transform2D'},
+                {
+                    '_className': 'SkeletonAnimation2D',
+                    'skin': {
+                        'skinParts':{
+                            'default': 'spineboy.json'
+                        }
+                    },
+                    'skeleton': {
+                        'skeletonData': "spineboySpineData2.json"
+                    }
+                }
+            ]
+        };
+
+        var skeletonAnimationPrefab1 = {
+            'name': "skeletonAnimation",
+            '_className': 'GameObject',
+            'components': [
+                {
+                    '_className': 'Transform2D',
+//                    'scale': {'x': 2, 'y': 2}
+                },
+                {
+                    '_className': 'SkeletonAnimation2D',
+                    'skin': {
+                        'skinParts':{
+                            'default': '190_3_1.json'
+                        }
+                    },
+                    'skeleton': {
+                        'skeletonData': "190_3_2_data.json"
+                    }
+                }
+            ]
+        };
+
         game.addScene(sceneJson);
 
         function start() {
             game.setScene("PlayGround");
-            GameObject.Instantiate(rootPrefab);
-            GameObject.Instantiate(rootPrefab, new Vec2(100, 100), 0.3);
-            GameObject.Instantiate(textPrefab, new Vec2(400, 100), 0);
-            GameObject.Instantiate(phys2dSpritePrefab, new Vec2(200, 0), 1.8);
-            GameObject.Instantiate(phys2dGrassPrefab, new Vec2(0, 300), 0);
-            GameObject.Instantiate(graphicsPrefab, new Vec2(400, 0), 0);
+//            GameObject.Instantiate(rootPrefab);
+            GameObject.Instantiate(rootPrefab, new Vec2(100, 100), 0);
+//            GameObject.Instantiate(textPrefab, new Vec2(400, 100), 0);
+//            GameObject.Instantiate(textPrefab, new Vec2(400, 200), 0);
+//            GameObject.Instantiate(phys2dSpritePrefab, new Vec2(200, 0), 1.8);
+//            GameObject.Instantiate(phys2dGrassPrefab, new Vec2(0, 300), 0);
+//            GameObject.Instantiate(graphicsPrefab, new Vec2(400, 0), 0);
 
-            var test = Assets.load('TestComponent.js', 'Module');
-            var font = Assets.load('tangshi.fnt', 'BitmapFont');
+//            var test = Assets.load('TestComponent.js', 'Module');
+//            var font = Assets.load('tangshi.fnt', 'BitmapFont');
+//            var skeletonData = Assets.load('spineboySpineData.json','Skeleton2DData');
+
+            GameObject.Instantiate(skeletonAnimationPrefab1, new Vec2(200, 200), 0);
         }
 
         game.on("start", function () {

@@ -8,11 +8,15 @@ WebGLSpriteBatch = function () {
     this.size = 2000;//Math.pow(2, 16) /  this.vertSize;
 
     //the total number of floats in our batch
-    var numVerts = this.size * 4 * this.vertSize;
+    var numVerts = this.size * 4 * 4 * this.vertSize;
     //the total number of indices in our batch
     var numIndices = this.size * 6;
 
-    this.vertices = new Float32Array(numVerts);
+    //this.vertices = new Float32Array(numVerts);
+    this.vertices = new ArrayBuffer(numVerts);
+
+    this.positions = new Float32Array(this.vertices);
+    this.colors = new Uint32Array(this.vertices);
 
     this.indices = new Uint16Array(numIndices);
 
@@ -48,9 +52,18 @@ WebGLSpriteBatch = function () {
             'precision lowp float;',
             'varying vec2 vTextureCoord;',
             'varying vec4 vColor;',
+            'varying float vAlpha;',
             'uniform sampler2D uSampler;',
             'void main(void) {',
-            '   gl_FragColor = texture2D(uSampler, vTextureCoord) * vColor ;',
+            //'   gl_FragColor = texture2D(uSampler, vTextureCoord);',
+            //'   gl_FragColor = texture2D(uSampler, vTextureCoord) * vColor ;',
+            '   vec4 color = texture2D(uSampler, vTextureCoord);',
+            '   if(vColor.a != 0.0){',
+            '      color = vec4(color.rgb * (1.0-vColor.a) + vColor.rgb * vColor.a * color.a, color.a);',
+            '   }',
+            //'   color = vec4(color.r, color.g, color.b, color.a);',
+            //'   color = vec4(color.a, 0.5, 0.5, 0.5);',
+            '   gl_FragColor = color * vAlpha;',
             '}'
         ]
     });
@@ -127,7 +140,11 @@ WebGLSpriteBatch.prototype.render = function (sprite) {
     if(destWidth <= 0) destWidth = sourceWidth;
     if(destHeight <= 0) destHeight = sourceHeight;
 
-    var vertices = this.vertices;
+    var vertices = this.positions;
+    var colors = this.colors;
+    //var positions = this.positions;
+    var color = ((tint&0xff0000) >> 16) + (tint & 0xff00) + ((tint & 0xff) << 16) + (tint & 0xff000000);
+    //var color = (tint >> 16) + (tint & 0xff00) + ((tint & 0xff) << 16) + (alpha * 255 << 24);
     var index = this.currentBatchSize * 4 * this.vertSize;
 
     var m = worldMatrix.elements;
@@ -176,7 +193,8 @@ WebGLSpriteBatch.prototype.render = function (sprite) {
     vertices[index++] = sourceY;
     // alpha
     vertices[index++] = alpha;
-    vertices[index++] = tint;
+    //vertices[index++] = tint;
+    colors[index++] = color;
     // xy
     vertices[index++] = a * w + tx;
     vertices[index++] = b * w + ty;
@@ -185,7 +203,8 @@ WebGLSpriteBatch.prototype.render = function (sprite) {
     vertices[index++] = sourceY;
     // alpha
     vertices[index++] = alpha;
-    vertices[index++] = tint;
+    //vertices[index++] = tint;
+    colors[index++] = color;
     // xy
     vertices[index++] = a * w + c * h + tx;
     vertices[index++] = d * h + b * w + ty;
@@ -194,7 +213,8 @@ WebGLSpriteBatch.prototype.render = function (sprite) {
     vertices[index++] = sourceHeight + sourceY;
     // alpha
     vertices[index++] = alpha;
-    vertices[index++] = tint;
+    //vertices[index++] = tint;
+    colors[index++] = color;
     // xy
     vertices[index++] = c * h + tx;
     vertices[index++] = d * h + ty;
@@ -203,7 +223,8 @@ WebGLSpriteBatch.prototype.render = function (sprite) {
     vertices[index++] = sourceHeight + sourceY;
     // alpha
     vertices[index++] = alpha;
-    vertices[index++] = tint;
+    //vertices[index++] = tint;
+    colors[index++] = color;
 
     //this._render(worldMatrix, texture, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight, alpha, tint);
     // increment the batchsize
@@ -643,7 +664,10 @@ WebGLSpriteBatch.prototype.flush = function () {
         var stride = this.vertSize * 4;
         gl.vertexAttribPointer(shader.aVertexPosition, 2, gl.FLOAT, false, stride, 0);
         gl.vertexAttribPointer(shader.aTextureCoord, 2, gl.FLOAT, false, stride, 2 * 4);
-        gl.vertexAttribPointer(shader.colorAttribute, 2, gl.FLOAT, false, stride, 4 * 4);
+        //gl.vertexAttribPointer(shader.colorAttribute, 2, gl.FLOAT, false, stride, 4 * 4);
+        // color attributes will be interpreted as unsigned bytes and normalized
+        gl.vertexAttribPointer(shader.aAlphaAttribute, 1, gl.FLOAT, false, stride, 4 * 4);
+        gl.vertexAttribPointer(shader.colorAttribute, 4, gl.UNSIGNED_BYTE, true, stride, 5 * 4);
     }
 
     // upload the verts to the buffer  
@@ -651,7 +675,7 @@ WebGLSpriteBatch.prototype.flush = function () {
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.vertices);
     }
     else {
-        var view = this.vertices.subarray(0, this.currentBatchSize * 4 * this.vertSize);
+        var view = this.positions.subarray(0, this.currentBatchSize * 4 * this.vertSize);
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, view);
     }
 

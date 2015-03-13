@@ -38,7 +38,12 @@ function PixiShader(gl)
         'varying vec4 vColor;',
         'uniform sampler2D uSampler;',
         'void main(void) {',
+        //'   vec4 color = texture2D(uSampler, vTextureCoord);',
+        //'   color = vec4((color.rgb * (1.0-vColor.a) + vColor.rgb * vColor.a)), color.a);',
+        //'   color = vec4(color.rgb, color.a);',
+        //'   gl_FragColor = color;',
         '   gl_FragColor = texture2D(uSampler, vTextureCoord) * vColor ;',
+        //'   gl_FragColor = texture2D(uSampler, vTextureCoord);',
         '}'
     ];
 
@@ -101,6 +106,7 @@ PixiShader.prototype.init = function()
     // get and store the attributes
     this.aVertexPosition = gl.getAttribLocation(program, 'aVertexPosition');
     this.aTextureCoord = gl.getAttribLocation(program, 'aTextureCoord');
+    this.aAlphaAttribute = gl.getAttribLocation(program, 'aAlpha');
     this.colorAttribute = gl.getAttribLocation(program, 'aColor');
 
     // Begin worst hack eva //
@@ -109,12 +115,16 @@ PixiShader.prototype.init = function()
     // maybe its something to do with the current state of the gl context.
     // I'm convinced this is a bug in the chrome browser as there is NO reason why this should be returning -1 especially as it only manifests on my chrome pixel
     // If theres any webGL people that know why could happen please help :)
+    //if(this.aAlphaAttribute === -1)
+    //{
+    //    this.aAlphaAttribute = 2;
+    //}
     if(this.colorAttribute === -1)
     {
         this.colorAttribute = 2;
     }
 
-    this.attributes = [this.aVertexPosition, this.aTextureCoord, this.colorAttribute];
+    this.attributes = [this.aVertexPosition, this.aTextureCoord, this.aAlphaAttribute, this.colorAttribute];
 
     // End worst hack eva //
 
@@ -374,6 +384,7 @@ PixiShader.prototype.destroy = function()
 PixiShader.defaultVertexSrc = [
     'attribute vec2 aVertexPosition;',
     'attribute vec2 aTextureCoord;',
+    'attribute float aAlpha;',
     'attribute vec4 aColor;',
 
     'uniform vec2 projectionVector;',
@@ -381,14 +392,20 @@ PixiShader.defaultVertexSrc = [
 
     'varying vec2 vTextureCoord;',
     'varying vec4 vColor;',
+    'varying float vAlpha;',
 
     'const vec2 center = vec2(-1.0, 1.0);',
 
+    'float myMod (float f) {',
+    '   float aa = mod(f, 256.0);',
+    '   if(aa == 0.0 && f > 0.0) aa = 256.0;',
+    '   return aa;',
+    '}',
     'void main(void) {',
     '   gl_Position = vec4( ((aVertexPosition + offsetVector) / projectionVector) + center , 0.0, 1.0);',
     '   vTextureCoord = aTextureCoord;',
-    '   vec3 color = mod(vec3(aColor.y/65536.0, aColor.y/256.0, aColor.y), 256.0) / 256.0;',
-    '   vColor = vec4(color * aColor.x, aColor.x);',
+    '   vColor = aColor;',
+    '   vAlpha = aAlpha;',
     '}'
 ];
 

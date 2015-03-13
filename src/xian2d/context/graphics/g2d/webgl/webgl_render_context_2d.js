@@ -389,7 +389,7 @@ WebGLRenderContext2D.prototype.fromJSON = function (json) {
 
 WebGLRenderContext2D.prototype._initContext = function()
 {
-    var gl = this.canvas.getContext('webgl', this._contextOptions) || this.view.getContext('experimental-webgl', this._contextOptions);
+    var gl = this.canvas.getContext('webgl', this._contextOptions) || this.canvas.getContext('experimental-webgl', this._contextOptions);
     this.gl = gl;
 
     if (!gl) {

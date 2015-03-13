@@ -484,6 +484,23 @@ Mat32.prototype.setScaleRotation = function (scale, angle) {
     return this;
 };
 
+Mat32.prototype.setScaleSkew = function (scale, skewX, skewY) {
+    var te = this.elements,
+        sx = scale.x,
+        sy = scale.y,
+        cosx = cos(skewX),
+        sinx = sin(skewX),
+        cosy = cos(skewY),
+        siny = sin(skewY);
+
+    te[0] = cosy * sx;
+    te[1] = siny * sx;
+    te[2] = -sinx * sy;
+    te[3] = cosx * sy;
+
+    return this;
+};
+
 /**
  * @method setRotation
  * @memberof Odin.Mat32
