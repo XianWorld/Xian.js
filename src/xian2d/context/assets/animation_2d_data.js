@@ -155,14 +155,26 @@ function RotateTimeline2DData() {
 Timeline2DData.extend(RotateTimeline2DData);
 RotateTimeline2DData.prototype.init = function (frameCount) {
     Timeline2DData.prototype.init.call(this, frameCount);
-    this.frames.length = frameCount * 2;
+    this.frames.length = frameCount * 4;
     return this;
 };
-RotateTimeline2DData.prototype.setFrame = function (frameIndex, time, angle) {
-    frameIndex *= 2;
+RotateTimeline2DData.prototype.setFrame = function (frameIndex, time, angle, skewX, skewY) {
+    frameIndex *= 4;
     this.frames[frameIndex] = time;
     this.frames[frameIndex + 1] = angle;
+    this.frames[frameIndex + 2] = skewX;
+    this.frames[frameIndex + 3] = skewY;
 };
+//RotateTimeline2DData.prototype.init = function (frameCount) {
+//    Timeline2DData.prototype.init.call(this, frameCount);
+//    this.frames.length = frameCount * 2;
+//    return this;
+//};
+//RotateTimeline2DData.prototype.setFrame = function (frameIndex, time, angle) {
+//    frameIndex *= 2;
+//    this.frames[frameIndex] = time;
+//    this.frames[frameIndex + 1] = angle;
+//};
 
 function TranslateTimeline2DData() {
     Timeline2DData.call(this);

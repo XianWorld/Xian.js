@@ -81,6 +81,7 @@ Skeleton2DDataLoader.prototype.init = function(asset){
     }
     catch (e){
         this.emit("errorInit", this, asset, e);
+        console.log(e.stack);
     }
 
     //var texture = this.assets.load(textureUrl, "Texture");
@@ -129,8 +130,10 @@ Skeleton2DDataLoader.prototype.readSkeletonData = function (root, name) {
         var boneData = new Bone2DData(boneMap["name"], parent);
         boneData.length = (boneMap["length"] || 0) * this.scale;
         boneData.x = (boneMap["x"] || 0) * this.scale;
-        boneData.y = (boneMap["y"] || 0) * this.scale;
-        boneData.rotation = (boneMap["rotation"] || 0);
+        boneData.y = -(boneMap["y"] || 0) * this.scale;
+        boneData.rotation = boneMap.hasOwnProperty("rotation") ? boneMap["rotation"] : 0;//(boneMap["rotation"] || 0)
+        boneData.skewX = (boneMap["skewX"] || 0);
+        boneData.skewY = (boneMap["skewY"] || 0);
         boneData.scaleX = boneMap.hasOwnProperty("scaleX") ? boneMap["scaleX"] : 1;
         boneData.scaleY = boneMap.hasOwnProperty("scaleY") ? boneMap["scaleY"] : 1;
         boneData.inheritScale = boneMap.hasOwnProperty("inheritScale") ? boneMap["inheritScale"] : true;
@@ -393,7 +396,8 @@ Skeleton2DDataLoader.prototype.readAnimation = function (name, map, skeletonData
                 var frameIndex = 0;
                 for (var i = 0, n = values.length; i < n; i++) {
                     var valueMap = values[i];
-                    timeline.setFrame(frameIndex, valueMap["time"], valueMap["angle"]);
+                    //timeline.setFrame(frameIndex, valueMap["time"], valueMap["angle"]);
+                    timeline.setFrame(frameIndex, valueMap["time"], valueMap["angle"], valueMap["skewX"], valueMap["skewY"]);
                     this.readCurve(timeline, frameIndex, valueMap);
                     frameIndex++;
                 }
@@ -416,6 +420,7 @@ Skeleton2DDataLoader.prototype.readAnimation = function (name, map, skeletonData
                     var valueMap = values[i];
                     var x = (valueMap["x"] || 0) * timelineScale;
                     var y = (valueMap["y"] || 0) * timelineScale;
+                    if(timelineName == "translate") y = -y;
                     timeline.setFrame(frameIndex, valueMap["time"], x, y);
                     this.readCurve(timeline, frameIndex, valueMap);
                     frameIndex++;

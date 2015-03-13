@@ -97,6 +97,14 @@ function RotateTimeline2D() {
     Timeline2D.call(this);
 }
 Timeline2D.extend(RotateTimeline2D);
+
+function nomalizeAngle(angle){
+    while (angle > 180)
+        angle -= 360;
+    while (angle < -180)
+        angle += 360;
+    return angle;
+}
 RotateTimeline2D.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha) {
     var data = this.data;
     var frames = data.frames;
@@ -104,35 +112,95 @@ RotateTimeline2D.prototype.apply = function (skeleton, lastTime, time, firedEven
 
     var bone = skeleton.bones[data.boneIndex];
 
-    if (time >= frames[frames.length - 2]) { // Time is after last frame.
-        var amount = bone.data.rotation + frames[frames.length - 1] - bone.rotation;
-        while (amount > 180)
-            amount -= 360;
-        while (amount < -180)
-            amount += 360;
-        bone.rotation += amount * alpha;
+    var amount,sx,sy;
+    if (time >= frames[frames.length - 4]) { // Time is after last frame.
+        amount = frames[frames.length - 2] - bone.skewX;
+        //amount = bone.data.skewX + frames[frames.length - 2] - bone.skewX;
+        amount = nomalizeAngle(amount);
+        sx = bone.skewX + amount * alpha;
+        amount = frames[frames.length - 1] - bone.skewY;
+        //amount = bone.data.skewY + frames[frames.length - 1] - bone.skewY;
+        amount = nomalizeAngle(amount);
+        sy = bone.skewY + amount * alpha;
+        if (Math.abs(sx - sy) <= 0.1){
+            bone.skewX = bone.skewY = bone.rotation = sx;
+        }
+        else{
+            bone.skewX = sx;
+            bone.skewY = sy;
+            bone.rotation = null;
+        }
+
         return;
     }
 
     // Interpolate between the previous frame and the current frame.
-    var frameIndex = Animation2DData.binarySearch(frames, time, 2);
-    var prevFrameValue = frames[frameIndex - 1];
+    var frameIndex = Animation2DData.binarySearch(frames, time, 4);
+    var prevFrameValue = frames[frameIndex - 3];
+    var prevFrameSkewX = frames[frameIndex - 2];
+    var prevFrameSkewY = frames[frameIndex - 1];
     var frameTime = frames[frameIndex];
-    var percent = 1 - (time - frameTime) / (frames[frameIndex - 2/*PREV_FRAME_TIME*/] - frameTime);
-    percent = data.curves.getCurvePercent(frameIndex / 2 - 1, percent);
+    var percent = 1 - (time - frameTime) / (frames[frameIndex - 4/*PREV_FRAME_TIME*/] - frameTime);
+    percent = data.curves.getCurvePercent(frameIndex / 4 - 1, percent);
 
-    var amount = frames[frameIndex + 1/*FRAME_VALUE*/] - prevFrameValue;
-    while (amount > 180)
-        amount -= 360;
-    while (amount < -180)
-        amount += 360;
-    amount = bone.data.rotation + (prevFrameValue + amount * percent) - bone.rotation;
-    while (amount > 180)
-        amount -= 360;
-    while (amount < -180)
-        amount += 360;
-    bone.rotation += amount * alpha;
+    amount = frames[frameIndex + 2/*FRAME_VALUE*/] - prevFrameSkewX;
+    amount = nomalizeAngle(amount);
+    amount = (prevFrameSkewX + amount * percent) - bone.skewX;
+    //amount = bone.data.skewX + (prevFrameSkewX + amount * percent) - bone.skewX;
+    amount = nomalizeAngle(amount);
+    sx = bone.skewX + amount * alpha;
+    amount = frames[frameIndex + 3/*FRAME_VALUE*/] - prevFrameSkewY;
+    amount = nomalizeAngle(amount);
+    amount = (prevFrameSkewY + amount * percent) - bone.skewY;
+    //amount = bone.data.skewY + (prevFrameSkewY + amount * percent) - bone.skewY;
+    amount = nomalizeAngle(amount);
+    sy = bone.skewY + amount * alpha;
+
+    if (Math.abs(sx - sy) <= 0.1){
+        bone.skewX = bone.skewY = bone.rotation = sx;
+    }
+    else{
+        bone.skewX = sx;
+        bone.skewY = sy;
+        bone.rotation = null;
+    }
 };
+//RotateTimeline2D.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha) {
+//    var data = this.data;
+//    var frames = data.frames;
+//    if (time < frames[0]) return; // Time is before first frame.
+//
+//    var bone = skeleton.bones[data.boneIndex];
+//
+//    if (time >= frames[frames.length - 2]) { // Time is after last frame.
+//        var amount = bone.data.rotation + frames[frames.length - 1] - bone.rotation;
+//        while (amount > 180)
+//            amount -= 360;
+//        while (amount < -180)
+//            amount += 360;
+//        bone.rotation += amount * alpha;
+//        return;
+//    }
+//
+//    // Interpolate between the previous frame and the current frame.
+//    var frameIndex = Animation2DData.binarySearch(frames, time, 2);
+//    var prevFrameValue = frames[frameIndex - 1];
+//    var frameTime = frames[frameIndex];
+//    var percent = 1 - (time - frameTime) / (frames[frameIndex - 2/*PREV_FRAME_TIME*/] - frameTime);
+//    percent = data.curves.getCurvePercent(frameIndex / 2 - 1, percent);
+//
+//    var amount = frames[frameIndex + 1/*FRAME_VALUE*/] - prevFrameValue;
+//    while (amount > 180)
+//        amount -= 360;
+//    while (amount < -180)
+//        amount += 360;
+//    amount = bone.data.rotation + (prevFrameValue + amount * percent) - bone.rotation;
+//    while (amount > 180)
+//        amount -= 360;
+//    while (amount < -180)
+//        amount += 360;
+//    bone.rotation += amount * alpha;
+//};
 Timeline2D.typeHash[Timeline2DType.rotate] = RotateTimeline2D;
 
 function TranslateTimeline2D() {
@@ -147,8 +215,10 @@ TranslateTimeline2D.prototype.apply = function (skeleton, lastTime, time, firedE
     var bone = skeleton.bones[data.boneIndex];
 
     if (time >= frames[frames.length - 3]) { // Time is after last frame.
-        bone.x += (bone.data.x + frames[frames.length - 2] - bone.x) * alpha;
-        bone.y += (bone.data.y + frames[frames.length - 1] - bone.y) * alpha;
+        bone.x += (frames[frames.length - 2] - bone.x) * alpha;
+        bone.y += (frames[frames.length - 1] - bone.y) * alpha;
+        //bone.x += (bone.data.x + frames[frames.length - 2] - bone.x) * alpha;
+        //bone.y += (bone.data.y + frames[frames.length - 1] - bone.y) * alpha;
         return;
     }
 
@@ -160,8 +230,10 @@ TranslateTimeline2D.prototype.apply = function (skeleton, lastTime, time, firedE
     var percent = 1 - (time - frameTime) / (frames[frameIndex + -3/*PREV_FRAME_TIME*/] - frameTime);
     percent = data.curves.getCurvePercent(frameIndex / 3 - 1, percent);
 
-    bone.x += (bone.data.x + prevFrameX + (frames[frameIndex + 1/*FRAME_X*/] - prevFrameX) * percent - bone.x) * alpha;
-    bone.y += (bone.data.y + prevFrameY + (frames[frameIndex + 2/*FRAME_Y*/] - prevFrameY) * percent - bone.y) * alpha;
+    bone.x += (prevFrameX + (frames[frameIndex + 1/*FRAME_X*/] - prevFrameX) * percent - bone.x) * alpha;
+    bone.y += (prevFrameY + (frames[frameIndex + 2/*FRAME_Y*/] - prevFrameY) * percent - bone.y) * alpha;
+    //bone.x += (bone.data.x + prevFrameX + (frames[frameIndex + 1/*FRAME_X*/] - prevFrameX) * percent - bone.x) * alpha;
+    //bone.y += (bone.data.y + prevFrameY + (frames[frameIndex + 2/*FRAME_Y*/] - prevFrameY) * percent - bone.y) * alpha;
 };
 Timeline2D.typeHash[Timeline2DType.translate] = TranslateTimeline2D;
 
@@ -177,8 +249,10 @@ ScaleTimeline2D.prototype.apply = function (skeleton, lastTime, time, firedEvent
     var bone = skeleton.bones[data.boneIndex];
 
     if (time >= frames[frames.length - 3]) { // Time is after last frame.
-        bone.scaleX += (bone.data.scaleX * frames[frames.length - 2] - bone.scaleX) * alpha;
-        bone.scaleY += (bone.data.scaleY * frames[frames.length - 1] - bone.scaleY) * alpha;
+        bone.scaleX += (frames[frames.length - 2] - bone.scaleX) * alpha;
+        bone.scaleY += (frames[frames.length - 1] - bone.scaleY) * alpha;
+        //bone.scaleX += (bone.data.scaleX * frames[frames.length - 2] - bone.scaleX) * alpha;
+        //bone.scaleY += (bone.data.scaleY * frames[frames.length - 1] - bone.scaleY) * alpha;
         return;
     }
 
@@ -190,8 +264,10 @@ ScaleTimeline2D.prototype.apply = function (skeleton, lastTime, time, firedEvent
     var percent = 1 - (time - frameTime) / (frames[frameIndex + -3/*PREV_FRAME_TIME*/] - frameTime);
     percent = data.curves.getCurvePercent(frameIndex / 3 - 1, percent);
 
-    bone.scaleX += (bone.data.scaleX * (prevFrameX + (frames[frameIndex + 1/*FRAME_X*/] - prevFrameX) * percent) - bone.scaleX) * alpha;
-    bone.scaleY += (bone.data.scaleY * (prevFrameY + (frames[frameIndex + 2/*FRAME_Y*/] - prevFrameY) * percent) - bone.scaleY) * alpha;
+    bone.scaleX += ((prevFrameX + (frames[frameIndex + 1/*FRAME_X*/] - prevFrameX) * percent) - bone.scaleX) * alpha;
+    bone.scaleY += ((prevFrameY + (frames[frameIndex + 2/*FRAME_Y*/] - prevFrameY) * percent) - bone.scaleY) * alpha;
+    //bone.scaleX += (bone.data.scaleX * (prevFrameX + (frames[frameIndex + 1/*FRAME_X*/] - prevFrameX) * percent) - bone.scaleX) * alpha;
+    //bone.scaleY += (bone.data.scaleY * (prevFrameY + (frames[frameIndex + 2/*FRAME_Y*/] - prevFrameY) * percent) - bone.scaleY) * alpha;
 };
 Timeline2D.typeHash[Timeline2DType.scale] = ScaleTimeline2D;
 

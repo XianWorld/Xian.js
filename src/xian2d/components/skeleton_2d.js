@@ -173,13 +173,19 @@ Skeleton2D.prototype.update = function()
             var bone = slot.bone;
 
             transform = slotContainer.transform;
-            transform.position.x = bone.worldX + attachment.x * bone.m00 + attachment.y * bone.m01;
-            transform.position.y = bone.worldY + attachment.x * bone.m10 + attachment.y * bone.m11;
+            //transform.position.x = bone.worldX + attachment.x * bone.m00 + attachment.y * bone.m01;
+            //transform.position.y = bone.worldY + attachment.x * bone.m10 + attachment.y * bone.m11;
+            transform.position.x = bone.worldX;// + attachment.x * bone.m00 + attachment.y * bone.m01;
+            transform.position.y = bone.worldY;// + attachment.x * bone.m10 + attachment.y * bone.m11;
             transform.scale.x = bone.worldScaleX;
             transform.scale.y = bone.worldScaleY;
 
-            transform.rotation = -(slot.bone.worldRotation * TO_RADS);
-
+            if(bone.worldRotation != null)
+                transform.rotation = (bone.worldRotation * TO_RADS);
+            else{
+                transform.skewX = (bone.worldSkewX * TO_RADS);
+                transform.skewY = (bone.worldSkewY * TO_RADS);
+            }
             slot.currentSprite.tint = Color.rgb2hex([slot.r,slot.g,slot.b]);
         }
         //else if (type === AttachmentType.skinnedmesh)
@@ -299,14 +305,39 @@ Skeleton2D.prototype._initSkeleton = function () {
     this.ready = true;
 };
 Skeleton2D.prototype._createSlot = function(slot){
-    var gameObject = new GameObject().addComponents(Transform2D);
-    gameObject.name = slot.name;
+    var gameObject = new GameObject().addComponents(Transform2D, Renderer2D);
+    gameObject.name = slot.data.name;
+
+    //var graphics = gameObject.addComponent(Graphics);
+    ////graphics.beginFill(0xff0000);
+    //graphics.lineStyle(1,0xff0000);
+    ////graphics.drawRect(attachment.x, attachment.y, attachment.width, attachment.height);
+    //graphics.drawRect(0, 0, 4, 4);
+    ////graphics.endFill();
+    //graphics.anchor.x = graphics.anchor.y = 0.5;
+    ////graphics.cacheAsBitmap = true;
+    //
+    //var text2d = gameObject.addComponent(Text2D);
+    //text2d.text = slot.data.name;
+    //text2d.setStyle({
+    //    'font': "14px Arial",
+    //    'fill': "#ffffff",
+    //    'align': "center",
+    //    //'stroke': "#FFFFFF",
+    //    //'strokeThickness': 4
+    //});
+
     return gameObject;
 };
 
 Skeleton2D.prototype._createRegionAttachment = function(slot, attachment){
     var gameObject = new GameObject().addComponents(Transform2D, Renderer2D);
     var transform = gameObject.transform;
+    gameObject.name = attachment.name;
+    transform.position.x = attachment.x;
+    transform.position.y = -attachment.y;
+    transform.scale.set(attachment.scaleX, attachment.scaleY);
+    transform.rotation = -attachment.rotation * TO_RADS;
 
     var sprite2d = gameObject.addComponent(Sprite2D);
     sprite2d.anchor.x = sprite2d.anchor.y = 0.5;
@@ -317,28 +348,23 @@ Skeleton2D.prototype._createRegionAttachment = function(slot, attachment){
     //    sprite2d.textureClip = skinSSD.getFrameByName(attachment.name);
     //}
 
-    var graphics = gameObject.addComponent(Graphics);
-
-    gameObject.name = attachment.name;
-
-    //graphics.beginFill(0xff0000);
-    graphics.lineStyle(1,0xff0000);
-    //graphics.drawRect(attachment.x, attachment.y, attachment.width, attachment.height);
-    graphics.drawRect(0, 0, 4, 4);
-    //graphics.endFill();
-    transform.scale.set(attachment.scaleX, attachment.scaleY);
-    transform.rotation = -attachment.rotation * TO_RADS;
-    graphics.anchor.x = graphics.anchor.y = 0.5;
-
-    var text2d = gameObject.addComponent(Text2D);
-    text2d.text = attachment.name;
-    text2d.setStyle({
-        'font': "14px Arial",
-        'fill': "#ffffff",
-        'align': "center",
-        //'stroke': "#FFFFFF",
-        //'strokeThickness': 4
-    });
+    //var graphics = gameObject.addComponent(Graphics);
+    ////graphics.beginFill(0xff0000);
+    //graphics.lineStyle(1,0xff0000);
+    ////graphics.drawRect(attachment.x, attachment.y, attachment.width, attachment.height);
+    //graphics.drawRect(0, 0, 4, 4);
+    ////graphics.endFill();
+    //graphics.anchor.x = graphics.anchor.y = 0.5;
+    //
+    //var text2d = gameObject.addComponent(Text2D);
+    //text2d.text = attachment.name;
+    //text2d.setStyle({
+    //    'font': "14px Arial",
+    //    'fill': "#ffffff",
+    //    'align': "center",
+    //    //'stroke': "#FFFFFF",
+    //    //'strokeThickness': 4
+    //});
 
 
     slot.sprites = slot.sprites || {};
@@ -587,8 +613,11 @@ function Bone2D() {
     this.rotationIK = 0;
     this.scaleX = 1;
     this.scaleY = 1;
+    this.skewX = 0;
+    this.skewY = 0;
     this.flipX = false;
     this.flipY = false;
+
     this.m00 = 0; //a
     this.m01 = 0; //b
     this.worldX = 0; // x
@@ -598,6 +627,8 @@ function Bone2D() {
     this.worldRotation = 0;
     this.worldScaleX = 1;
     this.worldScaleY = 1;
+    this.worldSkewX = 0;
+    this.worldSkewY = 0;
     this.worldFlipX = false;
     this.worldFlipY = false;
 }
@@ -633,6 +664,8 @@ Bone2D.prototype.updateWorldTransform = function () {
         this.worldScaleX = this.scaleX;
         this.worldScaleY = this.scaleY;
         this.worldRotation = this.rotationIK;
+        this.worldSkewX = this.skewX;
+        this.worldSkewY = this.skewY;
         this.worldFlipX = skeletonFlipX != this.flipX;
         this.worldFlipY = skeletonFlipY != this.flipY;
     }
@@ -663,6 +696,8 @@ Bone2D.prototype.setToSetupPose = function () {
     this.rotationIK = this.rotation;
     this.scaleX = data.scaleX;
     this.scaleY = data.scaleY;
+    this.skewX = data.skewX;
+    this.skewY = data.skewY;
     this.flipX = data.flipX;
     this.flipY = data.flipY;
 };

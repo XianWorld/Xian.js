@@ -21,6 +21,12 @@ function Transform2D() {
     this._rotation = 0;
     this._scale = new Vec2(1, 1);
 
+    this._skewX = 0;
+    this._skewY = 0;
+    this._dirty_skewX = true;
+    this._dirty_skewY = true;
+    this._skewed = false;
+
     this.matrix = new Mat32;
     this.matrixWorld = new Mat32;
     this.modelView = new Mat32;
@@ -50,6 +56,30 @@ Object.defineProperty(Transform2D.prototype, "scale", {
         this._scale.copy(value);
     }
 });
+Object.defineProperty(Transform2D.prototype, "skewX", {
+    get: function () {
+        return this._skewX;
+    },
+    set: function (value) {
+        if (this._skewX === value) return;
+        this._skewX = value;
+        this._skewed = true;
+        this._rotation = value;
+        this._dirty_skewX = true;
+    }
+});
+Object.defineProperty(Transform2D.prototype, "skewY", {
+    get: function () {
+        return this._skewY;
+    },
+    set: function (value) {
+        if (this._skewY === value) return;
+        this._skewY = value;
+        this._skewed = true;
+        this._rotation = value;
+        this._dirty_skewY = true;
+    }
+});
 Object.defineProperty(Transform2D.prototype, "rotation", {
     get: function () {
         return this._rotation;
@@ -57,6 +87,9 @@ Object.defineProperty(Transform2D.prototype, "rotation", {
     set: function (value) {
         if (this._rotation === value) return;
         this._rotation = value;
+        this._skewed = false;
+        this._skewX = value;
+        this._skewY = value;
         this._dirty_rotation = true;
     }
 });
@@ -67,7 +100,13 @@ Transform2D.prototype.copy = function (other) {
     this.identity = other.identity;
     this.position.copy(other.position);
     this.scale.copy(other.scale);
-    this.rotation = other.rotation;
+    this._skewed = other._skewed;
+    if(other._skewed){
+        this.skewX = other.skewX;
+        this.skewY = other.skewY;
+    }
+    else
+        this.rotation = other.rotation;
 
     return this;
 };
@@ -101,7 +140,15 @@ Transform2D.prototype.toJSON = function (json) {
 
     json.position = this.position.toJSON(json.position);
     json.scale = this.scale.toJSON(json.scale);
-    json.rotation = this.rotation;
+
+    json.skewed = this._skewed;
+    if(this._skewed)
+    {
+        json.skewX = this.skewX;
+        json.skewY = this.skewY;
+    }
+    else
+        json.rotation = this.rotation;
 
     return json;
 };
@@ -113,7 +160,15 @@ Transform2D.prototype.fromJSON = function (json) {
 
     json.position ? this.position.fromJSON(json.position) : this.position.clear();
     json.scale ? this.scale.fromJSON(json.scale) : this.scale.set(1,1);
-    this.rotation = json.rotation || 0;
+
+    this._skewed = json.skewed !== undefined ? !!json.skewed : false;
+    if(this._skewed)
+    {
+        this.skewX = json.skewX || 0;
+        this.skewY = json.skewY || 0;
+    }
+    else
+        this.rotation = json.rotation || 0;
 
     return this;
 };
@@ -143,9 +198,17 @@ Transform2D.prototype.update = function () {
             this._position._dirty = false;
             this._matrix_changed = true;
         }
-        if (this._dirty_rotation || this._scale._dirty) {
-            matrix.setScaleRotation(this._scale, this.rotation);
-            this._scale._dirty = this._dirty_rotation = false;
+        if (this._dirty_rotation || this._scale._dirty || this._dirty_skewX || this._dirty_skewY) {
+            if(this._skewed){
+                //TODO should be optimized
+                matrix.setScaleSkew(this._scale, this._skewX, this._skewY);
+            }
+            else {
+                matrix.setScaleRotation(this._scale, this._rotation);
+            }
+            this._dirty_rotation = false;
+            this._dirty_skewX = this._dirty_skewY = false;
+            this._scale._dirty = false;
             this._matrix_changed = true;
         }
 

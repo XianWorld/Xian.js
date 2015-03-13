@@ -108,6 +108,8 @@ function Bone2DData(name, parent) {
     this.rotation = 0;
     this.scaleX = 1;
     this.scaleY = 1;
+    this.skewX = 0;
+    this.skewY = 0;
     this.inheritScale = true;
     this.inheritRotation = true;
     this.flipX = false;
