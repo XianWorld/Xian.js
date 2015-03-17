@@ -44,13 +44,15 @@
 //                state.setMixByName("walk", "jump", 0.2);
 //                state.setMixByName("jump", "walk", 0.4);
 
-                state.setAnimationByName(0, "Marche_2", true);
+                state.setAnimationByName(0, "Marche_0", true);
             }
             else if(Input.keyDown('up')){
-                state.setAnimationByName(0, "jump", false);
-                state.addAnimationByName(0, "walk", true, 0);
-//                spineBoy.state.setAnimationByName(0, "jump", false);
-//                spineBoy.state.addAnimationByName(0, "walk", true, 0);
+//                state.setAnimationByName(0, "jump", false);
+//                state.addAnimationByName(0, "walk", true, 0);
+                state.setAnimationByName(0, "Marche_6", true);
+            }
+            else if(Input.keyDown('down')){
+                state.setAnimationByName(0, "Marche_2", true);
             }
 
 //            var gameObject = GameObject.Find('root');

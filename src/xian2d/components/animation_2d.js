@@ -341,6 +341,27 @@ AttachmentTimeline2D.prototype.apply = function (skeleton, lastTime, time, fired
 };
 Timeline2D.typeHash[Timeline2DType.attachment] = AttachmentTimeline2D;
 
+function DrawOrderTimeline2D() {
+    Timeline2D.call(this);
+}
+Timeline2D.extend(DrawOrderTimeline2D);
+DrawOrderTimeline2D.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha) {
+    var data = this.data;
+    var frames = data.frames;
+    if (time < frames[0]) return; // Time is before first frame.
+
+    var index;
+    if (time >= frames[frames.length - 2]) { // Time is after last frame.
+        index = frames[frames.length - 1];
+    }
+    else{
+        var frameIndex = Animation2DData.binarySearch(frames, time, 2);
+        index = frames[frameIndex - 1];
+    }
+    skeleton.setSlotDrawOrder(data.slotIndex, index);
+};
+Timeline2D.typeHash[Timeline2DType.drawOrder] = DrawOrderTimeline2D;
+
 Animation2D.Timeline2D = Timeline2D;
 
 module.exports = Animation2D;

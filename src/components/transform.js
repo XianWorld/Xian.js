@@ -123,6 +123,29 @@ Transform.prototype.addChild = function (child) {
     return this;
 };
 
+Transform.prototype.moveToTop = function (child) {
+    var i;
+    var children = this.children;
+
+    i = children.indexOf(child);
+    if(i < 0) return false;
+
+    children.splice(i, 1);
+    children.unshift(child);
+    return true;
+};
+
+Transform.prototype.moveToBottom = function (child) {
+    var i;
+    var children = this.children;
+
+    i = children.indexOf(child);
+    if(i < 0) return false;
+
+    children.splice(i, 1);
+    children.push(child);
+    return true;
+};
 
 Transform.prototype.addChildren = function () {
     var i, il, scene;

@@ -58,7 +58,7 @@ function Skeleton2D() {
 }
 Class.extend(Skeleton2D);
 
-Skeleton2D.prototype.onAssetInited = function(asset) {
+Skeleton2D.prototype.onAssetInited = function (asset) {
     this._dirty = true;
 
     this._initSkeleton();
@@ -75,7 +75,7 @@ Object.defineProperty(Skeleton2D.prototype, "data", {
             this._data.release(this);
         }
         this._data = value;
-        if (this._data){
+        if (this._data) {
             //if(this._skeletonData.ready) this.skeleton.init(this._skeletonData);
             this._data.retain(this);
         }
@@ -122,57 +122,81 @@ Skeleton2D.prototype.fromJSON = function (json) {
     return this;
 };
 
-Skeleton2D.prototype.update = function()
-{
-    if(!this.ready) return;
+Skeleton2D.prototype.setSlotDrawOrder = function (slotIndex, index) {
+    var drawOrder = this.drawOrder;
+    var oldSlot = drawOrder[index];
+    var newSlot = this.slots[slotIndex];
+    if(oldSlot == newSlot)
+        return false;
+    console.log(oldSlot.data.name + "->" + newSlot.data.name);
+    drawOrder[index] = newSlot;
+    this._dirty_drawOrder = true;
+    return true;
+};
+
+Skeleton2D.prototype.update = function () {
+    if (!this.ready) return;
 
     this.updateWorldTransform();
 
+    var _dirty_drawOrder = this._dirty_drawOrder;
+    var animatorTransform = this.animator.transform;
     var transform;
     var drawOrder = this.drawOrder;
     for (var i = 0, n = drawOrder.length; i < n; i++) {
         var slot = drawOrder[i];
         var attachment = slot.attachment;
-        var slotContainer = this.slotContainers[i];
+        var slotContainer = slot.slotContainer;//this.slotContainers[i];
 
-        if (!attachment)
-        {
+        transform = slotContainer.transform;
+
+        if (_dirty_drawOrder) {
+            animatorTransform.moveToBottom(transform);
+        }
+
+        if (!attachment) {
             slotContainer.setActive(false);
             continue;
         }
 
         var type = attachment.type;
-        if (type === AttachmentType.region)
-        {
-            if (attachment.skinName)
-            {
-                if (!slot.currentSpriteName || slot.currentSpriteName !== attachment.name)
-                {
-                    var spriteName = attachment.name;
-                    if (slot.currentSprite !== undefined)
-                    {
-                        slot.currentSprite.setActive(false);
-                    }
-                    slot.sprites = slot.sprites || {};
-                    if (slot.sprites[spriteName] !== undefined)
-                    {
-                        slot.sprites[spriteName].setActive(true);
-                    }
-                    else
-                    {
-                        var sprite = this._createRegionAttachment(slot, attachment);
-                        //slotContainer.addChild(sprite);
-                        slotContainer.transform.addChild(sprite.transform);
-                    }
-                    slot.currentSprite = slot.sprites[spriteName];
-                    slot.currentSpriteName = spriteName;
-
+        if (type === AttachmentType.region) {
+            var spriteName = attachment.name;
+            var spriteGameObject = slot.currentSprite;
+            if (!slot.currentSpriteName || slot.currentSpriteName !== attachment.name) {
+                if (spriteGameObject === undefined) {
+                    spriteGameObject = this._createRegionAttachment(slot, attachment);
+                    //slotContainer.addChild(sprite);
+                    transform.addChild(spriteGameObject.transform);
+                    slot.currentSprite = spriteGameObject;
                 }
+                else {
+                    spriteGameObject.setActive(true);
+                    this.animator.skin.applySkin(attachment.skinName, attachment.name, spriteGameObject.sprite2d);
+                }
+                slot.currentSpriteName = spriteName;
+
+                //if (slot.currentSprite !== undefined)
+                //{
+                //    slot.currentSprite.setActive(false);
+                //}
+                //slot.sprites = slot.sprites || {};
+                //if (slot.sprites[spriteName] !== undefined)
+                //{
+                //    slot.sprites[spriteName].setActive(true);
+                //}
+                //else
+                //{
+                //    var sprite = this._createRegionAttachment(slot, attachment);
+                //    //slotContainer.addChild(sprite);
+                //    slotContainer.transform.addChild(sprite.transform);
+                //}
+                //slot.currentSprite = slot.sprites[spriteName];
+                //slot.currentSpriteName = spriteName;
             }
 
             var bone = slot.bone;
 
-            transform = slotContainer.transform;
             //transform.position.x = bone.worldX + attachment.x * bone.m00 + attachment.y * bone.m01;
             //transform.position.y = bone.worldY + attachment.x * bone.m10 + attachment.y * bone.m11;
             transform.position.x = bone.worldX;// + attachment.x * bone.m00 + attachment.y * bone.m01;
@@ -180,13 +204,19 @@ Skeleton2D.prototype.update = function()
             transform.scale.x = bone.worldScaleX;
             transform.scale.y = bone.worldScaleY;
 
-            if(bone.worldRotation != null)
+            if (bone.worldRotation != null)
                 transform.rotation = (bone.worldRotation * TO_RADS);
-            else{
+            else {
                 transform.skewX = (bone.worldSkewX * TO_RADS);
                 transform.skewY = (bone.worldSkewY * TO_RADS);
             }
-            slot.currentSprite.tint = Color.rgb2hex([slot.r,slot.g,slot.b]);
+            if (spriteGameObject && spriteGameObject.sprite2d) {
+
+                if (slot.a > 0)
+                    spriteGameObject.sprite2d.tint = (slot.a * 255 << 24) + (slot.r * 255 << 16) + (slot.g * 255 << 8) + slot.b * 255;//Color.rgb2hex([slot.r,slot.g,slot.b]);
+                else
+                    spriteGameObject.sprite2d.tint = 0;
+            }
         }
         //else if (type === AttachmentType.skinnedmesh)
         //{
@@ -217,8 +247,7 @@ Skeleton2D.prototype.update = function()
         //    attachment.computeWorldVertices(slot.bone.skeleton.x, slot.bone.skeleton.y, slot, slot.currentMesh.vertices);
         //
         //}
-        else
-        {
+        else {
             slotContainer.setActive(false);
             continue;
         }
@@ -226,10 +255,11 @@ Skeleton2D.prototype.update = function()
 
         //slotContainer.alpha = slot.a;
     }
+    this._dirty_drawOrder = false;
 };
 
 Skeleton2D.prototype._clearSkeleton = function () {
-    var i,n;
+    var i, n;
     for (i = 0; i < this.bones.length; i++) {
         this.bones[i].destroy();
     }
@@ -257,14 +287,13 @@ Skeleton2D.prototype._clearSkeleton = function () {
 Skeleton2D.prototype._initSkeleton = function () {
     this._clearSkeleton();
 
-    if(!this._data || !this._data.ready) return;
+    if (!this._data || !this._data.ready) return;
 
-    var i,n;
+    var i, n;
     var gameObject = this.animator.gameObject;
     var transform = gameObject.transform;
 
-    if(this.data)
-    {
+    if (this.data) {
         this.init(this._data);
 
         //init animation data to animation state.
@@ -274,11 +303,11 @@ Skeleton2D.prototype._initSkeleton = function () {
             var slot = this.drawOrder[i];
             var attachment = slot.attachment;
             var slotContainer = this._createSlot(slot);
+            slot.slotContainer = slotContainer;
             this.slotContainers.push(slotContainer);
             transform.addChild(slotContainer.transform);
 
-            if (attachment.type === AttachmentType.region)
-            {
+            if (attachment.type === AttachmentType.region) {
                 var spriteName = attachment.name;
                 var sprite = this._createRegionAttachment(slot, attachment);
                 slot.currentSprite = sprite;
@@ -292,19 +321,18 @@ Skeleton2D.prototype._initSkeleton = function () {
             //    slot.currentMeshName = attachment.name;
             //    slotContainer.addChild(mesh);
             //}
-            else
-            {
+            else {
                 continue;
             }
 
         }
     }
-    else{
+    else {
 
     }
     this.ready = true;
 };
-Skeleton2D.prototype._createSlot = function(slot){
+Skeleton2D.prototype._createSlot = function (slot) {
     var gameObject = new GameObject().addComponents(Transform2D, Renderer2D);
     gameObject.name = slot.data.name;
 
@@ -330,7 +358,7 @@ Skeleton2D.prototype._createSlot = function(slot){
     return gameObject;
 };
 
-Skeleton2D.prototype._createRegionAttachment = function(slot, attachment){
+Skeleton2D.prototype._createRegionAttachment = function (slot, attachment) {
     var gameObject = new GameObject().addComponents(Transform2D, Renderer2D);
     var transform = gameObject.transform;
     gameObject.name = attachment.name;
@@ -367,8 +395,8 @@ Skeleton2D.prototype._createRegionAttachment = function(slot, attachment){
     //});
 
 
-    slot.sprites = slot.sprites || {};
-    slot.sprites[attachment.name] = gameObject;
+    //slot.sprites = slot.sprites || {};
+    //slot.sprites[attachment.name] = gameObject;
 
     return gameObject;
 };
@@ -526,34 +554,34 @@ Skeleton2D.prototype.findSlotIndex = function (slotName) {
     return -1;
 };
 
-Skeleton2D.prototype.setSkinByName = function (skinName) {
-    var skin = this.data.findSkin(skinName);
-    if (!skin) throw "Skin not found: " + skinName;
-    this.setSkin(skin);
-};
-
-/** Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}.
- * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was
- * no old skin, each slot's setup mode attachment is attached from the new skin.
- * @param newSkin May be null. */
-Skeleton2D.prototype.setSkin = function (newSkin) {
-    if (newSkin) {
-        if (this.skin)
-            newSkin._attachAll(this, this.skin);
-        else {
-            var slots = this.slots;
-            for (var i = 0, n = slots.length; i < n; i++) {
-                var slot = slots[i];
-                var name = slot.data.attachmentName;
-                if (name) {
-                    var attachment = newSkin.getAttachment(i, name);
-                    if (attachment) slot.setAttachment(attachment);
-                }
-            }
-        }
-    }
-    this.skin = newSkin;
-};
+//Skeleton2D.prototype.setSkinByName = function (skinName) {
+//    var skin = this.data.findSkin(skinName);
+//    if (!skin) throw "Skin not found: " + skinName;
+//    this.setSkin(skin);
+//};
+//
+///** Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}.
+// * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was
+// * no old skin, each slot's setup mode attachment is attached from the new skin.
+// * @param newSkin May be null. */
+//Skeleton2D.prototype.setSkin = function (newSkin) {
+//    if (newSkin) {
+//        if (this.skin)
+//            newSkin._attachAll(this, this.skin);
+//        else {
+//            var slots = this.slots;
+//            for (var i = 0, n = slots.length; i < n; i++) {
+//                var slot = slots[i];
+//                var name = slot.data.attachmentName;
+//                if (name) {
+//                    var attachment = newSkin.getAttachment(i, name);
+//                    if (attachment) slot.setAttachment(attachment);
+//                }
+//            }
+//        }
+//    }
+//    this.skin = newSkin;
+//};
 
 /** @return May be null. */
 Skeleton2D.prototype.getAttachmentBySlotName = function (slotName, attachmentName) {
@@ -562,11 +590,20 @@ Skeleton2D.prototype.getAttachmentBySlotName = function (slotName, attachmentNam
 
 /** @return May be null. */
 Skeleton2D.prototype.getAttachmentBySlotIndex = function (slotIndex, attachmentName) {
-    if (this.skin) {
-        var attachment = this.skin.getAttachment(slotIndex, attachmentName);
-        if (attachment) return attachment;
+    //if (this.skin) {
+    //    var attachment = this.skin.getAttachment(slotIndex, attachmentName);
+    //    if (attachment) return attachment;
+    //}
+    //if (this.data.defaultSkin) return this.data.defaultSkin.getAttachment(slotIndex, attachmentName);
+
+    var slotData = this.data.slots[slotIndex];
+    var skinName = slotData.skinName;
+    if (skinName) {
+        var skinData = this.data.findSkin(skinName);
+        if (skinData) {
+            return skinData.getAttachment(slotIndex, attachmentName);
+        }
     }
-    if (this.data.defaultSkin) return this.data.defaultSkin.getAttachment(slotIndex, attachmentName);
     return null;
 };
 

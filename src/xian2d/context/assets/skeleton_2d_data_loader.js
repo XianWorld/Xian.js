@@ -19,6 +19,7 @@ var TranslateTimeline2DData = Animation2DData.TranslateTimeline2DData;
 var ScaleTimeline2DData = Animation2DData.ScaleTimeline2DData;
 var ColorTimeline2DData = Animation2DData.ColorTimeline2DData;
 var AttachmentTimeline2DData = Animation2DData.AttachmentTimeline2DData;
+var DrawOrderTimeline2DData = Animation2DData.DrawOrderTimeline2DData;
 
 var util = require("../../../base/util");
 var ajax = util.ajax;
@@ -81,6 +82,7 @@ Skeleton2DDataLoader.prototype.init = function(asset){
     }
     catch (e){
         this.emit("errorInit", this, asset, e);
+        console.log(e);
         console.log(e.stack);
     }
 
@@ -196,11 +198,15 @@ Skeleton2DDataLoader.prototype.readSkeletonData = function (root, name) {
         for (var slotName in skinMap) {
             if (!skinMap.hasOwnProperty(slotName)) continue;
             var slotIndex = skeletonData.findSlotIndex(slotName);
+            var slotData = skeletonData.slots[slotIndex];
+            slotData.skinName = skinName;
             var slotEntry = skinMap[slotName];
             for (var attachmentName in slotEntry) {
                 if (!slotEntry.hasOwnProperty(attachmentName)) continue;
                 var attachment = this.readAttachment(skin, attachmentName, slotEntry[attachmentName]);
-                if (attachment) skin.addAttachment(slotIndex, attachmentName, attachment);
+                if (attachment) {
+                    skin.addAttachment(slotIndex, attachmentName, attachment);
+                }
             }
         }
         skeletonData.skins.push(skin);
@@ -351,10 +357,19 @@ Skeleton2DDataLoader.prototype.readAnimation = function (name, map, skeletonData
                 for (var i = 0, n = values.length; i < n; i++) {
                     var valueMap = values[i];
                     var color = valueMap["color"];
-                    var r = this.toColor(color, 0);
-                    var g = this.toColor(color, 1);
-                    var b = this.toColor(color, 2);
-                    var a = this.toColor(color, 3);
+                    var r, g, b,a;
+                    if(color){
+                        r = this.toColor(color, 0);
+                        g = this.toColor(color, 1);
+                        b = this.toColor(color, 2);
+                        a = this.toColor(color, 3);
+                    }
+                    else{
+                        r = valueMap.r;
+                        g = valueMap.g;
+                        b = valueMap.b;
+                        a = valueMap.a;
+                    }
                     timeline.setFrame(frameIndex, valueMap["time"], r, g, b, a);
                     this.readCurve(timeline, frameIndex, valueMap);
                     frameIndex++;
@@ -374,6 +389,17 @@ Skeleton2DDataLoader.prototype.readAnimation = function (name, map, skeletonData
                 timelines.push(timeline);
                 duration = Math.max(duration, timeline.frames[timeline.getFrameCount() - 1]);
 
+            } else if (timelineName == "drawOrder") {
+                var timeline = new DrawOrderTimeline2DData().init(values.length);
+                timeline.slotIndex = slotIndex;
+
+                var frameIndex = 0;
+                for (var i = 0, n = values.length; i < n; i++) {
+                    var valueMap = values[i];
+                    timeline.setFrame(frameIndex++, valueMap["time"], valueMap["index"]);
+                }
+                timelines.push(timeline);
+                duration = Math.max(duration, timeline.frames[timeline.getFrameCount()*2 - 2]);
             } else
                 throw "Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")";
         }
@@ -402,7 +428,7 @@ Skeleton2DDataLoader.prototype.readAnimation = function (name, map, skeletonData
                     frameIndex++;
                 }
                 timelines.push(timeline);
-                duration = Math.max(duration, timeline.frames[timeline.getFrameCount() * 2 - 2]);
+                duration = Math.max(duration, timeline.frames[timeline.getFrameCount() * 4 - 4]);
 
             } else if (timelineName == "translate" || timelineName == "scale") {
                 var timeline;

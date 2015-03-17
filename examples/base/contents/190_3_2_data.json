@@ -188,13 +188,6 @@
 							"skewX": 2.25,
 							"skewY": 2.25
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"arm-right": {
@@ -448,13 +441,6 @@
 							"skewX": 11.51,
 							"skewY": -2
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"tail": {
@@ -515,28 +501,6 @@
 							"angle": 13.76,
 							"skewX": 13.77,
 							"skewY": 13.76
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1.01,
-							"y": 1.01
-						},
-						{
-							"time": 0.08,
-							"x": 1,
-							"y": 1
-						},
-						{
-							"time": 0.16,
-							"x": 1.01,
-							"y": 1.01
-						},
-						{
-							"time": 0.24,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -625,16 +589,6 @@
 					"scale": [
 						{
 							"time": 0,
-							"x": 1.13,
-							"y": 1.18
-						},
-						{
-							"time": 0.08,
-							"x": 1.13,
-							"y": 1.19
-						},
-						{
-							"time": 0.12,
 							"x": 1.13,
 							"y": 1.18
 						},
@@ -744,6 +698,120 @@
 							"time": 0,
 							"x": 1.1,
 							"y": 1.1
+						}
+					]
+				}
+			},
+			"slots": {
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 21"
+						}
+					]
+				},
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 17"
+						}
+					]
+				},
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 14"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
 						}
 					]
 				}
@@ -888,13 +956,6 @@
 							"skewX": -4.01,
 							"skewY": -3.75
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"body": {
@@ -955,13 +1016,6 @@
 							"angle": null,
 							"skewX": 13.76,
 							"skewY": 16.52
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -1041,16 +1095,6 @@
 							"time": 0,
 							"x": 1.08,
 							"y": 1.13
-						},
-						{
-							"time": 0.12,
-							"x": 1.07,
-							"y": 1.13
-						},
-						{
-							"time": 0.16,
-							"x": 1.08,
-							"y": 1.13
 						}
 					]
 				},
@@ -1075,11 +1119,6 @@
 							"time": 0.16,
 							"x": 3.3,
 							"y": -10.4
-						},
-						{
-							"time": 0.2,
-							"x": 5.1,
-							"y": -8.9
 						},
 						{
 							"time": 0.24,
@@ -1139,26 +1178,6 @@
 					"scale": [
 						{
 							"time": 0,
-							"x": 0.86,
-							"y": 0.86
-						},
-						{
-							"time": 0.12,
-							"x": 0.86,
-							"y": 0.85
-						},
-						{
-							"time": 0.16,
-							"x": 0.87,
-							"y": 0.86
-						},
-						{
-							"time": 0.2,
-							"x": 0.86,
-							"y": 0.85
-						},
-						{
-							"time": 0.24,
 							"x": 0.86,
 							"y": 0.86
 						}
@@ -1324,6 +1343,120 @@
 						}
 					]
 				}
+			},
+			"slots": {
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 39"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 24"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 14"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
+						}
+					]
+				}
 			}
 		},
 		"Course_5": {
@@ -1392,26 +1525,6 @@
 						{
 							"time": 0,
 							"x": 0.98,
-							"y": 0.99
-						},
-						{
-							"time": 0.08,
-							"x": 0.99,
-							"y": 0.98
-						},
-						{
-							"time": 0.16,
-							"x": 0.98,
-							"y": 0.99
-						},
-						{
-							"time": 0.24,
-							"x": 0.99,
-							"y": 0.98
-						},
-						{
-							"time": 0.28,
-							"x": 0.99,
 							"y": 0.99
 						}
 					]
@@ -1483,16 +1596,6 @@
 							"y": 1.21
 						},
 						{
-							"time": 0.08,
-							"x": 1.12,
-							"y": 1.22
-						},
-						{
-							"time": 0.16,
-							"x": 1.13,
-							"y": 1.21
-						},
-						{
 							"time": 0.24,
 							"x": 1.12,
 							"y": 0.92
@@ -1538,13 +1641,6 @@
 							"angle": 11.51,
 							"skewX": 11.51,
 							"skewY": 11.51
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -1607,13 +1703,6 @@
 							"skewX": -11.76,
 							"skewY": -176.75
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"leg-left": {
@@ -1627,11 +1716,6 @@
 							"time": 0.12,
 							"x": -0.55,
 							"y": -6.2
-						},
-						{
-							"time": 0.16,
-							"x": 0.5,
-							"y": -5.8
 						},
 						{
 							"time": 0.24,
@@ -1730,11 +1814,6 @@
 							"time": 0.24,
 							"x": 3.4,
 							"y": -7.8
-						},
-						{
-							"time": 0.28,
-							"x": 4.7,
-							"y": -6.35
 						}
 					],
 					"rotate": [
@@ -1885,6 +1964,120 @@
 						}
 					]
 				}
+			},
+			"slots": {
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 48"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 46"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 42"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
+						}
+					]
+				}
 			}
 		},
 		"Course_2": {
@@ -1948,13 +2141,6 @@
 							"skewX": 0,
 							"skewY": 0
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"arm-right": {
@@ -2015,28 +2201,6 @@
 							"angle": 70.22,
 							"skewX": 70.22,
 							"skewY": 70.22
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.08,
-							"x": 1,
-							"y": 1
-						},
-						{
-							"time": 0.16,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.24,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -2099,13 +2263,6 @@
 							"skewX": -2,
 							"skewY": 1.5
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"arm-left": {
@@ -2167,18 +2324,6 @@
 							"skewX": -96,
 							"skewY": -96
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.08,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"leg-left": {
@@ -2202,11 +2347,6 @@
 							"time": 0.24,
 							"x": 6.2,
 							"y": -11.45
-						},
-						{
-							"time": 0.28,
-							"x": 6.1,
-							"y": -13
 						}
 					],
 					"rotate": [
@@ -2380,11 +2520,6 @@
 							"time": 0.24,
 							"x": -9.1,
 							"y": -21.25
-						},
-						{
-							"time": 0.28,
-							"x": -7.8,
-							"y": -19.95
 						}
 					],
 					"rotate": [
@@ -2418,13 +2553,6 @@
 							"skewX": 57.43,
 							"skewY": 57.43
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1.01,
-							"y": 1.01
-						}
 					]
 				},
 				"shadow": {
@@ -2448,6 +2576,120 @@
 							"time": 0,
 							"x": 0.96,
 							"y": 0.96
+						}
+					]
+				}
+			},
+			"slots": {
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 68"
+						}
+					]
+				},
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 57"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 56"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 53"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 14"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
 						}
 					]
 				}
@@ -2514,13 +2756,6 @@
 							"skewX": 123.33,
 							"skewY": -56.67
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1.01,
-							"y": 1.01
-						}
 					]
 				},
 				"arm-left": {
@@ -2581,28 +2816,6 @@
 							"angle": 70.22,
 							"skewX": 70.22,
 							"skewY": 70.22
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.08,
-							"x": 1,
-							"y": 1
-						},
-						{
-							"time": 0.16,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.24,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -2665,13 +2878,6 @@
 							"skewX": -2,
 							"skewY": 1.5
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"arm-right": {
@@ -2733,18 +2939,6 @@
 							"skewX": -96,
 							"skewY": -96
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.08,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"leg-right": {
@@ -2768,11 +2962,6 @@
 							"time": 0.24,
 							"x": 6.2,
 							"y": -11.45
-						},
-						{
-							"time": 0.28,
-							"x": 6.1,
-							"y": -13
 						}
 					],
 					"rotate": [
@@ -2984,13 +3173,6 @@
 							"skewX": 0,
 							"skewY": 0
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 0.99,
-							"y": 0.99
-						}
 					]
 				},
 				"shadow": {
@@ -3014,6 +3196,120 @@
 							"time": 0,
 							"x": 0.96,
 							"y": 0.96
+						}
+					]
+				}
+			},
+			"slots": {
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 14"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 57"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 79"
+						}
+					]
+				},
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 53"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 77"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
 						}
 					]
 				}
@@ -3060,13 +3356,6 @@
 							"skewX": 3.25,
 							"skewY": 3.25
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"arm-left": {
@@ -3107,13 +3396,6 @@
 							"angle": null,
 							"skewX": 3.25,
 							"skewY": -176.75
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -3213,6 +3495,120 @@
 						}
 					]
 				}
+			},
+			"slots": {
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 48"
+						}
+					]
+				},
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 46"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 42"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
+						}
+					]
+				}
 			}
 		},
 		"Statique_0": {
@@ -3231,13 +3627,6 @@
 							"angle": 2.25,
 							"skewX": 2.25,
 							"skewY": 2.25
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -3352,13 +3741,6 @@
 							"skewX": 13.52,
 							"skewY": 13.26
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"arm-left": {
@@ -3400,12 +3782,119 @@
 							"skewX": 0,
 							"skewY": 0
 						}
-					],
-					"scale": [
+					]
+				}
+			},
+			"slots": {
+				"head": {
+					"drawOrder": [
 						{
 							"time": 0,
-							"x": 0.99,
-							"y": 0.99
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 21"
+						}
+					]
+				},
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 17"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 14"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
 						}
 					]
 				}
@@ -3476,13 +3965,6 @@
 							"skewX": 5.5,
 							"skewY": 5.5
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"body": {
@@ -3500,13 +3982,6 @@
 							"skewX": -2,
 							"skewY": 1.31
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"arm-right": {
@@ -3523,13 +3998,6 @@
 							"angle": -30.57,
 							"skewX": -30.56,
 							"skewY": -30.57
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -3605,6 +4073,120 @@
 						}
 					]
 				}
+			},
+			"slots": {
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 48"
+						}
+					]
+				},
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 77"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 57"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 79"
+						}
+					]
+				},
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 53"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
+						}
+					]
+				}
 			}
 		},
 		"Statique_2": {
@@ -3624,13 +4206,6 @@
 							"skewX": 0,
 							"skewY": 0
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"arm-right": {
@@ -3647,13 +4222,6 @@
 							"angle": 5.5,
 							"skewX": 5.5,
 							"skewY": 5.5
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -3672,13 +4240,6 @@
 							"skewX": -2,
 							"skewY": 1.31
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"arm-left": {
@@ -3695,13 +4256,6 @@
 							"angle": -30.57,
 							"skewX": -30.56,
 							"skewY": -30.57
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -3768,13 +4322,6 @@
 							"skewX": 36.09,
 							"skewY": 36.09
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1.01,
-							"y": 1.01
-						}
 					]
 				},
 				"shadow": {
@@ -3798,6 +4345,120 @@
 							"time": 0,
 							"x": 0.96,
 							"y": 0.96
+						}
+					]
+				}
+			},
+			"slots": {
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 68"
+						}
+					]
+				},
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 57"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 56"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 53"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 14"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
 						}
 					]
 				}
@@ -3891,13 +4552,6 @@
 							"angle": null,
 							"skewX": 31.32,
 							"skewY": -143.66
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 0.99,
-							"y": 0.99
 						}
 					]
 				},
@@ -3997,6 +4651,120 @@
 						}
 					]
 				}
+			},
+			"slots": {
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 39"
+						}
+					]
+				},
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 24"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 86"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 14"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
+						}
+					]
+				}
 			}
 		},
 		"Marche_0": {
@@ -4035,13 +4803,6 @@
 							"angle": 2.25,
 							"skewX": 2.25,
 							"skewY": 2.25
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -4170,11 +4931,6 @@
 							"time": 0.28,
 							"x": 0,
 							"y": -14.35
-						},
-						{
-							"time": 0.32,
-							"x": 0.95,
-							"y": -13.1
 						},
 						{
 							"time": 0.36,
@@ -4339,13 +5095,6 @@
 							"skewX": 11.51,
 							"skewY": -2
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"tail": {
@@ -4418,28 +5167,6 @@
 							"skewX": 13.77,
 							"skewY": 13.76
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1.01,
-							"y": 1.01
-						},
-						{
-							"time": 0.12,
-							"x": 1,
-							"y": 1
-						},
-						{
-							"time": 0.24,
-							"x": 1.01,
-							"y": 1.01
-						},
-						{
-							"time": 0.36,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"leg-left": {
@@ -4473,11 +5200,6 @@
 							"time": 0.24,
 							"x": 4.4,
 							"y": -21.7
-						},
-						{
-							"time": 0.28,
-							"x": 3.7,
-							"y": -20.05
 						},
 						{
 							"time": 0.32,
@@ -4560,16 +5282,6 @@
 					"scale": [
 						{
 							"time": 0,
-							"x": 1.13,
-							"y": 1.18
-						},
-						{
-							"time": 0.12,
-							"x": 1.13,
-							"y": 1.19
-						},
-						{
-							"time": 0.16,
 							"x": 1.13,
 							"y": 1.18
 						},
@@ -4695,6 +5407,120 @@
 							"time": 0,
 							"x": 1.1,
 							"y": 1.1
+						}
+					]
+				}
+			},
+			"slots": {
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 21"
+						}
+					]
+				},
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 17"
+						}
+					]
+				},
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 14"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
 						}
 					]
 				}
@@ -4839,13 +5665,6 @@
 							"skewX": -4.01,
 							"skewY": -3.75
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"body": {
@@ -4906,13 +5725,6 @@
 							"angle": null,
 							"skewX": 13.76,
 							"skewY": 16.52
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -5014,21 +5826,6 @@
 							"time": 0,
 							"x": 1.08,
 							"y": 1.13
-						},
-						{
-							"time": 0.16,
-							"x": 1.07,
-							"y": 1.13
-						},
-						{
-							"time": 0.2,
-							"x": 1.08,
-							"y": 1.14
-						},
-						{
-							"time": 0.24,
-							"x": 1.08,
-							"y": 1.13
 						}
 					]
 				},
@@ -5112,21 +5909,6 @@
 					"scale": [
 						{
 							"time": 0,
-							"x": 0.86,
-							"y": 0.86
-						},
-						{
-							"time": 0.24,
-							"x": 0.87,
-							"y": 0.86
-						},
-						{
-							"time": 0.32,
-							"x": 0.86,
-							"y": 0.85
-						},
-						{
-							"time": 0.36,
 							"x": 0.86,
 							"y": 0.86
 						}
@@ -5325,6 +6107,120 @@
 						}
 					]
 				}
+			},
+			"slots": {
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 39"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 24"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 14"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
+						}
+					]
+				}
 			}
 		},
 		"Marche_5": {
@@ -5337,29 +6233,14 @@
 							"y": -10.8
 						},
 						{
-							"time": 0.04,
-							"x": 9.2,
-							"y": -9
-						},
-						{
 							"time": 0.12,
 							"x": 9.2,
 							"y": -5.25
 						},
 						{
-							"time": 0.16,
-							"x": 9.1,
-							"y": -7.1
-						},
-						{
 							"time": 0.24,
 							"x": 9.1,
 							"y": -10.8
-						},
-						{
-							"time": 0.28,
-							"x": 9.2,
-							"y": -9
 						},
 						{
 							"time": 0.36,
@@ -5426,36 +6307,6 @@
 						{
 							"time": 0,
 							"x": 0.98,
-							"y": 0.99
-						},
-						{
-							"time": 0.04,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.12,
-							"x": 0.99,
-							"y": 0.98
-						},
-						{
-							"time": 0.24,
-							"x": 0.98,
-							"y": 0.99
-						},
-						{
-							"time": 0.28,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.36,
-							"x": 0.99,
-							"y": 0.98
-						},
-						{
-							"time": 0.44,
-							"x": 0.99,
 							"y": 0.99
 						}
 					]
@@ -5527,16 +6378,6 @@
 							"y": 1.21
 						},
 						{
-							"time": 0.12,
-							"x": 1.12,
-							"y": 1.22
-						},
-						{
-							"time": 0.24,
-							"x": 1.13,
-							"y": 1.21
-						},
-						{
 							"time": 0.36,
 							"x": 1.12,
 							"y": 0.92
@@ -5588,13 +6429,6 @@
 							"skewX": 11.51,
 							"skewY": 11.51
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"body": {
@@ -5603,11 +6437,6 @@
 							"time": 0,
 							"x": 8.4,
 							"y": -20.85
-						},
-						{
-							"time": 0.04,
-							"x": 8.25,
-							"y": -19.2
 						},
 						{
 							"time": 0.12,
@@ -5667,13 +6496,6 @@
 							"skewX": -11.76,
 							"skewY": -176.75
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"leg-left": {
@@ -5687,11 +6509,6 @@
 							"time": 0.12,
 							"x": -0.35,
 							"y": -6.9
-						},
-						{
-							"time": 0.24,
-							"x": 0.5,
-							"y": -5.8
 						},
 						{
 							"time": 0.36,
@@ -5760,18 +6577,8 @@
 							"y": 1
 						},
 						{
-							"time": 0.16,
-							"x": 1.05,
-							"y": 1
-						},
-						{
 							"time": 0.2,
 							"x": 1.03,
-							"y": 1
-						},
-						{
-							"time": 0.24,
-							"x": 1.02,
 							"y": 1
 						},
 						{
@@ -5792,11 +6599,6 @@
 							"time": 0,
 							"x": 7.95,
 							"y": -6.15
-						},
-						{
-							"time": 0.04,
-							"x": 6.25,
-							"y": -5.1
 						},
 						{
 							"time": 0.12,
@@ -5822,11 +6624,6 @@
 							"time": 0.36,
 							"x": 3.4,
 							"y": -7.8
-						},
-						{
-							"time": 0.44,
-							"x": 4.7,
-							"y": -6.35
 						}
 					],
 					"rotate": [
@@ -5989,6 +6786,120 @@
 						}
 					]
 				}
+			},
+			"slots": {
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 48"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 46"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 42"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 8"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
+						}
+					]
+				}
 			}
 		},
 		"Marche_2": {
@@ -6051,13 +6962,6 @@
 							"angle": 0,
 							"skewX": 0,
 							"skewY": 0
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -6142,28 +7046,6 @@
 							"skewX": 70.22,
 							"skewY": 70.22
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.12,
-							"x": 1,
-							"y": 1
-						},
-						{
-							"time": 0.24,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.36,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"body": {
@@ -6224,13 +7106,6 @@
 							"angle": null,
 							"skewX": -2,
 							"skewY": 1.5
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -6304,18 +7179,6 @@
 							"skewX": -96,
 							"skewY": -96
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.04,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"leg-left": {
@@ -6349,11 +7212,6 @@
 							"time": 0.36,
 							"x": 6.2,
 							"y": -11.45
-						},
-						{
-							"time": 0.44,
-							"x": 6.1,
-							"y": -13
 						}
 					],
 					"rotate": [
@@ -6432,24 +7290,9 @@
 							"y": -8
 						},
 						{
-							"time": 0.16,
-							"x": -7.2,
-							"y": -9.95
-						},
-						{
 							"time": 0.2,
 							"x": -6.75,
 							"y": -11.55
-						},
-						{
-							"time": 0.24,
-							"x": -6.45,
-							"y": -13.3
-						},
-						{
-							"time": 0.28,
-							"x": -6.9,
-							"y": -10.8
 						},
 						{
 							"time": 0.36,
@@ -6572,11 +7415,6 @@
 							"time": 0.36,
 							"x": -9.1,
 							"y": -21.25
-						},
-						{
-							"time": 0.44,
-							"x": -7.8,
-							"y": -19.95
 						}
 					],
 					"rotate": [
@@ -6616,13 +7454,6 @@
 							"skewX": 57.43,
 							"skewY": 57.43
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1.01,
-							"y": 1.01
-						}
 					]
 				},
 				"shadow": {
@@ -6649,6 +7480,120 @@
 						}
 					]
 				}
+			},
+			"slots": {
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 68"
+						}
+					]
+				},
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 57"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 56"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 53"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 14"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
+						}
+					]
+				}
 			}
 		},
 		"Marche_6": {
@@ -6661,29 +7606,14 @@
 							"y": -9.9
 						},
 						{
-							"time": 0.04,
-							"x": -2.05,
-							"y": -8.35
-						},
-						{
 							"time": 0.12,
 							"x": -1.45,
 							"y": -5
 						},
 						{
-							"time": 0.16,
-							"x": -1.7,
-							"y": -6.6
-						},
-						{
 							"time": 0.24,
 							"x": -2.4,
 							"y": -9.9
-						},
-						{
-							"time": 0.28,
-							"x": -2.05,
-							"y": -8.35
 						},
 						{
 							"time": 0.36,
@@ -6744,43 +7674,6 @@
 							"angle": null,
 							"skewX": 123.33,
 							"skewY": -56.67
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1.01,
-							"y": 1.01
-						},
-						{
-							"time": 0.04,
-							"x": 1,
-							"y": 1
-						},
-						{
-							"time": 0.12,
-							"x": 1.01,
-							"y": 1.01
-						},
-						{
-							"time": 0.16,
-							"x": 1,
-							"y": 1
-						},
-						{
-							"time": 0.24,
-							"x": 1.01,
-							"y": 1.01
-						},
-						{
-							"time": 0.28,
-							"x": 1,
-							"y": 1
-						},
-						{
-							"time": 0.36,
-							"x": 1.01,
-							"y": 1.01
 						}
 					]
 				},
@@ -6865,28 +7758,6 @@
 							"skewX": 70.22,
 							"skewY": 70.22
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.12,
-							"x": 1,
-							"y": 1
-						},
-						{
-							"time": 0.24,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.36,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"body": {
@@ -6947,13 +7818,6 @@
 							"angle": null,
 							"skewX": -2,
 							"skewY": 1.5
-						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 1,
-							"y": 1
 						}
 					]
 				},
@@ -7027,18 +7891,6 @@
 							"skewX": -96,
 							"skewY": -96
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 0.99,
-							"y": 0.99
-						},
-						{
-							"time": 0.04,
-							"x": 1,
-							"y": 1
-						}
 					]
 				},
 				"leg-right": {
@@ -7072,11 +7924,6 @@
 							"time": 0.36,
 							"x": 6.2,
 							"y": -11.45
-						},
-						{
-							"time": 0.44,
-							"x": 6.1,
-							"y": -13
 						}
 					],
 					"rotate": [
@@ -7155,24 +8002,9 @@
 							"y": -8
 						},
 						{
-							"time": 0.16,
-							"x": -7.2,
-							"y": -9.95
-						},
-						{
 							"time": 0.2,
 							"x": -6.75,
 							"y": -11.55
-						},
-						{
-							"time": 0.24,
-							"x": -6.45,
-							"y": -13.3
-						},
-						{
-							"time": 0.28,
-							"x": -6.9,
-							"y": -10.8
 						},
 						{
 							"time": 0.36,
@@ -7333,13 +8165,6 @@
 							"skewX": 0,
 							"skewY": 0
 						}
-					],
-					"scale": [
-						{
-							"time": 0,
-							"x": 0.99,
-							"y": 0.99
-						}
 					]
 				},
 				"shadow": {
@@ -7363,6 +8188,120 @@
 							"time": 0,
 							"x": 0.96,
 							"y": 0.96
+						}
+					]
+				}
+			},
+			"slots": {
+				"tail": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 7
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 14"
+						}
+					]
+				},
+				"arm-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 6
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 57"
+						}
+					]
+				},
+				"body": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 5
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 79"
+						}
+					]
+				},
+				"arm-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 4
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 53"
+						}
+					]
+				},
+				"leg-right": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 3
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"leg-left": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 2
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 11"
+						}
+					]
+				},
+				"head": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 1
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 77"
+						}
+					]
+				},
+				"shadow": {
+					"drawOrder": [
+						{
+							"time": 0,
+							"index": 0
+						}
+					],
+					"attachment": [
+						{
+							"time": 0,
+							"name": "sprite 3"
 						}
 					]
 				}
