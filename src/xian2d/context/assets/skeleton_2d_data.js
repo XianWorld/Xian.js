@@ -119,12 +119,13 @@ function Bone2DData(name, parent) {
 function Slot2DData(name, boneData) {
     this.name = name;
     this.boneData = boneData;
-    this.r = 1;
-    this.g = 1;
-    this.b = 1;
-    this.a = 1;
+    this.r = 0;
+    this.g = 0;
+    this.b = 0;
+    this.a = 0;
     this.attachmentName = null;
     this.additiveBlending = false;
+    this.skinName = null;
 }
 
 //function IkConstraint2DData(name) {
@@ -141,6 +142,7 @@ function SkinData (name) {
 }
 SkinData.prototype.addAttachment = function (slotIndex, name, attachment) {
     this.attachments[slotIndex + ":" + name] = attachment;
+    //this.slots[slotIndex].skinName = this.name;
     attachment.skinName = this.name;
 };
 SkinData.prototype.getAttachment = function (slotIndex, name) {

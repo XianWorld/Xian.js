@@ -114,7 +114,8 @@ var Timeline2DType = {
     translate: 1,
     scale: 2,
     color: 3,
-    attachment: 4
+    attachment: 4,
+    drawOrder: 5
 };
 
 function Timeline2DData() {
@@ -260,6 +261,23 @@ AttachmentTimeline2DData.prototype.setFrame = function (frameIndex, time, attach
     this.attachmentNames[frameIndex] = attachmentName;
 };
 
+function DrawOrderTimeline2DData() {
+    Timeline2DData.call(this);
+    this.type = Timeline2DType.drawOrder;
+    this.slotIndex = 0;
+}
+Timeline2DData.extend(DrawOrderTimeline2DData);
+DrawOrderTimeline2DData.prototype.init = function (frameCount) {
+    Timeline2DData.prototype.init.call(this, frameCount);
+    this.frames.length = frameCount * 2;
+    return this;
+};
+DrawOrderTimeline2DData.prototype.setFrame = function (frameIndex, time, index) {
+    frameIndex *= 2;
+    this.frames[frameIndex] = time;
+    this.frames[frameIndex + 1] = index;
+};
+
 function AnimationState2DData(skeletonData) {
     this.skeletonData = skeletonData;
     this.animationToMixTime = {};
@@ -288,6 +306,7 @@ Animation2DData.TranslateTimeline2DData = TranslateTimeline2DData;
 Animation2DData.ScaleTimeline2DData = ScaleTimeline2DData;
 Animation2DData.ColorTimeline2DData = ColorTimeline2DData;
 Animation2DData.AttachmentTimeline2DData = AttachmentTimeline2DData;
+Animation2DData.DrawOrderTimeline2DData = DrawOrderTimeline2DData;
 
 Animation2DData.AnimationState2DData = AnimationState2DData;
 

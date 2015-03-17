@@ -181,7 +181,7 @@ SkinPart2D.prototype.apply = function () {
     var skin = this.skin;
     var skeleton = skin.animator.skeleton;
 
-    if(!skeleton) return;
+    if(!skeleton || !skeleton.ready) return;
     var skeletonData = skeleton.data;
     var skinData;
     skinData = skeletonData.findSkin(this.name);
