@@ -147,6 +147,8 @@ AnimationState2D.prototype.apply = function (skeleton) {
         var loop = current.loop;
         if (!loop && time > endTime) time = endTime;
 
+        console.log(current.animation.name+": "+time+", "+lastTime+", "+endTime);
+
         var previous = current.previous;
         if (!previous) {
             if (current.mix == 1)

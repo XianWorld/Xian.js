@@ -126,9 +126,9 @@ Skeleton2D.prototype.setSlotDrawOrder = function (slotIndex, index) {
     var drawOrder = this.drawOrder;
     var oldSlot = drawOrder[index];
     var newSlot = this.slots[slotIndex];
-    if(oldSlot == newSlot)
+    if (oldSlot == newSlot)
         return false;
-    console.log(oldSlot.data.name + "->" + newSlot.data.name);
+    //console.log(oldSlot.data.name + "->" + newSlot.data.name);
     drawOrder[index] = newSlot;
     this._dirty_drawOrder = true;
     return true;
@@ -138,6 +138,8 @@ Skeleton2D.prototype.update = function () {
     if (!this.ready) return;
 
     this.updateWorldTransform();
+
+    console.log("-------------------------------------------");
 
     var _dirty_drawOrder = this._dirty_drawOrder;
     var animatorTransform = this.animator.transform;
@@ -211,12 +213,16 @@ Skeleton2D.prototype.update = function () {
                 transform.skewY = (bone.worldSkewY * TO_RADS);
             }
             if (spriteGameObject && spriteGameObject.sprite2d) {
-
                 if (slot.a > 0)
                     spriteGameObject.sprite2d.tint = (slot.a * 255 << 24) + (slot.r * 255 << 16) + (slot.g * 255 << 8) + slot.b * 255;//Color.rgb2hex([slot.r,slot.g,slot.b]);
                 else
                     spriteGameObject.sprite2d.tint = 0;
             }
+            console.log(slot.data.name + " : " + spriteName
+                + "(" + bone.worldX + ", " + bone.worldY + ")"
+                + "(" + bone.worldScaleX + ", " + bone.worldScaleY + ")"
+                + "(" + bone.worldSkewX + ", " + bone.worldSkewY + ")"
+            );
         }
         //else if (type === AttachmentType.skinnedmesh)
         //{
