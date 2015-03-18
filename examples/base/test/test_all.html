@@ -54,6 +54,25 @@
             else if(Input.keyDown('down')){
                 state.setAnimationByName(0, "Marche_2", true);
             }
+            else if(Input.keyDown('space')){
+//                gameObject.skeletonAnimation2d.updateTime(0.04);
+                gameObject.skeletonAnimation2d.autoPlay = !gameObject.skeletonAnimation2d.autoPlay;
+            }
+            else if(Input.keyDown('0')){
+                state.setAnimationByName(0, "Marche_0", true);
+            }
+            else if(Input.keyDown('1')){
+                state.setAnimationByName(0, "Marche_1", true);
+            }
+            else if(Input.keyDown('2')){
+                state.setAnimationByName(0, "Marche_2", true);
+            }
+            else if(Input.keyDown('5')){
+                state.setAnimationByName(0, "Marche_5", true);
+            }
+            else if(Input.keyDown('6')){
+                state.setAnimationByName(0, "Marche_6", true);
+            }
 
 //            var gameObject = GameObject.Find('root');
 //            if(!gameObject) return;
@@ -301,11 +320,12 @@
                     '_className': 'SkeletonAnimation2D',
                     'skin': {
                         'skinParts':{
-                            'default': '190_3_1.json'
+//                            'default': '190_3_1.json'
+                            'default': 'dog.json'
                         }
                     },
                     'skeleton': {
-                        'skeletonData': "190_3_2_data.json"
+                        'skeletonData': "dog_skeleton.json"
                     }
                 }
             ]

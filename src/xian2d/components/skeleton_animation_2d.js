@@ -33,7 +33,7 @@ function SkeletonAnimation2D() {
     Behaviour.call(this);
 
     //this._skeletonData = undefined;
-
+    this.autoPlay = true;
     this.skeleton = new Skeleton2D();
     this.skin = new Skin2D();
 
@@ -105,6 +105,7 @@ SkeletonAnimation2D.prototype.fromJSON = function (json) {
 
 SkeletonAnimation2D.prototype.update = function()
 {
+    if(!this.autoPlay) return;
     if(!this.skeleton.ready) return;
 
     //this.lastTime = this.lastTime || Date.now();
@@ -118,5 +119,19 @@ SkeletonAnimation2D.prototype.update = function()
     this.skeleton.update();
 };
 
+SkeletonAnimation2D.prototype.updateTime = function(timeDelta)
+{
+    if(!this.skeleton.ready) return;
+
+    //this.lastTime = this.lastTime || Date.now();
+    //var timeDelta = (Date.now() - this.lastTime) * 0.001;
+    //this.lastTime = Date.now();
+    //var timeDelta = Time.delta;// * 0.001;
+
+    this.animationState.update(timeDelta);
+    this.animationState.apply(this.skeleton);
+
+    this.skeleton.update();
+};
 
 module.exports = SkeletonAnimation2D;
