@@ -3,6 +3,7 @@
  */
 var Device = require('./device/device');
 var Input = require('./input/input');
+var Handler = require('./input/handler');
 var Time = require('./time/time');
 var Loop = require('./time/loop');
 var NetContext = require('./net/socket.io');
@@ -44,6 +45,7 @@ MainContext.prototype.init = function()
     this.ScreenContext.init();
     this.GraphicsContext.init();
     //this.Input.init();
+    Handler.setElement(this.ScreenContext.rootDiv);
     return this;
 };
 
@@ -52,6 +54,7 @@ MainContext.prototype.update = function()
     this.Time.update();
     this.Assets.update();
     this.ObjectPools.update();
+    this.Input.update();
 
     return this;
 };

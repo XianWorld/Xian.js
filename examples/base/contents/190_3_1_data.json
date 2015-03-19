@@ -1,0 +1,147 @@
+{
+	"bones": [
+		{
+			"name": "head",
+			"x": -0.1,
+			"y": -19.7
+		},
+		{
+			"name": "tail",
+			"x": -2.65,
+			"y": -7.7,
+			"rotation": 36.09,
+			"skewX": 36.09,
+			"skewY": 36.09
+		},
+		{
+			"name": "body",
+			"x": -12.85,
+			"y": -29.95,
+			"rotation": null,
+			"skewX": -2,
+			"skewY": 1.31
+		},
+		{
+			"name": "arm-left",
+			"x": 7,
+			"y": -11.65,
+			"rotation": -30.57,
+			"skewX": -30.56,
+			"skewY": -30.57
+		},
+		{
+			"name": "arm-right",
+			"x": -6.95,
+			"y": -13.55,
+			"rotation": 5.5,
+			"skewX": 5.5,
+			"skewY": 5.5
+		},
+		{
+			"name": "leg-left",
+			"x": 6.4,
+			"y": -7.25,
+			"rotation": null,
+			"skewX": 6.44,
+			"skewY": -175.77
+		},
+		{
+			"name": "leg-right",
+			"x": -6.15,
+			"y": -7.4,
+			"rotation": null,
+			"scaleY": 1.1,
+			"skewX": -6.43,
+			"skewY": -4.23
+		},
+		{
+			"name": "shadow",
+			"x": 0.1,
+			"y": -0.5
+		}
+	],
+	"slots": [
+		{
+			"name": "shadow",
+			"bone": "shadow",
+			"attachment": "sprite 3"
+		},
+		{
+			"name": "tail",
+			"bone": "tail",
+			"attachment": "sprite 14"
+		},
+		{
+			"name": "leg-right",
+			"bone": "leg-right",
+			"attachment": "sprite 11"
+		},
+		{
+			"name": "leg-left",
+			"bone": "leg-left",
+			"attachment": "sprite 11"
+		},
+		{
+			"name": "arm-left",
+			"bone": "arm-left",
+			"attachment": "sprite 53"
+		},
+		{
+			"name": "body",
+			"bone": "body",
+			"attachment": "sprite 56"
+		},
+		{
+			"name": "arm-right",
+			"bone": "arm-right",
+			"attachment": "sprite 57"
+		},
+		{
+			"name": "head",
+			"bone": "head",
+			"attachment": "sprite 68"
+		}
+	],
+	"skins": {
+		"default": {
+			"head": {
+				"sprite 21": {},
+				"sprite 39": {},
+				"sprite 46": {},
+				"sprite 68": {},
+				"sprite 77": {}
+			},
+			"tail": {
+				"sprite 14": {},
+				"sprite 48": {}
+			},
+			"body": {
+				"sprite 17": {},
+				"sprite 24": {},
+				"sprite 42": {},
+				"sprite 56": {},
+				"sprite 79": {}
+			},
+			"arm-left": {
+				"sprite 8": {},
+				"sprite 53": {},
+				"sprite 57": {}
+			},
+			"arm-right": {
+				"sprite 8": {},
+				"sprite 57": {},
+				"sprite 53": {}
+			},
+			"leg-left": {
+				"sprite 11": {}
+			},
+			"leg-right": {
+				"sprite 11": {},
+				"sprite 86": {}
+			},
+			"shadow": {
+				"sprite 3": {}
+			}
+		}
+	}
+}

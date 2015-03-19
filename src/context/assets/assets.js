@@ -13,7 +13,7 @@ function Assets() {
 
     this.assetHash = {};
 
-    this.assets = [[],[],[],[],[]];
+    this.assets = [[],[],[],[],[],[]];
     this._noneAssets = this.assets[Asset.AssetState.NONE];
     this._loadingAssets = this.assets[Asset.AssetState.LOADING];
     this._loadedAssets = this.assets[Asset.AssetState.LOADED];

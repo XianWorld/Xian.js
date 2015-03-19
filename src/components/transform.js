@@ -42,8 +42,14 @@ Transform.prototype.clear = function () {
     Component.prototype.clear.call(this);
     var children = this.children,
         i = children.length;
+    var child;
 
-    while (i--) this.removeChild(children[i]);
+    while (i--) {
+        child = children[i];
+        this.removeChild(child);
+        //If a transform is cleared, it's children will be destroyed.
+        if(child.gameObject) child.gameObject.destroy();
+    }
 
     this.root = this;
     this.depth = 0;
@@ -117,6 +123,29 @@ Transform.prototype.addChild = function (child) {
     return this;
 };
 
+Transform.prototype.moveToTop = function (child) {
+    var i;
+    var children = this.children;
+
+    i = children.indexOf(child);
+    if(i < 0) return false;
+
+    children.splice(i, 1);
+    children.unshift(child);
+    return true;
+};
+
+Transform.prototype.moveToBottom = function (child) {
+    var i;
+    var children = this.children;
+
+    i = children.indexOf(child);
+    if(i < 0) return false;
+
+    children.splice(i, 1);
+    children.push(child);
+    return true;
+};
 
 Transform.prototype.addChildren = function () {
     var i, il, scene;
